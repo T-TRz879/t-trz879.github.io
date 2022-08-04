@@ -367,20 +367,11 @@
                 
                 
                 
-                <a href="/categories/JuiceFS/" title="JuiceFS: 6">
+                <a href="/categories/JuiceFS/" title="JuiceFS: 8">
                     <span class="chip center-align waves-effect waves-light
                              chip-active "
                             style="background-color: #F9EBEA;">JuiceFS
-                        <span class="tag-length">6</span>
-                    </span>
-                </a>
-                
-                
-                <a href="/categories/Homebrew/" title="Homebrew: 1">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-default "
-                            style="background-color: #F5EEF8;">Homebrew
-                        <span class="tag-length">1</span>
+                        <span class="tag-length">8</span>
                     </span>
                 </a>
                 
@@ -388,7 +379,16 @@
                 <a href="/categories/Jna/" title="Jna: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #D5F5E3;">Jna
+                            style="background-color: #F5EEF8;">Jna
+                        <span class="tag-length">1</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/categories/Homebrew/" title="Homebrew: 1">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            style="background-color: #D5F5E3;">Homebrew
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -404,6 +404,108 @@
 
     <article id="articles" class="container articles">
         <div class="row tags-posts">
+            
+            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2022/08/04/openfiles/">
+                        <div class="card-image tag-image">
+                            
+                            
+                            <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="JuiceFS中Attr缓存">
+                            
+                            <span class="card-title">JuiceFS中Attr缓存</span>
+                        </div>
+                    </a>
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                openfilesopenfiles持有所有打开文件的openFile
+每次使用openfiles过程中都会对其上锁
+type openfiles struct {
+    sync.Mutex
+    expire time.Durati
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-08-04
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/JuiceFS/" class="post-category">
+                                    JuiceFS
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/Attr%E7%BC%93%E5%AD%98/">
+                            <span class="chip bg-color">Attr缓存</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2022/07/28/JuiceFS%E4%B8%AD%E7%9A%84%E5%88%A0%E9%99%A4/">
+                        <div class="card-image tag-image">
+                            
+                            
+                            <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="JuiceFS中的删除">
+                            
+                            <span class="card-title">JuiceFS中的删除</span>
+                        </div>
+                    </a>
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                JuiceFS删除文件时会经历以下过程
+删除时判断文件是否被其它终端或用户打开，那么会调用延迟删除，将inode添加入removeFilesMap中，当其它人关闭文件时，会调用删除逻辑
+获取inode的每个c&amp;inode_indx的
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-07-28
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/JuiceFS/" class="post-category">
+                                    JuiceFS
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/%E5%88%A0%E9%99%A4/">
+                            <span class="chip bg-color">删除</span>
+                        </a>
+                        
+                        <a href="/tags/%E5%9B%9E%E6%94%B6%E7%AB%99/">
+                            <span class="chip bg-color">回收站</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
@@ -558,12 +660,12 @@ Linux：&#x2F;var&#
                             <span class="chip bg-color">Go</span>
                         </a>
                         
-                        <a href="/tags/Cache/">
-                            <span class="chip bg-color">Cache</span>
-                        </a>
-                        
                         <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
                             <span class="chip bg-color">分布式文件系统</span>
+                        </a>
+                        
+                        <a href="/tags/Cache/">
+                            <span class="chip bg-color">Cache</span>
                         </a>
                         
                     </div>
@@ -670,12 +772,12 @@ Linux：&#x2F;var&#
                             <span class="chip bg-color">Go</span>
                         </a>
                         
-                        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
-                            <span class="chip bg-color">分布式文件系统</span>
-                        </a>
-                        
                         <a href="/tags/Read/">
                             <span class="chip bg-color">Read</span>
+                        </a>
+                        
+                        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
+                            <span class="chip bg-color">分布式文件系统</span>
                         </a>
                         
                     </div>
@@ -814,7 +916,7 @@ Linux：&#x2F;var&#
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">24.8k</span>
+                        class="white-color">28.5k</span>
             
             
             
