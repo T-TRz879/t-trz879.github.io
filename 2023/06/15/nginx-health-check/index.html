@@ -4,17 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="MacOSX使用Jna调用自定义C方法, T_TBlog">
-    <meta name="description" content="环境
-OpenJDK8 Zulu Java8
-gcc (Mac OS X自带的)
-Clion C++开发
-Idea Java开发
-
-自定义C方法C代码结构
-
-library.c#include &#34;library.h&#34;
-#include &amp;l">
+    <meta name="keywords" content="nginx-健康检测, T_TBlog">
+    <meta name="description" content="1.下载nginx从nginx官方下载地址中下载nginx，本次实验中采用nginx-1.24.0。
+2.下载nginx_upstream_check_module下载第三方模块nginx_upstream_check_module。
+根据">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -28,7 +21,7 @@ library.c#include &#34;library.h&#34;
 
     
 
-    <title>MacOSX使用Jna调用自定义C方法 | T_TBlog</title>
+    <title>nginx-健康检测 | T_TBlog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
@@ -318,12 +311,12 @@ library.c#include &#34;library.h&#34;
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">MacOSX使用Jna调用自定义C方法</h1>
+                    <h1 class="description center-align post-title">nginx-健康检测</h1>
                 </div>
             </div>
         </div>
@@ -439,8 +432,8 @@ library.c#include &#34;library.h&#34;
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/%E8%B7%A8%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8/">
-                                <span class="chip bg-color">跨语言调用</span>
+                            <a href="/tags/Health-Check/">
+                                <span class="chip bg-color">Health-Check</span>
                             </a>
                         
                     </div>
@@ -451,8 +444,8 @@ library.c#include &#34;library.h&#34;
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Jna/" class="post-category">
-                                Jna
+                            <a href="/categories/Nginx/" class="post-category">
+                                Nginx
                             </a>
                         
                     </div>
@@ -464,28 +457,28 @@ library.c#include &#34;library.h&#34;
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2022-07-10
+                    2023-06-15
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-07-10
+                    2023-06-21
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    152
+                    492
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    2 分
                 </div>
                 
 
@@ -505,43 +498,93 @@ library.c#include &#34;library.h&#34;
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
-<li>OpenJDK8 <a target="_blank" rel="noopener" href="https://www.azul.com/downloads/?version=java-8-lts&os=macos&architecture=arm-64-bit&package=jdk">Zulu Java8</a></li>
-<li>gcc (Mac OS X自带的)</li>
-<li>Clion <a target="_blank" rel="noopener" href="https://www.jetbrains.com/clion/">C++开发</a></li>
-<li>Idea <a target="_blank" rel="noopener" href="https://www.jetbrains.com/idea/">Java开发</a></li>
+                <h2 id="1-下载nginx"><a href="#1-下载nginx" class="headerlink" title="1.下载nginx"></a>1.下载nginx</h2><p>从<a target="_blank" rel="noopener" href="https://nginx.org/en/download.html">nginx官方下载地址</a>中下载nginx，本次实验中采用<a target="_blank" rel="noopener" href="https://nginx.org/download/nginx-1.24.0.tar.gz">nginx-1.24.0</a>。</p>
+<h2 id="2-下载nginx-upstream-check-module"><a href="#2-下载nginx-upstream-check-module" class="headerlink" title="2.下载nginx_upstream_check_module"></a>2.下载nginx_upstream_check_module</h2><p>下载<a target="_blank" rel="noopener" href="https://github.com/yaoweibin/nginx_upstream_check_module/releases/tag/v0.4.0">第三方模块nginx_upstream_check_module</a>。</p>
+<p>根据模块方的提示，需要根据nginx的版本来选择不同的模块版本。</p>
+<pre class=" language-sh"><code class="language-sh">    If you use nginx-1.2.1 or nginx-1.3.0, the nginx upstream round robin
+    module changed greatly. You should use the patch named
+    'check_1.2.1.patch'.
+
+    If you use nginx-1.2.2+ or nginx-1.3.1+, It added the upstream
+    least_conn module. You should use the patch named 'check_1.2.2+.patch'.
+
+    If you use nginx-1.2.6+ or nginx-1.3.9+, It adjusted the round robin
+    module. You should use the patch named 'check_1.2.6+.patch'.
+
+    If you use nginx-1.5.12+, You should use the patch named
+    'check_1.5.12+.patch'.
+</code></pre>
+<h2 id="3-安装依赖包"><a href="#3-安装依赖包" class="headerlink" title="3.安装依赖包"></a>3.安装依赖包</h2><pre class=" language-sh"><code class="language-sh"># ubuntu
+sudo apt install -y patch pcre pcre-devel zlib zlib-devel
+# centos
+sudo yum install -y patch pcre pcre-devel zlib zlib-devel
+</code></pre>
+<h2 id="4-配置health-check"><a href="#4-配置health-check" class="headerlink" title="4.配置health-check"></a>4.配置health-check</h2><p>将nginx和第三方模块放在如下目录中。</p>
+<img src="/2023/06/15/nginx-health-check/image-20230619141023600.png" alt="nginx和第三方模块" style="zoom:100%;">
+
+<pre class=" language-sh"><code class="language-sh"># 进nginx目录
+cd /root/soft/nginx/nginx-1.24.0
+
+# check_1.20.1+.patch的全路径
+patch -p1 < /root/soft/nginx/nginx_upstream_check_module-0.4.0/check_1.20.1+.patch
+cd /path/to/nginx-1.0.14
+
+./configure --with-compat --add-dynamic-module=/root/soft/nginx/nginx_upstream_check_module-0.4.0
+
+make
+sudo make install
+</code></pre>
+<p>验证nginx安装情况</p>
+<img src="/2023/06/15/nginx-health-check/image-20230619143647685.png" alt="nginx的位置">
+
+<p>配置check-health</p>
+<pre><code># nginx配置文件在/usr/local/nginx/conf/nginx.conf中
+upstream backend &#123;
+        server 10.0.16.18;
+        server 10.0.16.4;
+    # 10s一次检测 检测3次成功可用 检测三次失败不可用 超时时间1s 端口8300 类型http
+    check interval=10000 rise=3 fall=3 timeout=1000 port=8300 type=http;
+    # 2xx表示alive
+    check_http_expect_alive http_2xx;
+    check_http_send &quot;GET /health HTTP/1.0\r\n\r\n&quot;;
+    &#125;
+
+    server &#123;
+        listen 8300;
+
+        location / &#123;
+            proxy_pass http://backend;
+        &#125;
+    &#125;
+</code></pre>
+<p>nginx常用命令：</p>
+<ul>
+<li><p>启动nginx：</p>
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx
+</code></pre>
+</li>
+<li><p>停止nginx：</p>
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -s stop
+</code></pre>
+</li>
+<li><p>重载配置：</p>
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -s reload
+</code></pre>
+</li>
+<li><p>检测配置语法：</p>
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -t
+</code></pre>
+</li>
 </ul>
-<h2 id="自定义C方法"><a href="#自定义C方法" class="headerlink" title="自定义C方法"></a>自定义C方法</h2><h3 id="C代码结构"><a href="#C代码结构" class="headerlink" title="C代码结构"></a>C代码结构</h3><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710193653210.png" alt="C代码结构" style="zoom:50%;">
+<h2 id="5-测试"><a href="#5-测试" class="headerlink" title="5.测试"></a>5.测试</h2><p>查看nginx日志（日志位于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;logs中）判断是否正常check-health</p>
+<img src="/2023/06/15/nginx-health-check/image-20230619144910788.png" alt="查看nginx日志">
 
-<h3 id="library-c"><a href="#library-c" class="headerlink" title="library.c"></a>library.c</h3><pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"library.h"</span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token keyword">void</span> <span class="token function">hello</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Hello, World!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<h3 id="编译生成dylib"><a href="#编译生成dylib" class="headerlink" title="编译生成dylib"></a>编译生成dylib</h3><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710193752071.png" alt="image-20220710193752071" style="zoom:50%;">
+<p>停掉10.0.16.18:8300后</p>
+<img src="/2023/06/15/nginx-health-check/image-20230619145238621.png" alt="关闭一个server后">
 
-<h2 id="Java调用方法"><a href="#Java调用方法" class="headerlink" title="Java调用方法"></a>Java调用方法</h2><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710194240971.png" alt="Java代码结构" style="zoom:50%;">
+<p>重启10.0.16.18:8300后server恢复正常，check-health也检测到服务正常</p>
+<img src="/2023/06/15/nginx-health-check/image-20230619145645735.png" alt="重启server后">
 
-<h3 id="IDemo接口"><a href="#IDemo接口" class="headerlink" title="IDemo接口"></a>IDemo接口</h3><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 必须继承Library</span>
-<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">IDemo</span> <span class="token keyword">extends</span> <span class="token class-name">Library</span> <span class="token punctuation">{</span>
-  <span class="token comment" spellcheck="true">// test_dll是指生成的dylib文件名「不含前缀和后缀」</span>
-  <span class="token comment" spellcheck="true">// I_DEMO 用于给其他调用的对象</span>
-  IDemo I_DEMO <span class="token operator">=</span> <span class="token punctuation">(</span>IDemo<span class="token punctuation">)</span> Native<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span><span class="token string">"test_dll"</span><span class="token punctuation">,</span> IDemo<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">void</span> <span class="token function">hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<h3 id="demo方法"><a href="#demo方法" class="headerlink" title="demo方法"></a>demo方法</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">demo</span> <span class="token punctuation">{</span>
-  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// dylib文件的目录</span>
-    File file <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token string">"resources/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    String absolutePath <span class="token operator">=</span> file<span class="token punctuation">.</span><span class="token function">getAbsolutePath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">// 设置当前需要去哪里找dylib</span>
-    System<span class="token punctuation">.</span><span class="token function">setProperty</span><span class="token punctuation">(</span><span class="token string">"jna.library.path"</span><span class="token punctuation">,</span> absolutePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    IDemo<span class="token punctuation">.</span>I_DEMO<span class="token punctuation">.</span><span class="token function">hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
 
                 
             </div>
@@ -568,7 +611,7 @@ library.c#include &#34;library.h&#34;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://t-trz879.github.io/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/">https://t-trz879.github.io/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/</a>
+                    <a href="https://t-trz879.github.io/2023/06/15/nginx-health-check/">https://t-trz879.github.io/2023/06/15/nginx-health-check/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -606,8 +649,8 @@ library.c#include &#34;library.h&#34;
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/%E8%B7%A8%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8/">
-                                    <span class="chip bg-color">跨语言调用</span>
+                                <a href="/tags/Health-Check/">
+                                    <span class="chip bg-color">Health-Check</span>
                                 </a>
                             
                         </div>
@@ -1047,17 +1090,18 @@ library.c#include &#34;library.h&#34;
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2022/07/28/JuiceFS%E4%B8%AD%E7%9A%84%E5%88%A0%E9%99%A4/">
+                <a href="/2023/06/15/nginx-health-check/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="JuiceFS中的删除">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="nginx-健康检测">
                         
-                        <span class="card-title">JuiceFS中的删除</span>
+                        <span class="card-title">nginx-健康检测</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1067,30 +1111,27 @@ library.c#include &#34;library.h&#34;
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2022-07-28
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-06-15
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/JuiceFS/" class="post-category">
-                                    JuiceFS
+                            <a href="/categories/Nginx/" class="post-category">
+                                    Nginx
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%88%A0%E9%99%A4/">
-                        <span class="chip bg-color">删除</span>
-                    </a>
-                    
-                    <a href="/tags/%E5%9B%9E%E6%94%B6%E7%AB%99/">
-                        <span class="chip bg-color">回收站</span>
+                    <a href="/tags/Health-Check/">
+                        <span class="chip bg-color">Health-Check</span>
                     </a>
                     
                 </div>
@@ -1104,13 +1145,13 @@ library.c#include &#34;library.h&#34;
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2022/07/10/JuiceFS%E5%85%83%E6%95%B0%E6%8D%AE/">
+                <a href="/2023/06/15/file-system-permissions/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="JuiceFS元数据">
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="file-system-permissions">
                         
-                        <span class="card-title">JuiceFS元数据</span>
+                        <span class="card-title">file-system-permissions</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1121,14 +1162,14 @@ library.c#include &#34;library.h&#34;
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-07-10
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-06-15
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/JuiceFS/" class="post-category">
-                                    JuiceFS
+                            <a href="/categories/Linux/" class="post-category">
+                                    Linux
                                 </a>
                             
                             
@@ -1138,16 +1179,12 @@ library.c#include &#34;library.h&#34;
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/metadata%E5%AD%98%E5%82%A8/">
-                        <span class="chip bg-color">metadata存储</span>
+                    <a href="/tags/POSIX/">
+                        <span class="chip bg-color">POSIX</span>
                     </a>
                     
-                    <a href="/tags/Redis/">
-                        <span class="chip bg-color">Redis</span>
-                    </a>
-                    
-                    <a href="/tags/Tikv/">
-                        <span class="chip bg-color">Tikv</span>
+                    <a href="/tags/Permissions/">
+                        <span class="chip bg-color">Permissions</span>
                     </a>
                     
                 </div>
