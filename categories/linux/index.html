@@ -376,28 +376,28 @@
                 </a>
                 
                 
-                <a href="/categories/Nginx/" title="Nginx: 1">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-default "
-                            style="background-color: #F5EEF8;">Nginx
-                        <span class="tag-length">1</span>
-                    </span>
-                </a>
-                
-                
                 <a href="/categories/Linux/" title="Linux: 2">
                     <span class="chip center-align waves-effect waves-light
                              chip-active "
-                            style="background-color: #D5F5E3;">Linux
+                            style="background-color: #F5EEF8;">Linux
                         <span class="tag-length">2</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/Jna/" title="Jna: 1">
+                <a href="/categories/Nginx/" title="Nginx: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #E8F8F5;">Jna
+                            style="background-color: #D5F5E3;">Nginx
+                        <span class="tag-length">1</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/categories/Homebrew/" title="Homebrew: 1">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            style="background-color: #E8F8F5;">Homebrew
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -412,10 +412,10 @@
                 </a>
                 
                 
-                <a href="/categories/Homebrew/" title="Homebrew: 1">
+                <a href="/categories/Jna/" title="Jna: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #F8F9F9;">Homebrew
+                            style="background-color: #F8F9F9;">Jna
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -434,25 +434,27 @@
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2023/06/15/umask/">
+                    <a href="/2023/06/19/file-system-permissions/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="umask">
+                            <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="file-system-permissions">
                             
-                            <span class="card-title">umask</span>
+                            <span class="card-title">file-system-permissions</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                1.什么是umask当程序创建文件时，文件权限受到掩码的限制。如果掩码的位设置为“1”，则相应的初始文件权限将被禁用。掩码中设置为“0”的位意味着相应的权限将由程序和文件系统决定
-一些系统中umask是四位，例如：0022。而另一些是三位，
+                                1.文件权限Linux中文件的权限由三元三组的集合组成，其中具体的有三种不同的权限，分别是：R（读取）、W（写入）和X（执行）。使用ls -l命令可查看文件具体权限。
+
+
+文件权限组成可参考下图（拿上图mnt目录举例，文件类型为目录，则第一
                             
                         </div>
                         <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-06-15
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-06-19
                             </span>
                             <span class="publish-author">
                                 
@@ -485,22 +487,20 @@
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2023/06/15/file-system-permissions/">
+                    <a href="/2023/06/15/umask/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="file-system-permissions">
+                            <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="umask">
                             
-                            <span class="card-title">file-system-permissions</span>
+                            <span class="card-title">umask</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                1.文件权限Linux中文件的权限由三元三组的集合组成，其中具体的有三种不同的权限，分别是：R（读取）、W（写入）和X（执行）。使用ls -l命令可查看文件具体权限。
-
-
-文件权限组成可参考下图（拿上图mnt目录举例，文件类型为目录，则第一
+                                1.什么是umask当程序创建文件时，文件权限受到掩码的限制。如果掩码的位设置为“1”，则相应的初始文件权限将被禁用。掩码中设置为“0”的位意味着相应的权限将由程序和文件系统决定
+一些系统中umask是四位，例如：0022。而另一些是三位，
                             
                         </div>
                         <div class="publish-info">

@@ -4,10 +4,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="nginx-健康检测, T_TBlog">
-    <meta name="description" content="1.下载nginx从nginx官方下载地址中下载nginx，本次实验中采用nginx-1.24.0。
-2.下载nginx_upstream_check_module下载第三方模块nginx_upstream_check_module。
-根据">
+    <meta name="keywords" content="file-system-permissions, T_TBlog">
+    <meta name="description" content="1.文件权限Linux中文件的权限由三元三组的集合组成，其中具体的有三种不同的权限，分别是：R（读取）、W（写入）和X（执行）。使用ls -l命令可查看文件具体权限。
+
+
+文件权限组成可参考下图（拿上图mnt目录举例，文件类型为目录，则第一">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -21,7 +22,7 @@
 
     
 
-    <title>nginx-健康检测 | T_TBlog</title>
+    <title>file-system-permissions | T_TBlog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
@@ -311,12 +312,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">nginx-健康检测</h1>
+                    <h1 class="description center-align post-title">file-system-permissions</h1>
                 </div>
             </div>
         </div>
@@ -432,8 +433,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Health-Check/">
-                                <span class="chip bg-color">Health-Check</span>
+                            <a href="/tags/POSIX/">
+                                <span class="chip bg-color">POSIX</span>
+                            </a>
+                        
+                            <a href="/tags/Permissions/">
+                                <span class="chip bg-color">Permissions</span>
                             </a>
                         
                     </div>
@@ -444,8 +449,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Nginx/" class="post-category">
-                                Nginx
+                            <a href="/categories/Linux/" class="post-category">
+                                Linux
                             </a>
                         
                     </div>
@@ -457,7 +462,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2023-06-15
+                    2023-06-19
                 </div>
                 
 
@@ -471,14 +476,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    492
+                    1.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    4 分
                 </div>
                 
 
@@ -498,93 +503,76 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="1-下载nginx"><a href="#1-下载nginx" class="headerlink" title="1.下载nginx"></a>1.下载nginx</h2><p>从<a target="_blank" rel="noopener" href="https://nginx.org/en/download.html">nginx官方下载地址</a>中下载nginx，本次实验中采用<a target="_blank" rel="noopener" href="https://nginx.org/download/nginx-1.24.0.tar.gz">nginx-1.24.0</a>。</p>
-<h2 id="2-下载nginx-upstream-check-module"><a href="#2-下载nginx-upstream-check-module" class="headerlink" title="2.下载nginx_upstream_check_module"></a>2.下载nginx_upstream_check_module</h2><p>下载<a target="_blank" rel="noopener" href="https://github.com/yaoweibin/nginx_upstream_check_module/releases/tag/v0.4.0">第三方模块nginx_upstream_check_module</a>。</p>
-<p>根据模块方的提示，需要根据nginx的版本来选择不同的模块版本。</p>
-<pre class=" language-sh"><code class="language-sh">    If you use nginx-1.2.1 or nginx-1.3.0, the nginx upstream round robin
-    module changed greatly. You should use the patch named
-    'check_1.2.1.patch'.
+                <h3 id="1-文件权限"><a href="#1-文件权限" class="headerlink" title="1.文件权限"></a>1.文件权限</h3><p>Linux中文件的权限由三元三组的集合组成，其中具体的有三种不同的权限，分别是：R（读取）、W（写入）和X（执行）。使用<code>ls -l</code>命令可查看文件具体权限。</p>
+<img src="/2023/06/19/file-system-permissions/image-20230618164801149.png" alt="ls -l显示文件权限" style="zoom:50%;">
 
-    If you use nginx-1.2.2+ or nginx-1.3.1+, It added the upstream
-    least_conn module. You should use the patch named 'check_1.2.2+.patch'.
+<p>文件权限组成可参考下图（拿上图<code>mnt</code>目录举例，文件类型为目录，则第一位显示为<code>d</code>。用户有rwx权限，组内有rx权限，其他有rx权限）。</p>
+<img src="/2023/06/19/file-system-permissions/image-20230618164934901.png" alt="文件权限组合" style="zoom:50%;">
 
-    If you use nginx-1.2.6+ or nginx-1.3.9+, It adjusted the round robin
-    module. You should use the patch named 'check_1.2.6+.patch'.
-
-    If you use nginx-1.5.12+, You should use the patch named
-    'check_1.5.12+.patch'.
-</code></pre>
-<h2 id="3-安装依赖包"><a href="#3-安装依赖包" class="headerlink" title="3.安装依赖包"></a>3.安装依赖包</h2><pre class=" language-sh"><code class="language-sh"># ubuntu
-sudo apt install -y patch pcre pcre-devel zlib zlib-devel
-# centos
-sudo yum install -y patch pcre pcre-devel zlib zlib-devel
-</code></pre>
-<h2 id="4-配置health-check"><a href="#4-配置health-check" class="headerlink" title="4.配置health-check"></a>4.配置health-check</h2><p>将nginx和第三方模块放在如下目录中。</p>
-<img src="/2023/06/15/nginx-health-check/image-20230619141023600.png" alt="nginx和第三方模块" style="zoom:100%;">
-
-<pre class=" language-sh"><code class="language-sh"># 进nginx目录
-cd /root/soft/nginx/nginx-1.24.0
-
-# check_1.20.1+.patch的全路径
-patch -p1 < /root/soft/nginx/nginx_upstream_check_module-0.4.0/check_1.20.1+.patch
-cd /path/to/nginx-1.0.14
-
-./configure --with-compat --add-dynamic-module=/root/soft/nginx/nginx_upstream_check_module-0.4.0
-
-make
-sudo make install
-</code></pre>
-<p>验证nginx安装情况</p>
-<img src="/2023/06/15/nginx-health-check/image-20230619143647685.png" alt="nginx的位置">
-
-<p>配置check-health</p>
-<pre><code># nginx配置文件在/usr/local/nginx/conf/nginx.conf中
-upstream backend &#123;
-        server 10.0.16.18;
-        server 10.0.16.4;
-    # 10s一次检测 检测3次成功可用 检测三次失败不可用 超时时间1s 端口8300 类型http
-    check interval=10000 rise=3 fall=3 timeout=1000 port=8300 type=http;
-    # 2xx表示alive
-    check_http_expect_alive http_2xx;
-    check_http_send &quot;GET /health HTTP/1.0\r\n\r\n&quot;;
-    &#125;
-
-    server &#123;
-        listen 8300;
-
-        location / &#123;
-            proxy_pass http://backend;
-        &#125;
-    &#125;
-</code></pre>
-<p>nginx常用命令：</p>
+<h4 id="1-1）文件类型"><a href="#1-1）文件类型" class="headerlink" title="1.1）文件类型"></a>1.1）文件类型</h4><p>Linux系统中一共有七种文件权限：</p>
+<ol>
+<li><p><strong>常规文件（Regular files）</strong>： 这是最常见的类型，它包含一些特定的数据。数据可以是文本，也可以是二进制格式。常规文件也可以是程序或者脚本。<br>例如： <code>-rw-r--r-- 1 user group 123 Jan 1 00:00 regular_file</code></p>
+</li>
+<li><p><strong>目录（Directory）</strong>：目录是一个包含文件和其他目录的文件。可以想象为一个文件系统中的一个文件夹。<br>例如： <code>drwxr-xr-x 2 user group 4096 Jan 1 00:00 directory</code></p>
+</li>
+<li><p><strong>链接（Link）</strong>：链接是指向另一个文件的特殊文件。有两种类型的链接，硬链接和符号链接（也被称为软链接）。<br>例如： <code>lrwxrwxrwx 1 user group 9 Jan 1 00:00 link -&gt; regular_file</code></p>
+</li>
+<li><p><strong>设备文件（Device files）</strong>：设备文件是代表设备的文件。在 Linux 中，设备被视为文件，可以通过设备文件进行访问。设备文件有两种类型，字符设备文件和块设备文件。</p>
+<p>例如：字符设备  <code>crw------- 1 root root 1, 3 Jan 1 00:00 char_device</code></p>
+<p>​			块设备 <code>brw-rw---- 1 root disk 8, 0 Jan 1 00:00 block_device</code></p>
+</li>
+<li><p><strong>套接字（Socket）</strong>：套接字是用于进程间通信的特殊文件，它们可以帮助运行在同一台机器上的应用程序进行通信。<br>例如： <code>srwxrwxrwx 1 user group 0 Jan 1 00:00 socket</code></p>
+</li>
+<li><p><strong>管道（Pipe）</strong>：管道文件是另一种用于进程间通信的特殊文件。它们主要用于”管道”操作，可以将一个进程的输出直接作为另一个进程的输入。<br>例如： <code>prw-r--r-- 1 user group 0 Jan 1 00:00 pipe</code></p>
+</li>
+<li><p><strong>FIFO (First In First Out) 或命名管道</strong>：和管道类似，FIFO 也是用于进程间通信的一种特殊文件。不过与无名管道不同的是，FIFO有路径名与之关联，即它们在文件系统中是可见的。<br>例如： <code>prw-r--r-- 1 user group 0 Jan 1 00:00 fifo</code></p>
+</li>
+</ol>
+<h4 id="1-2）用户权限"><a href="#1-2）用户权限" class="headerlink" title="1.2）用户权限"></a>1.2）用户权限</h4><p>用户权限是第一个三元组，其表示用户对此文件有哪些权限。</p>
+<h4 id="1-3）组权限"><a href="#1-3）组权限" class="headerlink" title="1.3）组权限"></a>1.3）组权限</h4><p>用户权限是第二个三元组，其表示组内成员对此文件有哪些权限。</p>
+<h4 id="1-4）其他权限"><a href="#1-4）其他权限" class="headerlink" title="1.4）其他权限"></a>1.4）其他权限</h4><p>用户权限是第三个三元组，其表示<strong>除文件的用户和组之外其他人</strong>对此文件有哪些权限。</p>
+<h4 id="1-5）特殊权限"><a href="#1-5）特殊权限" class="headerlink" title="1.5）特殊权限"></a>1.5）特殊权限</h4><ol>
+<li><code>setuid</code>（Set User ID）: 如果setuid被设置在一个可执行文件上，那么执行这个文件的用户将拥有这个文件所有者的权限。例如，如果一个文件的所有者是root，并且设置了setuid位，那么任何用户在执行这个文件时，都将拥有root的权限。setuid位被表示为4或s。</li>
+<li><code>setgid</code>（Set Group ID）: 如果setgid被设置在一个可执行文件上，那么执行这个文件的用户将拥有这个文件所在组的权限。如果setgid被设置在一个目录上，那么这个目录下新创建的文件的所属组将是这个目录的所属组，而不是用户的默认组。setgid位被表示为2或s。</li>
+<li><code>sticky</code>位：如果sticky位被设置在一个目录上，那么只有<strong>目录的所有者、文件的所有者或者root用</strong>户才可以删除或重命名这个目录下的文件。这在&#x2F;tmp目录中尤其有用，因为<code>/tmp</code>目录是所有用户都可以写入的，而设置了sticky位后，用户就不能删除或重命名其他用户在&#x2F;tmp目录下创建的文件了。sticky位被表示为1或t。</li>
+</ol>
+<p>可以使用<code>chmod</code>命令来设置这些特殊位，例如：</p>
 <ul>
-<li><p>启动nginx：</p>
-<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx
-</code></pre>
-</li>
-<li><p>停止nginx：</p>
-<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -s stop
-</code></pre>
-</li>
-<li><p>重载配置：</p>
-<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -s reload
-</code></pre>
-</li>
-<li><p>检测配置语法：</p>
-<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -t
-</code></pre>
-</li>
+<li>设置setuid：<code>chmod u+s filename</code></li>
+<li>设置setgid：<code>chmod g+s filename</code></li>
+<li>设置sticky位：<code>chmod o+t directoryname</code></li>
 </ul>
-<h2 id="5-测试"><a href="#5-测试" class="headerlink" title="5.测试"></a>5.测试</h2><p>查看nginx日志（日志位于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;logs中）判断是否正常check-health</p>
-<img src="/2023/06/15/nginx-health-check/image-20230619144910788.png" alt="查看nginx日志">
+<h3 id="2-实操"><a href="#2-实操" class="headerlink" title="2.实操"></a>2.实操</h3><h4 id="2-1）共享目录（每个用户只能操作属于自己的文件）"><a href="#2-1）共享目录（每个用户只能操作属于自己的文件）" class="headerlink" title="2.1）共享目录（每个用户只能操作属于自己的文件）"></a>2.1）共享目录（每个用户只能操作属于自己的文件）</h4><p>可参考<code>tmp</code>目录的权限设计，使用特殊权限中的<code>sticky</code>位，接下来会用到三个用户，分别是<code>root</code>、<code>trz</code>和<code>zl	</code>。</p>
+<img src="/2023/06/19/file-system-permissions/image-20230618213012323.png" alt="三个用户" style="zoom:50%;">
 
-<p>停掉10.0.16.18:8300后</p>
-<img src="/2023/06/15/nginx-health-check/image-20230619145238621.png" alt="关闭一个server后">
+<p>共享目录创建后权限如下，组内和其他用户并没有写权限，需要分配写权限。</p>
+<img src="/2023/06/19/file-system-permissions/image-20230618213204380.png" alt="共享目录创建后" style="zoom:50%;">
 
-<p>重启10.0.16.18:8300后server恢复正常，check-health也检测到服务正常</p>
-<img src="/2023/06/15/nginx-health-check/image-20230619145645735.png" alt="重启server后">
+<p>使用如下命令赋予<strong>组内和其他的写权限</strong></p>
+<pre class=" language-sh"><code class="language-sh">chmod go+w shareDir
+</code></pre>
+<img src="/2023/06/19/file-system-permissions/image-20230618213756515.png" alt="共享目录赋予组内其他写权限" style="zoom:50%;">
 
+<p>这样就创建好了吗？并没有，要求中还需要<strong>用户不能操作（重命名或删除）别人的文件</strong></p>
+<pre class=" language-sh"><code class="language-sh">chmod o+t shareDir
+</code></pre>
+<img src="/2023/06/19/file-system-permissions/image-20230618214044601.png" alt="完善共享目录的权限" style="zoom:50%;">
+
+<p>测试一下共享目录的功能是否正确</p>
+<h5 id="（1）zl删除trz的文件和文件夹"><a href="#（1）zl删除trz的文件和文件夹" class="headerlink" title="（1）zl删除trz的文件和文件夹"></a>（1）zl删除trz的文件和文件夹</h5><img src="/2023/06/19/file-system-permissions/image-20230618214437033.png" alt="zl删除trz的文件和文件夹" style="zoom:50%;">
+
+<h5 id="（2）zl重命名trz的文件和文件夹"><a href="#（2）zl重命名trz的文件和文件夹" class="headerlink" title="（2）zl重命名trz的文件和文件夹"></a>（2）zl重命名trz的文件和文件夹</h5><img src="/2023/06/19/file-system-permissions/image-20230618214645380.png" alt="zl重命名trz的文件和文件夹" style="zoom:50%;">
+
+<h5 id="（3）zl覆盖写trz的文件"><a href="#（3）zl覆盖写trz的文件" class="headerlink" title="（3）zl覆盖写trz的文件"></a>（3）zl覆盖写trz的文件</h5><img src="/2023/06/19/file-system-permissions/image-20230618214824636.png" alt="zl覆盖写trz的文件" style="zoom:50%;">
+
+<h5 id="（4）zl读取trz的文件内容"><a href="#（4）zl读取trz的文件内容" class="headerlink" title="（4）zl读取trz的文件内容"></a>（4）zl读取trz的文件内容</h5><img src="/2023/06/19/file-system-permissions/image-20230618214921939.png" alt="zl读取trz的文件内容" style="zoom:50%;">
+
+<h5 id="（5）root可以删除trz和zl的文件"><a href="#（5）root可以删除trz和zl的文件" class="headerlink" title="（5）root可以删除trz和zl的文件"></a>（5）root可以删除trz和zl的文件</h5><img src="/2023/06/19/file-system-permissions/image-20230618215028951.png" alt="root可以删除trz和zl的文件" style="zoom:50%;">
+
+<p>创建共享目录命令如下</p>
+<pre class=" language-sh"><code class="language-sh">mkdir dirname
+chmod u+rwx,g+rwx,o+rwt dirname
+</code></pre>
 
                 
             </div>
@@ -611,7 +599,7 @@ upstream backend &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://t-trz879.github.io/2023/06/15/nginx-health-check/">https://t-trz879.github.io/2023/06/15/nginx-health-check/</a>
+                    <a href="https://t-trz879.github.io/2023/06/19/file-system-permissions/">https://t-trz879.github.io/2023/06/19/file-system-permissions/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -649,8 +637,12 @@ upstream backend &#123;
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Health-Check/">
-                                    <span class="chip bg-color">Health-Check</span>
+                                <a href="/tags/POSIX/">
+                                    <span class="chip bg-color">POSIX</span>
+                                </a>
+                            
+                                <a href="/tags/Permissions/">
+                                    <span class="chip bg-color">Permissions</span>
                                 </a>
                             
                         </div>
@@ -1090,12 +1082,11 @@ upstream backend &#123;
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2023/06/15/nginx-health-check/">
+                <a href="/2023/06/21/nginx-health-check/">
                     <div class="card-image">
                         
                         
@@ -1111,9 +1102,9 @@ upstream backend &#123;
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-06-15
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-06-21
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1126,7 +1117,6 @@ upstream backend &#123;
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -1145,13 +1135,13 @@ upstream backend &#123;
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2023/06/15/file-system-permissions/">
+                <a href="/2023/06/15/umask/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="file-system-permissions">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="umask">
                         
-                        <span class="card-title">file-system-permissions</span>
+                        <span class="card-title">umask</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
