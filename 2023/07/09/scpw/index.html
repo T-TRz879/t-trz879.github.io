@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="scpw, T_TBlog">
-    <meta name="description" content="一、概述·在Linux可以使用scp命令服务器A的资源发送到服务器B上，这个命令确实很方便，对于我来说并不是特别方便（我是很喜欢偷懒的人，所以就想办法能不能把偷懒做到极致，这时候就需要“造个轮子”）。
-1.1、需求概述我需要将服务打包后的文">
+    <meta name="description" content="一、概述在Linux可以使用scp命令服务器A的资源发送到服务器B上，这个命令确实很方便，对于我来说并不是特别方便（我是很喜欢偷懒的人，所以就想办法能不能把偷懒做到极致，这时候就需要“造个轮子”）。
+1.1、需求概述我需要将服务打包后的文件">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -467,7 +467,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-07-09
+                    2023-07-11
                 </div>
                 
 
@@ -501,7 +501,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p>·在Linux可以使用<code>scp</code>命令<strong>服务器A</strong>的资源发送到<strong>服务器B</strong>上，这个命令确实很方便，对于我来说并不是特别方便（我是很喜欢偷懒的人，所以就想办法能不能把偷懒做到极致，这时候就需要“造个轮子”）。</p>
+                <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p>在Linux可以使用<code>scp</code>命令<strong>服务器A</strong>的资源发送到<strong>服务器B</strong>上，这个命令确实很方便，对于我来说并不是特别方便（我是很喜欢偷懒的人，所以就想办法能不能把偷懒做到极致，这时候就需要“造个轮子”）。</p>
 <h3 id="1-1、需求概述"><a href="#1-1、需求概述" class="headerlink" title="1.1、需求概述"></a>1.1、需求概述</h3><p>我需要将服务打包后的文件发送到很多个服务器中，我需要打开多个terminal传输包，或者等上一个传输结束后再次传输，如果这个能一个命令解决且是并行的那该多好啊。如果能做到配置一次服务器的信息，每次只需要选择需要传输的选项的话，就不用输入服务器的信息和密码了。</p>
 <p>总结：</p>
 <ul>
@@ -554,7 +554,8 @@
 <li><code>1</code>：错误。这个响应码表示前面的操作失败了，后面会跟随一行文本，解释了发生了什么错误。</li>
 <li><code>2</code>：致命错误。这个响应码表示发生了一个严重的错误，<code>scp</code>进程无法继续执行。后面会跟随一行文本，解释了发生了什么错误。</li>
 </ol>
-<h2 id="三、实现"><a href="#三、实现" class="headerlink" title="三、实现"></a>三、实现</h2><p><code>scpw</code>项目中提供了如下实现</p>
+<h2 id="三、实现"><a href="#三、实现" class="headerlink" title="三、实现"></a>三、实现</h2><p><img src="/scpw/scpw.gif" alt="scpw"></p>
+<p><code>scpw</code>项目中提供了如下实现</p>
 <ol>
 <li>传输文件到远程</li>
 <li>传输整个文件夹到远程</li>
