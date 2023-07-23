@@ -4,15 +4,13 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Go语言陷阱, T_TBlog">
-    <meta name="description" content="一、for-range中赋值type node struct {
-    key     string
-    version string
-}
-
-type newNode struct {
-    key     *string
-    ">
+    <meta name="keywords" content="TCP, T_TBlog">
+    <meta name="description" content="简介TCP是可靠的、有序传输、流控制、拥塞控制的传输层通信协议。
+可靠：序列号、响应确认、重传策略
+有序传输：序列号
+流控制：限制发送端发送数据的速率
+面向连接：先初始化连接才能通信
+可靠TCP中基本单位为一个段，每发送一次也称之为发送一个">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -26,7 +24,7 @@ type newNode struct {
 
     
 
-    <title>Go语言陷阱 | T_TBlog</title>
+    <title>TCP | T_TBlog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
@@ -316,12 +314,12 @@ type newNode struct {
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/26.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Go语言陷阱</h1>
+                    <h1 class="description center-align post-title">TCP</h1>
                 </div>
             </div>
         </div>
@@ -435,13 +433,9 @@ type newNode struct {
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                    <div class="article-tag">
-                        
-                            <a href="/tags/%E8%AF%AD%E6%B3%95%E6%B3%A8%E6%84%8F%E7%82%B9/">
-                                <span class="chip bg-color">语法注意点</span>
-                            </a>
-                        
-                    </div>
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
                     
                 </div>
                 <div class="col s5 right-align">
@@ -449,8 +443,8 @@ type newNode struct {
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/go/" class="post-category">
-                                go
+                            <a href="/categories/TCP/" class="post-category">
+                                TCP
                             </a>
                         
                     </div>
@@ -462,28 +456,28 @@ type newNode struct {
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2023-07-11
+                    2023-07-23
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-07-11
+                    2023-07-23
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    505
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    4 分
                 </div>
                 
 
@@ -503,77 +497,66 @@ type newNode struct {
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="一、for-range中赋值"><a href="#一、for-range中赋值" class="headerlink" title="一、for-range中赋值"></a>一、for-range中赋值</h2><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> node <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token builtin">string</span>
-    version <span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+                <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TCP是<strong>可靠的</strong>、<strong>有序传输</strong>、<strong>流控制</strong>、<strong>拥塞控制</strong>的传输层通信协议。</p>
+<p>可靠：序列号、响应确认、重传策略</p>
+<p>有序传输：序列号</p>
+<p>流控制：限制发送端发送数据的速率</p>
+<p>面向连接：先初始化连接才能通信</p>
+<h3 id="可靠"><a href="#可靠" class="headerlink" title="可靠"></a>可靠</h3><p>TCP中基本单位为一个<strong>段</strong>，每发送一次也称之为发送一个段，服务端收到请求后会做出响应，也称之为ACK。这样的机制奠定了TCP可以保证消息传输的可靠性，一旦服务器的ACK在网络中丢失或者出现拥堵，客户端迟迟收不到服务端的ACK，等到客户端触发重发策略时，就会重新发送刚刚的段。</p>
+<h3 id="有序传输"><a href="#有序传输" class="headerlink" title="有序传输"></a>有序传输</h3><p>服务端可以按照序列号进行重排序（互联网错综复杂，并不保证先发送的数据先到。可能发送丢失、堵塞等情况）</p>
+<h3 id="流控制"><a href="#流控制" class="headerlink" title="流控制"></a>流控制</h3><p>TCP限制发送者传输数据的速率以保证可靠的传输。 接收方不断提示发送方可以接收多少数据。 当接收主机的缓冲区填满时，下一个确认将暂停传输并允许处理缓冲区中的数据。</p>
+<h3 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h3><p>TCP每次在通信传输数据前都需要建立连接，也被称为三次握手。</p>
+<h2 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h2><ol>
+<li>SYN：客户端向服务端发起SYN，客户端携带SYN的序列号为随机生成的<strong>A</strong></li>
+<li>SYN-ACK：服务端收到客户端的SYN后，需向客户端返回ACK，ACK的序列号为服务端携带的序列号<strong>A+1</strong>；服务端还需返回SYN序列号给客户端，SYN序列号为随机生成的<strong>B</strong></li>
+<li>ACK：客户端收到服务端的SYN-ACK后，需返回服务端ACK序列号<strong>B+1</strong></li>
+<li>自此三次握手完成</li>
+</ol>
+<h2 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h2><p>连接终止时连接的每一端都需要发起连接终止请求</p>
+<ol>
+<li>客户端FIN：客户端先发起FIN请求</li>
+<li>服务端ACK：服务端响应客户端的FIN；客户端的FIN只是告诉服务端我不再发送请求了，但是客户端还是可以接受请求</li>
+<li>服务端FIN：服务端发起FIN请求</li>
+<li>客户端ACK：客户端响应服务端的FIN，在响应后等待一段时间的超时时间客户端即可释放端口和关闭连接</li>
+</ol>
+<img src="/2023/07/23/TCP/2560px-Tcp_state_diagram_fixed_new.svg.png" alt="TCP状态转换图" style="zoom:67%;">
 
-<span class="token keyword">type</span> newNode <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token operator">*</span><span class="token builtin">string</span>
-    version <span class="token operator">*</span><span class="token builtin">string</span>
-<span class="token punctuation">}</span>
 
-<span class="token keyword">func</span> <span class="token function">TestRange</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    arr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>node<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
-    arr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"11"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"2"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"22"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"3"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"33"</span><span class="token punctuation">}</span>
 
-    newArr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>newNode<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+<h2 id="抓TCP包"><a href="#抓TCP包" class="headerlink" title="抓TCP包"></a>抓TCP包</h2><p>使用<code>go</code>编写监听<code>8080</code>端口的服务端，使用<code>telnet</code>模拟客户端发送请求</p>
+<img src="/2023/07/23/TCP/image-20230722134454300.png" alt="telnet发送请求" style="zoom:50%;">
 
-    <span class="token keyword">for</span> i<span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> arr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s \n"</span><span class="token punctuation">,</span> n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-        newArr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> newNode<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token operator">&amp;</span>n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token operator">&amp;</span>n<span class="token punctuation">.</span>version<span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+<p>可以明显看到连接开始到结束的<strong>三次握手</strong>、<strong>传输数据</strong>、<strong>Keep-Alive</strong>、<strong>调整滑动窗口大小</strong>和<strong>四次挥手</strong></p>
+<img src="/2023/07/23/TCP/image-20230722122318462.png" alt="WireShark抓包结果" style="zoom: 30%;">
 
-    <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> newArr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-<span class="token comment" spellcheck="true">// key:1 version:11 </span>
-<span class="token comment" spellcheck="true">// key:2 version:22 </span>
-<span class="token comment" spellcheck="true">// key:3 version:33 </span>
-<span class="token comment" spellcheck="true">// key:3 version:33</span>
-<span class="token comment" spellcheck="true">// key:3 version:33</span>
-<span class="token comment" spellcheck="true">// key:3 version:33</span>
-</code></pre>
-<p>为什么最后三行输出的是最后一个元素的值呢？</p>
-<p>这个陷阱在于在 <code>for</code> 循环中 <code>range</code> 过一个数组或切片，然后试图获取每个元素的地址。在 Go 中，<code>for range</code> 循环的每一次迭代中，变量 <code>n</code> 都会被重用和更新，所以 <code>&amp;n.key</code> 和 <code>&amp;n.version</code> 并不会获取到期望的值。</p>
-<p>可以看到，尽管你希望在 <code>newArr</code> 中存储的是每个 <code>node</code> 的 <code>key</code> 和 <code>version</code> 的地址，但是实际上你存储的是最后一个 <code>node</code> 的 <code>key</code> 和 <code>version</code> 的地址。</p>
-<p>这是因为在 <code>for range</code> 循环中，变量 <code>n</code> 在每次迭代时被重用，而不是重新创建。因此，当获取 <code>&amp;n.key</code> 和 <code>&amp;n.version</code> 时，实际上获取的是同一个变量（最后一个 <code>node</code>）的地址。</p>
-<p>为了解决这个问题，可以在循环中创建一个新的变量，将 <code>n.key</code> 和 <code>n.version</code> 的值赋给这个新的变量，然后取这个新变量的地址：</p>
-<p><strong>解决方法：</strong></p>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> node <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token builtin">string</span>
-    version <span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+<p>wireShark的流控制图</p>
+<img src="/2023/07/23/TCP/image-20230722122815342.png" alt="image-20230722122815342" style="zoom:40%;">
 
-<span class="token keyword">type</span> newNode <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token operator">*</span><span class="token builtin">string</span>
-    version <span class="token operator">*</span><span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+<p>按照上述过程画出的流程图</p>
+<img src="/2023/07/23/TCP/TCP握手挥手流程.jpg" alt="TCP握手挥手流程" style="zoom:50%;">
 
-<span class="token keyword">func</span> <span class="token function">TestRange</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    arr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>node<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
-    arr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"11"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"2"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"22"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"3"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"33"</span><span class="token punctuation">}</span>
 
-    newArr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>newNode<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
 
-    <span class="token keyword">for</span> i<span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> arr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s \n"</span><span class="token punctuation">,</span> n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 进行一次值拷贝，如果这里是一个比较大的结构体，可以使用fori拷贝指针</span>
-        newKey <span class="token operator">:=</span> n<span class="token punctuation">.</span>key
-        newVersion <span class="token operator">:=</span> n<span class="token punctuation">.</span>version
-        newArr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> newNode<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token operator">&amp;</span>newKey<span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token operator">&amp;</span>newVersion<span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
 
-    <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> newArr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
+
+<p>MSS：(Maximum Segment Size) 最大消息长度</p>
+<p>TCP以1个段为单位，每发送一个段需要等待一次应答，这样效率低下。所以就衍生出流控制的优化</p>
+<p>窗口控制：TCP不必等待每个段的应答再发送下一个段，而是等待更大段的应答。什么意思呢？TCP设置一个更大的段为5，那么只有在发送5个段后等待接收方的5个应答。换句话说以前是单线程发送（等待当前发送的应答），现在可以并发发送（并不需要等待当前应答，只需等待更大段的应答）</p>
+<p>窗口大小指无需等待确认应答而可以继续发送数据的最大值</p>
+<img src="/2023/07/23/TCP/1920px-Tcp.svg-20230723121318056.png" alt="TCP滑动窗口控制" style="zoom: 40%;">
+
+
+
+<p>高速重发策略：一个段在发送过程中丢失或者应答在返回过程中丢失，发送方也不会立刻重发。直到发送发连续收到3次重复的ack时才会重发段</p>
+<p>流控制：</p>
+<ol>
+<li>窗口控制能够减少RTT，窗口并非越大越好，还受接收端缓冲区限制，接收端处理数据能力一般时，缓存区的数据保证不能溢出。所以需要在窗口控制的基础上增加流量控制，限制窗口的总容量</li>
+<li>接收端在处理其它的事情，没有能力来处理数据包，这种情况下接收端就会丢弃数据包，会触发发送端的重发机制。这无形的占用和浪费网络资源。为了防止这样的情况发生，接收端会返回给发送端自己能接受的最大数据包大小。</li>
+</ol>
+<p>窗口探测：</p>
+<p>为了解决下面的情况：服务端返回ACK在网络中丢失，客户端迟迟等不到响应，从而导致窗口size一直为0，这样客户端就死锁了。TCP在客户端加入窗口探测机制，在迟迟没有等到服务端的ACK时，客户端会发起窗口大小的探测，服务端需返回给客户端<strong>可以确认的最大ACK</strong></p>
+<p>拥塞控制：</p>
+<p>慢启动：</p>
 
                 
             </div>
@@ -600,7 +583,7 @@ type newNode struct {
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://t-trz879.github.io/2023/07/11/Go%E8%AF%AD%E6%B3%95%E6%B3%A8%E6%84%8F%E7%82%B9/">https://t-trz879.github.io/2023/07/11/Go%E8%AF%AD%E6%B3%95%E6%B3%A8%E6%84%8F%E7%82%B9/</a>
+                    <a href="https://t-trz879.github.io/2023/07/23/TCP/">https://t-trz879.github.io/2023/07/23/TCP/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -637,11 +620,7 @@ type newNode struct {
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            
-                                <a href="/tags/%E8%AF%AD%E6%B3%95%E6%B3%A8%E6%84%8F%E7%82%B9/">
-                                    <span class="chip bg-color">语法注意点</span>
-                                </a>
-                            
+                            <span class="chip bg-color">无标签</span>
                         </div>
                     
                 </div>
@@ -1079,9 +1058,52 @@ type newNode struct {
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2023/07/23/TCP/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="TCP">
+                        
+                        <span class="card-title">TCP</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-07-23
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/TCP/" class="post-category">
+                                    TCP
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
             <div class="card">
                 <a href="/2023/07/16/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/">
                     <div class="card-image">
@@ -1099,9 +1121,9 @@ type newNode struct {
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2023-07-16
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-07-16
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1123,55 +1145,6 @@ type newNode struct {
                     
                     <a href="/tags/%E7%BD%91%E7%BB%9C%E4%BC%A0%E8%BE%93/">
                         <span class="chip bg-color">网络传输</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2023/07/09/Linux%E5%85%8D%E5%AF%86%E7%99%BB%E9%99%86/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/25.jpg" class="responsive-img" alt="Linux免密登陆">
-                        
-                        <span class="card-title">Linux免密登陆</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-07-09
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/Linux/" class="post-category">
-                                    Linux
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/SSH/">
-                        <span class="chip bg-color">SSH</span>
                     </a>
                     
                 </div>
