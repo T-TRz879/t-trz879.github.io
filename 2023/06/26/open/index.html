@@ -6,10 +6,10 @@
     <meta charset="utf-8">
     <meta name="keywords" content="open, T_TBlog">
     <meta name="description" content="1.介绍open方法在Linux中，open是用于打开文件以供读取、写入或者两者同时进行的系统调用
-#include &amp;lt;fcntl.h&gt;
+#include 
 
 int open(const char *pathname, int flags);
-int ">
+int open(const c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -36,7 +36,7 @@ int ">
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.2.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+<meta name="generator" content="Hexo 6.3.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -477,7 +477,7 @@ int ">
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    350
+                    347
                 </div>
                 
 
@@ -505,10 +505,10 @@ int ">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h2 id="1-介绍open方法"><a href="#1-介绍open方法" class="headerlink" title="1.介绍open方法"></a>1.介绍open方法</h2><p>在Linux中，<code>open</code>是用于打开文件以供读取、写入或者两者同时进行的系统调用</p>
-<pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;fcntl.h></span></span>
+<pre class=" language-lang-c"><code class="language-lang-c">#include <fcntl.h>
 
-<span class="token keyword">int</span> <span class="token function">open</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>pathname<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> <span class="token function">open</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>pathname<span class="token punctuation">,</span> <span class="token keyword">int</span> flags<span class="token punctuation">,</span> mode_t mode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+int open(const char *pathname, int flags);
+int open(const char *pathname, int flags, mode_t mode);
 </code></pre>
 <ul>
 <li><code>pathname</code> 是你想要打开的文件的路径。</li>
@@ -1339,7 +1339,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">35.9k</span>
+                        class="white-color">24k</span>
             
             
             
@@ -1582,6 +1582,22 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 

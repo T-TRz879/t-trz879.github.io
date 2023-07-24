@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="JuiceFS Read, T_TBlog">
-    <meta name="description" content="Read相关类和接口​	一个dataReader中有由Inode为key的fileReader Map结构；每一个fileReader中记录着当前file的最开始的sliceReader（一开始的sliceReader会随着读取的往后推进而">
+    <meta name="description" content="Read相关类和接口​    一个dataReader中有由Inode为key的fileReader Map结构；每一个fileReader中记录着当前file的最开始的sliceReader（一开始的sliceReader会随着读取的往后">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -32,7 +32,7 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.2.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+<meta name="generator" content="Hexo 6.3.0"><link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -477,14 +477,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    5.8k
+                    3.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    26 分
+                    16 分
                 </div>
                 
 
@@ -504,114 +504,112 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="Read相关类和接口"><a href="#Read相关类和接口" class="headerlink" title="Read相关类和接口"></a>Read相关类和接口</h2><p>​	一个dataReader中有由Inode为key的fileReader Map结构；每一个fileReader中记录着当前file的最开始的sliceReader（一开始的sliceReader会随着读取的往后推进而被清除），sliceReader类似一个双向链表。sliceReader中会记录当前slice的范围（用<a href="#frange">fange</a>记录）。</p>
-<img src="/2022/05/26/JuiceFS%20Read/Read类和接口结构.png" style="zoom: 50%;">
-
-<h3 id="dataReader"><a href="#dataReader" class="headerlink" title="dataReader"></a>dataReader</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> dataReader <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    sync<span class="token punctuation">.</span>Mutex
-    m              meta<span class="token punctuation">.</span>Meta
-    store          chunk<span class="token punctuation">.</span>ChunkStore
-    files          <span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token operator">*</span>fileReader	<span class="token comment" spellcheck="true">//Inode为key的fileReader Map</span>
-    blockSize      <span class="token builtin">uint64</span>
-    readAheadMax   <span class="token builtin">uint64</span>
-    readAheadTotal <span class="token builtin">uint64</span>
-    maxRequests    <span class="token builtin">int</span>
-    maxRetries     <span class="token builtin">uint32</span>
-<span class="token punctuation">}</span>
+                <h2 id="Read相关类和接口"><a href="#Read相关类和接口" class="headerlink" title="Read相关类和接口"></a>Read相关类和接口</h2><p>​    一个dataReader中有由Inode为key的fileReader Map结构；每一个fileReader中记录着当前file的最开始的sliceReader（一开始的sliceReader会随着读取的往后推进而被清除），sliceReader类似一个双向链表。sliceReader中会记录当前slice的范围（用<a href="#frange">fange</a>记录）。</p>
+<p><img src="/2022/05/26/JuiceFS%20Read/Read类和接口结构.png" style="zoom: 50%;"></p>
+<h3 id="dataReader"><a href="#dataReader" class="headerlink" title="dataReader"></a>dataReader</h3><pre class=" language-lang-go"><code class="language-lang-go">type dataReader struct {
+    sync.Mutex
+    m              meta.Meta
+    store          chunk.ChunkStore
+    files          map[Ino]*fileReader    //Inode为key的fileReader Map
+    blockSize      uint64
+    readAheadMax   uint64
+    readAheadTotal uint64
+    maxRequests    int
+    maxRetries     uint32
+}
 </code></pre>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">checkReadBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">Open</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">)</span> FileReader
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">visit</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> fn <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token operator">*</span>fileReader<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">Truncate</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">Invalidate</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> off<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">readSlice</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> s <span class="token operator">*</span>meta<span class="token punctuation">.</span>Slice<span class="token punctuation">,</span> page <span class="token operator">*</span>chunk<span class="token punctuation">.</span>Page<span class="token punctuation">,</span> off <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">error</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">Read</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> page <span class="token operator">*</span>chunk<span class="token punctuation">.</span>Page<span class="token punctuation">,</span> chunks <span class="token punctuation">[</span><span class="token punctuation">]</span>meta<span class="token punctuation">.</span>Slice<span class="token punctuation">,</span> offset <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>dataReader<span class="token punctuation">)</span> <span class="token function">readManyChunks</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> page <span class="token operator">*</span>chunk<span class="token punctuation">.</span>Page<span class="token punctuation">,</span> chunks <span class="token punctuation">[</span><span class="token punctuation">]</span>meta<span class="token punctuation">.</span>Slice<span class="token punctuation">,</span> offset <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func (r *dataReader) checkReadBuffer()
+func (r *dataReader) Open(inode Ino, length uint64) FileReader
+func (r *dataReader) visit(inode Ino, fn func(*fileReader))
+func (r *dataReader) Truncate(inode Ino, length uint64)
+func (r *dataReader) Invalidate(inode Ino, off, length uint64)
+func (r *dataReader) readSlice(ctx context.Context, s *meta.Slice, page *chunk.Page, off int) error
+func (r *dataReader) Read(ctx context.Context, page *chunk.Page, chunks []meta.Slice, offset uint32) int
+func (r *dataReader) readManyChunks(ctx context.Context, page *chunk.Page, chunks []meta.Slice, offset uint32) int
 </code></pre>
-<h3 id="fileReader"><a href="#fileReader" class="headerlink" title="fileReader"></a>fileReader</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> fileReader <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// protected by itself</span>
+<h3 id="fileReader"><a href="#fileReader" class="headerlink" title="fileReader"></a>fileReader</h3><pre class=" language-lang-go"><code class="language-lang-go">type fileReader struct {
+    // protected by itself
     inode    Ino
-    length   <span class="token builtin">uint64</span>	<span class="token comment" spellcheck="true">//文件大小</span>
-    err      syscall<span class="token punctuation">.</span>Errno
-    tried    <span class="token builtin">uint32</span>
-    sessions <span class="token punctuation">[</span>readSessions<span class="token punctuation">]</span>session
-    slices   <span class="token operator">*</span>sliceReader
-    last     <span class="token operator">*</span><span class="token operator">*</span>sliceReader
+    length   uint64    //文件大小
+    err      syscall.Errno
+    tried    uint32
+    sessions [readSessions]session
+    slices   *sliceReader
+    last     **sliceReader
 
-    sync<span class="token punctuation">.</span>Mutex
-    closing <span class="token builtin">bool</span>
+    sync.Mutex
+    closing bool
 
-    <span class="token comment" spellcheck="true">// protected by r</span>
-    refs <span class="token builtin">uint16</span>
-    next <span class="token operator">*</span>fileReader
-    r    <span class="token operator">*</span>dataReader
-<span class="token punctuation">}</span>
+    // protected by r
+    refs uint16
+    next *fileReader
+    r    *dataReader
+}
 </code></pre>
-<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 读取范围不在已有的Slice时，会创建新Slice 实现一部分的预读功能</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">newSlice</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token operator">*</span>sliceReader
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">delete</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">acquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">guessSession</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token builtin">int</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">checkReadahead</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token builtin">int</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">need</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token builtin">bool</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">cleanupRequests</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">releaseIdleBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token comment" spellcheck="true">// 处理读取范围和Block的关系 主要两种「在Block中、跨Block」</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">splitRange</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint64</span>
-<span class="token comment" spellcheck="true">// 当前读取范围是否在缓存中</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">readAhead</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">prepareRequests</span><span class="token punctuation">(</span>ranges <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>req
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">shouldStop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">waitForIO</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> reqs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>req<span class="token punctuation">,</span> buf <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> syscall<span class="token punctuation">.</span>Errno<span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">Read</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> offset <span class="token builtin">uint64</span><span class="token punctuation">,</span> buf <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> syscall<span class="token punctuation">.</span>Errno<span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">visit</span><span class="token punctuation">(</span>fn <span class="token keyword">func</span><span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">Close</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">)</span>
+<pre class=" language-lang-go"><code class="language-lang-go">// 读取范围不在已有的Slice时，会创建新Slice 实现一部分的预读功能
+func (f *fileReader) newSlice(block *frange) *sliceReader
+func (f *fileReader) delete()
+func (f *fileReader) acquire()
+func (f *fileReader) release()
+func (f *fileReader) guessSession(block *frange) int
+func (f *fileReader) checkReadahead(block *frange) int
+func (f *fileReader) need(block *frange) bool
+func (f *fileReader) cleanupRequests(block *frange)
+func (f *fileReader) releaseIdleBuffer()
+// 处理读取范围和Block的关系 主要两种「在Block中、跨Block」
+func (f *fileReader) splitRange(block *frange) []uint64
+// 当前读取范围是否在缓存中
+func (f *fileReader) readAhead(block *frange)
+func (f *fileReader) prepareRequests(ranges []uint64) []*req
+func (f *fileReader) shouldStop() bool
+func (f *fileReader) waitForIO(ctx meta.Context, reqs []*req, buf []byte) (int, syscall.Errno)
+func (f *fileReader) Read(ctx meta.Context, offset uint64, buf []byte) (int, syscall.Errno)
+func (f *fileReader) visit(fn func(s *sliceReader))
+func (f *fileReader) Close(ctx meta.Context)
 </code></pre>
-<h3 id="sliceReader"><a href="#sliceReader" class="headerlink" title="sliceReader"></a>sliceReader</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> sliceReader <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    file       <span class="token operator">*</span>fileReader
-    block      <span class="token operator">*</span>frange	<span class="token comment" spellcheck="true">//当前sliceReader的读取数据范围</span>
+<h3 id="sliceReader"><a href="#sliceReader" class="headerlink" title="sliceReader"></a>sliceReader</h3><pre class=" language-lang-go"><code class="language-lang-go">type sliceReader struct {
+    file       *fileReader
+    block      *frange    //当前sliceReader的读取数据范围
     state      sstate
-    page       <span class="token operator">*</span>chunk<span class="token punctuation">.</span>Page
-    indx       <span class="token builtin">uint32</span>
-    currentPos <span class="token builtin">uint32</span>
-    lastAccess time<span class="token punctuation">.</span>Time
-    cond       <span class="token operator">*</span>utils<span class="token punctuation">.</span>Cond
-    next       <span class="token operator">*</span>sliceReader
-    prev       <span class="token operator">*</span><span class="token operator">*</span>sliceReader
-    refs       <span class="token builtin">uint16</span>
-<span class="token punctuation">}</span>
+    page       *chunk.Page
+    indx       uint32
+    currentPos uint32
+    lastAccess time.Time
+    cond       *utils.Cond
+    next       *sliceReader
+    prev       **sliceReader
+    refs       uint16
+}
 </code></pre>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">delay</span><span class="token punctuation">(</span>delay time<span class="token punctuation">.</span>Duration<span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">done</span><span class="token punctuation">(</span>err syscall<span class="token punctuation">.</span>Errno<span class="token punctuation">,</span> delay time<span class="token punctuation">.</span>Duration<span class="token punctuation">)</span>
-<span class="token comment" spellcheck="true">// 实际读取方法</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">invalidate</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">drop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">delete</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func (s *sliceReader) delay(delay time.Duration)
+func (s *sliceReader) done(err syscall.Errno, delay time.Duration)
+// 实际读取方法
+func (s *sliceReader) run()
+func (s *sliceReader) invalidate()
+func (s *sliceReader) drop()
+func (s *sliceReader) delete()
 </code></pre>
-<h3 id="frange"><a href="#frange" class="headerlink" title="frange"></a>frange</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> frange <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    off <span class="token builtin">uint64</span>	<span class="token comment" spellcheck="true">//需要从off开始读取(相对文件长度的off)</span>
-    <span class="token builtin">len</span> <span class="token builtin">uint64</span>	<span class="token comment" spellcheck="true">//读取长度</span>
-<span class="token punctuation">}</span>
+<h3 id="frange"><a href="#frange" class="headerlink" title="frange"></a>frange</h3><pre class=" language-lang-go"><code class="language-lang-go">type frange struct {
+    off uint64    //需要从off开始读取(相对文件长度的off)
+    len uint64    //读取长度
+}
 </code></pre>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token function">String</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span>
-<span class="token comment" spellcheck="true">// off + len</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">uint64</span>
-<span class="token comment" spellcheck="true">// p是否在r的范围内</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token function">contain</span><span class="token punctuation">(</span>p <span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
-<span class="token comment" spellcheck="true">// a和r是否交叠</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token function">overlap</span><span class="token punctuation">(</span>a <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token builtin">bool</span>
-<span class="token comment" spellcheck="true">// a是否在r的范围内</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token function">include</span><span class="token punctuation">(</span>a <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token builtin">bool</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func (r *frange) String() string
+// off + len
+func (r *frange) end() uint64
+// p是否在r的范围内
+func (r *frange) contain(p uint64) bool
+// a和r是否交叠
+func (r *frange) overlap(a *frange) bool
+// a是否在r的范围内
+func (r *frange) include(a *frange) bool
 </code></pre>
 <h2 id="Read流程"><a href="#Read流程" class="headerlink" title="Read流程"></a>Read流程</h2><h3 id="基础流程"><a href="#基础流程" class="headerlink" title="基础流程"></a>基础流程</h3><ol>
 <li>如果开启了加密和压缩功能，JuiceFS将一个Block先解压在解密放入内存中。如果未开启则会跳过解压和解密过程</li>
 <li>Kernel Fuse读取JuiceFS数据时，现在JuiceFS的缓存中查看是否由此数据，没有JuiceFS则会去Strorage中获取</li>
 <li>JuiceFS将其切分成每段数据128KB，将其以128KB每份发送到Kernel中，Kernel将数组组合成1MB发送到Application</li>
 </ol>
-<img src="/2022/05/26/JuiceFS%20Read/read基础流程.png" alt="JuiceFS Read" style="zoom: 67%;">
-
+<p><img src="/2022/05/26/JuiceFS%20Read/read基础流程.png" alt="JuiceFS Read" style="zoom: 67%;"></p>
 <h3 id="Read方法调用流程"><a href="#Read方法调用流程" class="headerlink" title="Read方法调用流程"></a>Read方法调用流程</h3><ol>
 <li><p>vfs将off（开始读取索引）和buf（数据存放的字节数组）传入Read方法</p>
 <p><em>注意：buf数组的长度有一个适应大文件的过程，buf一开始的大小为16KB，如果一开始开128KB对于一个小文件来说很是浪费。buf会经历四个过程：16KB - &gt; 32KB -&gt; 64KB -&gt; 128KB。这样小文件即不会浪费空间，大文件也会逐渐提升buf长度。</em></p>
@@ -619,85 +617,84 @@
 <li><p>在fileReader.read中，小文件或最后取的一段数据小于32KB则会去缓存中寻找处于哪个Block中</p>
 </li>
 </ol>
-<img src="/2022/05/26/JuiceFS%20Read/Read流程.png" style="zoom: 33%;">
+<p><img src="/2022/05/26/JuiceFS%20Read/Read流程.png" style="zoom: 33%;"></p>
+<h3 id="Read主要代码"><a href="#Read主要代码" class="headerlink" title="Read主要代码"></a>Read主要代码</h3><h4 id="VFS-Read"><a href="#VFS-Read" class="headerlink" title="VFS.Read"></a>VFS.Read</h4><pre class=" language-lang-go"><code class="language-lang-go">func (v *VFS) Read(ctx Context, ino Ino, buf []byte, off uint64, fh uint64) (n int, err syscall.Errno) {
+   size := uint32(len(buf))
+   if IsSpecialNode(ino) {
+      if ino == logInode {
+         n = readAccessLog(fh, buf)
+      } else {
+         h := v.findHandle(ino, fh)
+         if h == nil {
+            err = syscall.EBADF
+            return
+         }
+         data := h.data
+         if off < h.off {
+            data = nil
+         } else {
+            off -= h.off
+         }
+         if int(off) < len(data) {
+            data = data[off:]
+            if int(size) < len(data) {
+               data = data[:size]
+            }
+            n = copy(buf, data)
+         }
+         if len(h.data) > 2<<20 {
+            // drop first part to avoid OOM
+            h.off += 1 << 20
+            h.data = h.data[1<<20:]
+         }
+      }
+      return
+   }
 
-<h3 id="Read主要代码"><a href="#Read主要代码" class="headerlink" title="Read主要代码"></a>Read主要代码</h3><h4 id="VFS-Read"><a href="#VFS-Read" class="headerlink" title="VFS.Read"></a>VFS.Read</h4><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>v <span class="token operator">*</span>VFS<span class="token punctuation">)</span> <span class="token function">Read</span><span class="token punctuation">(</span>ctx Context<span class="token punctuation">,</span> ino Ino<span class="token punctuation">,</span> buf <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> off <span class="token builtin">uint64</span><span class="token punctuation">,</span> fh <span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> err syscall<span class="token punctuation">.</span>Errno<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-   size <span class="token operator">:=</span> <span class="token function">uint32</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span>
-   <span class="token keyword">if</span> <span class="token function">IsSpecialNode</span><span class="token punctuation">(</span>ino<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      <span class="token keyword">if</span> ino <span class="token operator">==</span> logInode <span class="token punctuation">{</span>
-         n <span class="token operator">=</span> <span class="token function">readAccessLog</span><span class="token punctuation">(</span>fh<span class="token punctuation">,</span> buf<span class="token punctuation">)</span>
-      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-         h <span class="token operator">:=</span> v<span class="token punctuation">.</span><span class="token function">findHandle</span><span class="token punctuation">(</span>ino<span class="token punctuation">,</span> fh<span class="token punctuation">)</span>
-         <span class="token keyword">if</span> h <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-            err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EBADF
-            <span class="token keyword">return</span>
-         <span class="token punctuation">}</span>
-         data <span class="token operator">:=</span> h<span class="token punctuation">.</span>data
-         <span class="token keyword">if</span> off <span class="token operator">&lt;</span> h<span class="token punctuation">.</span>off <span class="token punctuation">{</span>
-            data <span class="token operator">=</span> <span class="token boolean">nil</span>
-         <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            off <span class="token operator">-=</span> h<span class="token punctuation">.</span>off
-         <span class="token punctuation">}</span>
-         <span class="token keyword">if</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            data <span class="token operator">=</span> data<span class="token punctuation">[</span>off<span class="token punctuation">:</span><span class="token punctuation">]</span>
-            <span class="token keyword">if</span> <span class="token function">int</span><span class="token punctuation">(</span>size<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               data <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token punctuation">:</span>size<span class="token punctuation">]</span>
-            <span class="token punctuation">}</span>
-            n <span class="token operator">=</span> <span class="token function">copy</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
-         <span class="token punctuation">}</span>
-         <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>h<span class="token punctuation">.</span>data<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">2</span><span class="token operator">&lt;&lt;</span><span class="token number">20</span> <span class="token punctuation">{</span>
-            <span class="token comment" spellcheck="true">// drop first part to avoid OOM</span>
-            h<span class="token punctuation">.</span>off <span class="token operator">+=</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">20</span>
-            h<span class="token punctuation">.</span>data <span class="token operator">=</span> h<span class="token punctuation">.</span>data<span class="token punctuation">[</span><span class="token number">1</span><span class="token operator">&lt;&lt;</span><span class="token number">20</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
-         <span class="token punctuation">}</span>
-      <span class="token punctuation">}</span>
-      <span class="token keyword">return</span>
-   <span class="token punctuation">}</span>
-
-   <span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      readSizeHistogram<span class="token punctuation">.</span><span class="token function">Observe</span><span class="token punctuation">(</span><span class="token function">float64</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
-      <span class="token function">logit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token string">"read (%d,%d,%d): %s (%d)"</span><span class="token punctuation">,</span> ino<span class="token punctuation">,</span> size<span class="token punctuation">,</span> off<span class="token punctuation">,</span> <span class="token function">strerr</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span>
-   <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   h <span class="token operator">:=</span> v<span class="token punctuation">.</span><span class="token function">findHandle</span><span class="token punctuation">(</span>ino<span class="token punctuation">,</span> fh<span class="token punctuation">)</span>
-   <span class="token keyword">if</span> h <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-      err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EBADF
-      <span class="token keyword">return</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">if</span> off <span class="token operator">>=</span> maxFileSize <span class="token operator">||</span> off<span class="token operator">+</span><span class="token function">uint64</span><span class="token punctuation">(</span>size<span class="token punctuation">)</span> <span class="token operator">>=</span> maxFileSize <span class="token punctuation">{</span>
-      err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EFBIG
-      <span class="token keyword">return</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">if</span> h<span class="token punctuation">.</span>reader <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-      err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EACCES
-      <span class="token keyword">return</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">if</span> <span class="token operator">!</span>h<span class="token punctuation">.</span><span class="token function">Rlock</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EINTR
-      <span class="token keyword">return</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">defer</span> h<span class="token punctuation">.</span><span class="token function">Runlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 防止read时，还有数据没有写入Block</span>
-   <span class="token boolean">_</span> <span class="token operator">=</span> v<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">Flush</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> ino<span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 具体读取方法</span>
-   n<span class="token punctuation">,</span> err <span class="token operator">=</span> h<span class="token punctuation">.</span>reader<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> off<span class="token punctuation">,</span> buf<span class="token punctuation">)</span>
-   <span class="token keyword">for</span> err <span class="token operator">==</span> syscall<span class="token punctuation">.</span>EAGAIN <span class="token punctuation">{</span>
-       <span class="token comment" spellcheck="true">// 读取失败，错误码为syscall.EAGAIN 则再一次读取</span>
-      n<span class="token punctuation">,</span> err <span class="token operator">=</span> h<span class="token punctuation">.</span>reader<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> off<span class="token punctuation">,</span> buf<span class="token punctuation">)</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">if</span> err <span class="token operator">==</span> syscall<span class="token punctuation">.</span>ENOENT <span class="token punctuation">{</span>
-      err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EBADF
-   <span class="token punctuation">}</span>
-   h<span class="token punctuation">.</span><span class="token function">removeOp</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
-   <span class="token keyword">return</span>
-<span class="token punctuation">}</span>
+   defer func() {
+      readSizeHistogram.Observe(float64(n))
+      logit(ctx, "read (%d,%d,%d): %s (%d)", ino, size, off, strerr(err), n)
+   }()
+   h := v.findHandle(ino, fh)
+   if h == nil {
+      err = syscall.EBADF
+      return
+   }
+   if off >= maxFileSize || off+uint64(size) >= maxFileSize {
+      err = syscall.EFBIG
+      return
+   }
+   if h.reader == nil {
+      err = syscall.EACCES
+      return
+   }
+   if !h.Rlock(ctx) {
+      err = syscall.EINTR
+      return
+   }
+   defer h.Runlock()
+    // 防止read时，还有数据没有写入Block
+   _ = v.writer.Flush(ctx, ino)
+    // 具体读取方法
+   n, err = h.reader.Read(ctx, off, buf)
+   for err == syscall.EAGAIN {
+       // 读取失败，错误码为syscall.EAGAIN 则再一次读取
+      n, err = h.reader.Read(ctx, off, buf)
+   }
+   if err == syscall.ENOENT {
+      err = syscall.EBADF
+   }
+   h.removeOp(ctx)
+   return
+}
 </code></pre>
 <h4 id="fileReader-Read"><a href="#fileReader-Read" class="headerlink" title="fileReader.Read"></a>fileReader.Read</h4><ol>
 <li><p>用size记录buf的长度；开始读取索引已经到file的末尾或当前size为0，则退出</p>
 </li>
-<li><p>用block记录offset和size，在block中：offset &#x3D; off，len &#x3D; size</p>
+<li><p>用block记录offset和size，在block中：offset = off，len = size</p>
 </li>
-<li><p>block.end() &#x3D; block.off + block.len，代表读取到end()结束。block.end() &gt; 文件长度，将block.len修改为文件长度 - block.off</p>
-<img src="/2022/05/26/JuiceFS%20Read/读取文件最后的情况.png" alt="读取文件最后的情况" style="zoom: 50%;">
+<li><p>block.end() = block.off + block.len，代表读取到end()结束。block.end() &gt; 文件长度，将block.len修改为文件长度 - block.off</p>
+<p><img src="/2022/05/26/JuiceFS%20Read/读取文件最后的情况.png" alt="读取文件最后的情况" style="zoom: 50%;"></p>
 </li>
 <li><p>最后一次读取没有32KB或文件本身没有32KB时，会调用readAhead方法，本次需要读取内容很有可能在上一次的末尾</p>
 </li>
@@ -710,57 +707,57 @@
 <li><p>调用prepareRequests对ranges范围进行查找，查看ranges存在在哪几个Slice中</p>
 </li>
 </ol>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">Read</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> offset <span class="token builtin">uint64</span><span class="token punctuation">,</span> buf <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> syscall<span class="token punctuation">.</span>Errno<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-   f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   <span class="token keyword">defer</span> f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   f<span class="token punctuation">.</span><span class="token function">acquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   <span class="token keyword">defer</span> f<span class="token punctuation">.</span><span class="token function">release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   <span class="token comment" spellcheck="true">// len(buf) 16KB -> 32KB -> 64 KB -> 128KB</span>
-   <span class="token keyword">if</span> f<span class="token punctuation">.</span>err <span class="token operator">!=</span> <span class="token number">0</span> <span class="token operator">||</span> f<span class="token punctuation">.</span>closing <span class="token punctuation">{</span>
-      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> f<span class="token punctuation">.</span>err
-   <span class="token punctuation">}</span>
-   <span class="token comment" spellcheck="true">// 获取buf的大小</span>
-   size <span class="token operator">:=</span> <span class="token function">uint64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span>
-   <span class="token keyword">if</span> offset <span class="token operator">>=</span> f<span class="token punctuation">.</span>length <span class="token operator">||</span> size <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
-      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span>
-   <span class="token punctuation">}</span>
-   <span class="token comment" spellcheck="true">// block.end() = offset + size</span>
-   block <span class="token operator">:=</span> <span class="token operator">&amp;</span>frange<span class="token punctuation">{</span>offset<span class="token punctuation">,</span> size<span class="token punctuation">}</span>
-   <span class="token comment" spellcheck="true">// 当前读完后的长度block.end() > 文件长度则需要设置block.len为f.length - block.off</span>
-   <span class="token keyword">if</span> block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> f<span class="token punctuation">.</span>length <span class="token punctuation">{</span>
-      block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> f<span class="token punctuation">.</span>length <span class="token operator">-</span> block<span class="token punctuation">.</span>off
-   <span class="token punctuation">}</span>
-   <span class="token comment" spellcheck="true">//logger.Warnf("offset:%d buf.len:%d file.size:%d", offset, len(buf), f.length)</span>
-   f<span class="token punctuation">.</span><span class="token function">cleanupRequests</span><span class="token punctuation">(</span>block<span class="token punctuation">)</span>
-   <span class="token comment" spellcheck="true">// lastBS 32KB is cache block size</span>
-   <span class="token keyword">var</span> lastBS <span class="token builtin">uint64</span> <span class="token operator">=</span> <span class="token number">32</span> <span class="token operator">&lt;&lt;</span> <span class="token number">10</span>
-   <span class="token keyword">if</span> block<span class="token punctuation">.</span>off<span class="token operator">+</span>lastBS <span class="token operator">></span> f<span class="token punctuation">.</span>length <span class="token punctuation">{</span>
-      <span class="token comment" spellcheck="true">// last block cache is 32KB</span>
-      lastblock <span class="token operator">:=</span> frange<span class="token punctuation">{</span>f<span class="token punctuation">.</span>length <span class="token operator">-</span> lastBS<span class="token punctuation">,</span> lastBS<span class="token punctuation">}</span>
-      <span class="token comment" spellcheck="true">// check file length less than 32KB</span>
-      <span class="token keyword">if</span> f<span class="token punctuation">.</span>length <span class="token operator">&lt;</span> lastBS <span class="token punctuation">{</span>
-         lastblock <span class="token operator">=</span> frange<span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> f<span class="token punctuation">.</span>length<span class="token punctuation">}</span>
-      <span class="token punctuation">}</span>
-      <span class="token comment" spellcheck="true">// read from cache</span>
-      f<span class="token punctuation">.</span><span class="token function">readAhead</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>lastblock<span class="token punctuation">)</span>
-   <span class="token punctuation">}</span>
-   ranges <span class="token operator">:=</span> f<span class="token punctuation">.</span><span class="token function">splitRange</span><span class="token punctuation">(</span>block<span class="token punctuation">)</span>
-   reqs <span class="token operator">:=</span> f<span class="token punctuation">.</span><span class="token function">prepareRequests</span><span class="token punctuation">(</span>ranges<span class="token punctuation">)</span>
-   <span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> req <span class="token operator">:=</span> <span class="token keyword">range</span> reqs <span class="token punctuation">{</span>
-         s <span class="token operator">:=</span> req<span class="token punctuation">.</span>s
-         s<span class="token punctuation">.</span>refs<span class="token operator">--</span>
-         <span class="token keyword">if</span> s<span class="token punctuation">.</span>refs <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> s<span class="token punctuation">.</span>state <span class="token operator">==</span> INVALID <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span><span class="token function">delete</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-         <span class="token punctuation">}</span>
-      <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   f<span class="token punctuation">.</span><span class="token function">checkReadahead</span><span class="token punctuation">(</span>block<span class="token punctuation">)</span>
-   <span class="token keyword">return</span> f<span class="token punctuation">.</span><span class="token function">waitForIO</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> reqs<span class="token punctuation">,</span> buf<span class="token punctuation">)</span>
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func (f *fileReader) Read(ctx meta.Context, offset uint64, buf []byte) (int, syscall.Errno) {
+   f.Lock()
+   defer f.Unlock()
+   f.acquire()
+   defer f.release()
+   // len(buf) 16KB -> 32KB -> 64 KB -> 128KB
+   if f.err != 0 || f.closing {
+      return 0, f.err
+   }
+   // 获取buf的大小
+   size := uint64(len(buf))
+   if offset >= f.length || size == 0 {
+      return 0, 0
+   }
+   // block.end() = offset + size
+   block := &frange{offset, size}
+   // 当前读完后的长度block.end() > 文件长度则需要设置block.len为f.length - block.off
+   if block.end() > f.length {
+      block.len = f.length - block.off
+   }
+   //logger.Warnf("offset:%d buf.len:%d file.size:%d", offset, len(buf), f.length)
+   f.cleanupRequests(block)
+   // lastBS 32KB is cache block size
+   var lastBS uint64 = 32 << 10
+   if block.off+lastBS > f.length {
+      // last block cache is 32KB
+      lastblock := frange{f.length - lastBS, lastBS}
+      // check file length less than 32KB
+      if f.length < lastBS {
+         lastblock = frange{0, f.length}
+      }
+      // read from cache
+      f.readAhead(&lastblock)
+   }
+   ranges := f.splitRange(block)
+   reqs := f.prepareRequests(ranges)
+   defer func() {
+      for _, req := range reqs {
+         s := req.s
+         s.refs--
+         if s.refs == 0 && s.state == INVALID {
+            s.delete()
+         }
+      }
+   }()
+   f.checkReadahead(block)
+   return f.waitForIO(ctx, reqs, buf)
+}
 </code></pre>
-<h4 id="fileReader-visit"><a href="#fileReader-visit" class="headerlink" title="fileReader.visit"></a>fileReader.visit</h4><p>​	fileReader中slices为一个链表，遍历节点将其传入fn中执行具体方法。</p>
-<p>​	Read方法中有很多会利用本方法寻找当前off所在的Slice</p>
+<h4 id="fileReader-visit"><a href="#fileReader-visit" class="headerlink" title="fileReader.visit"></a>fileReader.visit</h4><p>​    fileReader中slices为一个链表，遍历节点将其传入fn中执行具体方法。</p>
+<p>​    Read方法中有很多会利用本方法寻找当前off所在的Slice</p>
 <ol>
 <li><a href="#fileReader.splitRange">fileReader.splitRange</a></li>
 <li><a href="#fileReader.cleanupRequests">fileReader.cleanupRequests</a></li>
@@ -771,14 +768,14 @@
 <li><a href="#fileReader.Truncate">fileReader.Truncate</a></li>
 <li><a href="#fileReader.Invalidate">fileReader.Invalidate</a></li>
 </ol>
-<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 遍历fileReader中的slices</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">visit</span><span class="token punctuation">(</span>fn <span class="token keyword">func</span><span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-   <span class="token keyword">var</span> next <span class="token operator">*</span>sliceReader
-   <span class="token keyword">for</span> s <span class="token operator">:=</span> f<span class="token punctuation">.</span>slices<span class="token punctuation">;</span> s <span class="token operator">!=</span> <span class="token boolean">nil</span><span class="token punctuation">;</span> s <span class="token operator">=</span> next <span class="token punctuation">{</span>
-      next <span class="token operator">=</span> s<span class="token punctuation">.</span>next
-      <span class="token function">fn</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
-   <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">// 遍历fileReader中的slices
+func (f *fileReader) visit(fn func(s *sliceReader)) {
+   var next *sliceReader
+   for s := f.slices; s != nil; s = next {
+      next = s.next
+      fn(s)
+   }
+}
 </code></pre>
 <h4 id="fileReader-splitRange"><a href="#fileReader-splitRange" class="headerlink" title="fileReader.splitRange"></a>fileReader.splitRange</h4><ol>
 <li>将block.off和block.end()放入ranges中，ranges代表当前读取的开始索引和结束索引</li>
@@ -795,47 +792,45 @@
 <h5 id="ranges不同时段的日志"><a href="#ranges不同时段的日志" class="headerlink" title="ranges不同时段的日志"></a>ranges不同时段的日志</h5><ul>
 <li>开始Read时，开始时ranges[1]和ranges[0]的跨度是16KB -&gt; 32KB -&gt; 64 KB -&gt; 128KB的递增</li>
 </ul>
-<img src="/2022/05/26/JuiceFS%20Read/开始Read时的ranges.png" style="zoom: 66%;">
-
+<p><img src="/2022/05/26/JuiceFS%20Read/开始Read时的ranges.png" style="zoom: 66%;"></p>
 <ul>
 <li>跨片时，会在ranges[2]位置上添加第一个Block结尾索引</li>
 </ul>
-<img src="/2022/05/26/JuiceFS%20Read/跨片时的ranges.png" style="zoom: 66%;">
-
-<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 对block进行拆分，block.off和block.end()分别位于什么区间内</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">splitRange</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint64</span> <span class="token punctuation">{</span>
-    ranges <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint64</span><span class="token punctuation">{</span>block<span class="token punctuation">.</span>off<span class="token punctuation">,</span> block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true">// lambda func</span>
-    contain <span class="token operator">:=</span> <span class="token keyword">func</span><span class="token punctuation">(</span>p <span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// 这个方法用来判断p是否已经在ranges中。</span>
-    <span class="token comment" spellcheck="true">//不在ranges中则在下面visit方法中添加入ranges，在ranges中无需添加</span>
-        <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> i <span class="token operator">:=</span> <span class="token keyword">range</span> ranges <span class="token punctuation">{</span>
-            <span class="token keyword">if</span> i <span class="token operator">==</span> p <span class="token punctuation">{</span>
-                <span class="token keyword">return</span> <span class="token boolean">true</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-        <span class="token keyword">return</span> <span class="token boolean">false</span>
-    <span class="token punctuation">}</span>
-    f<span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> s<span class="token punctuation">.</span>state<span class="token punctuation">.</span><span class="token function">valid</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token comment" spellcheck="true">// s.block.off在block中 且 ranges中没有s.block.off</span>
-            <span class="token keyword">if</span> block<span class="token punctuation">.</span><span class="token function">contain</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">contain</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                ranges <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>ranges<span class="token punctuation">,</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token punctuation">)</span>
-            <span class="token punctuation">}</span>
-            <span class="token comment" spellcheck="true">// s.block.end()在block中 且 ranges中没有s.block.end()</span>
-            <span class="token keyword">if</span> block<span class="token punctuation">.</span><span class="token function">contain</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">contain</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                ranges <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>ranges<span class="token punctuation">,</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 对ranges升序排列</span>
-    sort<span class="token punctuation">.</span><span class="token function">Slice</span><span class="token punctuation">(</span>ranges<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> ranges<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;</span> ranges<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
-    <span class="token punctuation">}</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> ranges
-<span class="token punctuation">}</span>
+<p><img src="/2022/05/26/JuiceFS%20Read/跨片时的ranges.png" style="zoom: 66%;"></p>
+<pre class=" language-lang-go"><code class="language-lang-go">// 对block进行拆分，block.off和block.end()分别位于什么区间内
+func (f *fileReader) splitRange(block *frange) []uint64 {
+    ranges := []uint64{block.off, block.end()}
+    // lambda func
+    contain := func(p uint64) bool {
+    // 这个方法用来判断p是否已经在ranges中。
+    //不在ranges中则在下面visit方法中添加入ranges，在ranges中无需添加
+        for _, i := range ranges {
+            if i == p {
+                return true
+            }
+        }
+        return false
+    }
+    f.visit(func(s *sliceReader) {
+        if s.state.valid() {
+            // s.block.off在block中 且 ranges中没有s.block.off
+            if block.contain(s.block.off) && !contain(s.block.off) {
+                ranges = append(ranges, s.block.off)
+            }
+            // s.block.end()在block中 且 ranges中没有s.block.end()
+            if block.contain(s.block.end()) && !contain(s.block.end()) {
+                ranges = append(ranges, s.block.end())
+            }
+        }
+    })
+    // 对ranges升序排列
+    sort.Slice(ranges, func(i, j int) bool {
+        return ranges[i] < ranges[j]
+    })
+    return ranges
+}
 </code></pre>
-<h4 id="fileReader-newSlice"><a href="#fileReader-newSlice" class="headerlink" title="fileReader.newSlice"></a>fileReader.newSlice</h4><p>​	使用newSlice的地方有两处：</p>
+<h4 id="fileReader-newSlice"><a href="#fileReader-newSlice" class="headerlink" title="fileReader.newSlice"></a>fileReader.newSlice</h4><p>​    使用newSlice的地方有两处：</p>
 <ul>
 <li>readAhead中</li>
 <li>prepareRequests中。第一次的16KB的buf会创建第一个[0,16KB]的Slice</li>
@@ -845,13 +840,14 @@
 </li>
 <li><p>blockend代表当前block.off位于以blockend长度结尾的Block，可参考代码中的示例</p>
 </li>
-<li><p>校验当前s.block.end()和文件长度、blockend的关系（s.block.end() &#x3D; s.block.off + s.block.len）</p>
+<li><p>校验当前s.block.end()和文件长度、blockend的关系（s.block.end() = s.block.off + s.block.len）</p>
 <ol>
 <li><p>s.block.end() &gt; f.length，即[s.block.end(),f.length]是多余的，只需要[s.block.off,f.length - s.block.off]</p>
-<img src="/2022/05/26/JuiceFS%20Read/newSlice中block.end()和f.length比较.png" alt="newSlice中block.end()和f.length比较" style="zoom: 50%;">
+<p><img src="/2022/05/26/JuiceFS%20Read/newSlice中block.end()和f.length比较.png" alt="newSlice中block.end()和f.length比较" style="zoom: 50%;"></p>
 </li>
 <li><p>s.block.end() &gt; blockend，即已经涉及跨片，只选择s.block.off所在的Block，也就是[s.block.off,blockend - s.block.off]</p>
-<img src="/2022/05/26/JuiceFS%20Read/newSlice中block.end()和blockend比较.png" alt="newSlice中block.end()和f.length比较" style="zoom: 50%;"></li>
+<p><img src="/2022/05/26/JuiceFS%20Read/newSlice中block.end()和blockend比较.png" alt="newSlice中block.end()和f.length比较" style="zoom: 50%;"></p>
+</li>
 </ol>
 </li>
 <li><p>更新当前block的off和len。block.off设置为s.block.end()，s.block.end()为本次实际需要读取的末尾索引；block.len减去s.block.len（根据上面上个判断更更新s.block.len来说，s.block.len永远小于或等于block.len），用于下一个Block</p>
@@ -867,187 +863,186 @@
 <li><p>如下是newSlice创建过程的日志，除了前两次和最后一次之外的block.len都是4MB</p>
 <ol>
 <li>第一次是16KB的读取buf空间，需要创建Slice</li>
-<li>第二次len需要从16KB开始到4MB结束，len&#x3D;4MB-16KB</li>
-<li>最后一次的道理和第二次一样，len&#x3D;file.length-block.off</li>
+<li>第二次len需要从16KB开始到4MB结束，len=4MB-16KB</li>
+<li>最后一次的道理和第二次一样，len=file.length-block.off</li>
 </ol>
 </li>
 </ol>
-<img src="/2022/05/26/JuiceFS%20Read/newSlice日志.png" alt="newSlice日志" style="zoom: 66%;">
-
-<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 当前的Block属于新的Slice</span>
-<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">newSlice</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token operator">*</span>sliceReader <span class="token punctuation">{</span>
-   <span class="token comment" spellcheck="true">//logger.Warnf("new slice")</span>
-   s <span class="token operator">:=</span> <span class="token operator">&amp;</span>sliceReader<span class="token punctuation">{</span><span class="token punctuation">}</span>
-   s<span class="token punctuation">.</span>file <span class="token operator">=</span> f
-   s<span class="token punctuation">.</span>lastAccess <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   <span class="token comment" spellcheck="true">// s.indx当前的off位于第几个Chunk</span>
-   s<span class="token punctuation">.</span>indx <span class="token operator">=</span> <span class="token function">uint32</span><span class="token punctuation">(</span>block<span class="token punctuation">.</span>off <span class="token operator">/</span> meta<span class="token punctuation">.</span>ChunkSize<span class="token punctuation">)</span>
-   s<span class="token punctuation">.</span>block <span class="token operator">=</span> <span class="token operator">&amp;</span>frange<span class="token punctuation">{</span>block<span class="token punctuation">.</span>off<span class="token punctuation">,</span> block<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">}</span>
-   <span class="token comment" spellcheck="true">// random read</span>
-   <span class="token comment" spellcheck="true">// 当前off位于的Block的结束</span>
-   <span class="token comment" spellcheck="true">// off    			0MB       3.9MB  		4MB</span>
-   <span class="token comment" spellcheck="true">// blockend		4MB       4MB       8MB</span>
-   blockend <span class="token operator">:=</span> <span class="token punctuation">(</span>block<span class="token punctuation">.</span>off<span class="token operator">/</span>f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize
-   <span class="token comment" spellcheck="true">// 当前block.end是否超过文件总大小</span>
-   <span class="token keyword">if</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> f<span class="token punctuation">.</span>length <span class="token punctuation">{</span>
-      s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> f<span class="token punctuation">.</span>length <span class="token operator">-</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off
-   <span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true">// 当前block.end()是否超过blockend,超过则更新block.len</span>
-   <span class="token keyword">if</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> blockend <span class="token punctuation">{</span>
-      s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> blockend <span class="token operator">-</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off
-   <span class="token punctuation">}</span>
-   <span class="token comment" spellcheck="true">// 更新block的off和len用于下一个block</span>
-   block<span class="token punctuation">.</span>off <span class="token operator">=</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">-=</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span>
-   <span class="token comment" spellcheck="true">// 开 s.block.len个存储空间</span>
-   s<span class="token punctuation">.</span>page <span class="token operator">=</span> chunk<span class="token punctuation">.</span><span class="token function">NewOffPage</span><span class="token punctuation">(</span><span class="token function">int</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-   s<span class="token punctuation">.</span>cond <span class="token operator">=</span> utils<span class="token punctuation">.</span><span class="token function">NewCond</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>f<span class="token punctuation">.</span>Mutex<span class="token punctuation">)</span>
-   <span class="token comment" spellcheck="true">// 将当前的s前一个设置为f的最后一个</span>
-   s<span class="token punctuation">.</span>prev <span class="token operator">=</span> f<span class="token punctuation">.</span>last
-   <span class="token comment" spellcheck="true">// f的最后一个节点更新为当前s</span>
-   <span class="token operator">*</span><span class="token punctuation">(</span>f<span class="token punctuation">.</span>last<span class="token punctuation">)</span> <span class="token operator">=</span> s
-   f<span class="token punctuation">.</span>last <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>next<span class="token punctuation">)</span>
-   logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"newSlice block:[%d,%d]"</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token punctuation">,</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">)</span>
-   <span class="token comment" spellcheck="true">// get data things</span>
-   <span class="token keyword">go</span> s<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-   atomic<span class="token punctuation">.</span><span class="token function">AddInt64</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>readBufferUsed<span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-   <span class="token keyword">return</span> s
-<span class="token punctuation">}</span>
+<p><img src="/2022/05/26/JuiceFS%20Read/newSlice日志.png" alt="newSlice日志" style="zoom: 66%;"></p>
+<pre class=" language-lang-go"><code class="language-lang-go">// 当前的Block属于新的Slice
+func (f *fileReader) newSlice(block *frange) *sliceReader {
+   //logger.Warnf("new slice")
+   s := &sliceReader{}
+   s.file = f
+   s.lastAccess = time.Now()
+   // s.indx当前的off位于第几个Chunk
+   s.indx = uint32(block.off / meta.ChunkSize)
+   s.block = &frange{block.off, block.len}
+   // random read
+   // 当前off位于的Block的结束
+   // off                0MB       3.9MB          4MB
+   // blockend        4MB       4MB       8MB
+   blockend := (block.off/f.r.blockSize + 1) * f.r.blockSize
+   // 当前block.end是否超过文件总大小
+   if s.block.end() > f.length {
+      s.block.len = f.length - s.block.off
+   }
+    // 当前block.end()是否超过blockend,超过则更新block.len
+   if s.block.end() > blockend {
+      s.block.len = blockend - s.block.off
+   }
+   // 更新block的off和len用于下一个block
+   block.off = s.block.end()
+   block.len -= s.block.len
+   // 开 s.block.len个存储空间
+   s.page = chunk.NewOffPage(int(s.block.len))
+   s.cond = utils.NewCond(&f.Mutex)
+   // 将当前的s前一个设置为f的最后一个
+   s.prev = f.last
+   // f的最后一个节点更新为当前s
+   *(f.last) = s
+   f.last = &(s.next)
+   logger.Warnf("newSlice block:[%d,%d]", s.block.off, s.block.len)
+   // get data things
+   go s.run()
+   atomic.AddInt64(&readBufferUsed, int64(s.block.len))
+   return s
+}
 </code></pre>
-<h4 id="fileReader-prepareRequests"><a href="#fileReader-prepareRequests" class="headerlink" title="fileReader.prepareRequests"></a>fileReader.prepareRequests</h4><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">prepareRequests</span><span class="token punctuation">(</span>ranges <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>req <span class="token punctuation">{</span>
-   <span class="token keyword">var</span> reqs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>req
-   edges <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>ranges<span class="token punctuation">)</span>
-   <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> edges<span class="token number">-1</span><span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
-      <span class="token keyword">var</span> added <span class="token builtin">bool</span>
-      <span class="token comment" spellcheck="true">// b.off是本次开始读 b.len是本次读多少</span>
-      b <span class="token operator">:=</span> frange<span class="token punctuation">{</span>ranges<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> ranges<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> ranges<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">}</span>
-      f<span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-         <span class="token keyword">if</span> <span class="token operator">!</span>added <span class="token operator">&amp;&amp;</span> s<span class="token punctuation">.</span>state<span class="token punctuation">.</span><span class="token function">valid</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">include</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span>refs<span class="token operator">++</span>
-            s<span class="token punctuation">.</span>lastAccess <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-            reqs <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>reqs<span class="token punctuation">,</span> <span class="token operator">&amp;</span>req<span class="token punctuation">{</span>frange<span class="token punctuation">{</span>ranges<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token punctuation">,</span> b<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">}</span><span class="token punctuation">,</span> s<span class="token punctuation">}</span><span class="token punctuation">)</span>
-            added <span class="token operator">=</span> <span class="token boolean">true</span>
-         <span class="token punctuation">}</span>
-      <span class="token punctuation">}</span><span class="token punctuation">)</span>
-      <span class="token comment" spellcheck="true">// 第一次读会走下面这个</span>
-      <span class="token keyword">if</span> <span class="token operator">!</span>added <span class="token punctuation">{</span>
-         <span class="token keyword">for</span> b<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
-            logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"prepareRequests create slice"</span><span class="token punctuation">)</span>
-            s <span class="token operator">:=</span> f<span class="token punctuation">.</span><span class="token function">newSlice</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>b<span class="token punctuation">)</span>
-            s<span class="token punctuation">.</span>refs<span class="token operator">++</span>
-            reqs <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>reqs<span class="token punctuation">,</span> <span class="token operator">&amp;</span>req<span class="token punctuation">{</span>frange<span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">}</span><span class="token punctuation">,</span> s<span class="token punctuation">}</span><span class="token punctuation">)</span>
-            <span class="token comment" spellcheck="true">//logger.Warnf("b.off:%d b.len:%d s.block.len:%d", b.off, b.len, s.block.len)</span>
-         <span class="token punctuation">}</span>
-      <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">return</span> reqs
-<span class="token punctuation">}</span>
+<h4 id="fileReader-prepareRequests"><a href="#fileReader-prepareRequests" class="headerlink" title="fileReader.prepareRequests"></a>fileReader.prepareRequests</h4><pre class=" language-lang-go"><code class="language-lang-go">func (f *fileReader) prepareRequests(ranges []uint64) []*req {
+   var reqs []*req
+   edges := len(ranges)
+   for i := 0; i < edges-1; i++ {
+      var added bool
+      // b.off是本次开始读 b.len是本次读多少
+      b := frange{ranges[i], ranges[i+1] - ranges[i]}
+      f.visit(func(s *sliceReader) {
+         if !added && s.state.valid() && s.block.include(&b) {
+            s.refs++
+            s.lastAccess = time.Now()
+            reqs = append(reqs, &req{frange{ranges[i] - s.block.off, b.len}, s})
+            added = true
+         }
+      })
+      // 第一次读会走下面这个
+      if !added {
+         for b.len > 0 {
+            logger.Warnf("prepareRequests create slice")
+            s := f.newSlice(&b)
+            s.refs++
+            reqs = append(reqs, &req{frange{0, s.block.len}, s})
+            //logger.Warnf("b.off:%d b.len:%d s.block.len:%d", b.off, b.len, s.block.len)
+         }
+      }
+   }
+   return reqs
+}
 </code></pre>
-<h4 id="fileReader-readAhead"><a href="#fileReader-readAhead" class="headerlink" title="fileReader.readAhead"></a>fileReader.readAhead</h4><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileReader<span class="token punctuation">)</span> <span class="token function">readAhead</span><span class="token punctuation">(</span>block <span class="token operator">*</span>frange<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-   f<span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span>r <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-      <span class="token keyword">if</span> r<span class="token punctuation">.</span>state<span class="token punctuation">.</span><span class="token function">valid</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off <span class="token operator">&lt;=</span> block<span class="token punctuation">.</span>off <span class="token operator">&amp;&amp;</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> block<span class="token punctuation">.</span>off <span class="token punctuation">{</span>
-         <span class="token keyword">if</span> r<span class="token punctuation">.</span>state <span class="token operator">==</span> READY <span class="token operator">&amp;&amp;</span> block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">></span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token operator">&amp;&amp;</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off <span class="token operator">==</span> block<span class="token punctuation">.</span>off <span class="token operator">&amp;&amp;</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token operator">%</span>f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
-            <span class="token comment" spellcheck="true">// next block is ready, reduce readahead by a block</span>
-            block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">-=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token operator">/</span> <span class="token number">2</span>
-         <span class="token punctuation">}</span>
-         <span class="token keyword">if</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-         <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> <span class="token number">0</span>
-         <span class="token punctuation">}</span>
-         block<span class="token punctuation">.</span>off <span class="token operator">=</span> r<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-      <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span><span class="token punctuation">)</span>
-   <span class="token keyword">if</span> block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> block<span class="token punctuation">.</span>off <span class="token operator">&lt;</span> f<span class="token punctuation">.</span>length <span class="token operator">&amp;&amp;</span> <span class="token function">uint64</span><span class="token punctuation">(</span>atomic<span class="token punctuation">.</span><span class="token function">LoadInt64</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>readBufferUsed<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>readAheadTotal <span class="token punctuation">{</span>
-      <span class="token keyword">if</span> block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">&lt;</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token punctuation">{</span>
-         block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">+=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token operator">-</span> block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">%</span>f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>blockSize <span class="token comment" spellcheck="true">// align to end of a block</span>
-      <span class="token punctuation">}</span>
-      logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"readAhead"</span><span class="token punctuation">)</span>
-      f<span class="token punctuation">.</span><span class="token function">newSlice</span><span class="token punctuation">(</span>block<span class="token punctuation">)</span>
-      <span class="token keyword">if</span> block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
-         f<span class="token punctuation">.</span><span class="token function">readAhead</span><span class="token punctuation">(</span>block<span class="token punctuation">)</span>
-      <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<h4 id="fileReader-readAhead"><a href="#fileReader-readAhead" class="headerlink" title="fileReader.readAhead"></a>fileReader.readAhead</h4><pre class=" language-lang-go"><code class="language-lang-go">func (f *fileReader) readAhead(block *frange) {
+   f.visit(func(r *sliceReader) {
+      if r.state.valid() && r.block.off <= block.off && r.block.end() > block.off {
+         if r.state == READY && block.len > f.r.blockSize && r.block.off == block.off && r.block.off%f.r.blockSize == 0 {
+            // next block is ready, reduce readahead by a block
+            block.len -= f.r.blockSize / 2
+         }
+         if r.block.end() <= block.end() {
+            block.len = block.end() - r.block.end()
+         } else {
+            block.len = 0
+         }
+         block.off = r.block.end()
+      }
+   })
+   if block.len > 0 && block.off < f.length && uint64(atomic.LoadInt64(&readBufferUsed)) < f.r.readAheadTotal {
+      if block.len < f.r.blockSize {
+         block.len += f.r.blockSize - block.end()%f.r.blockSize // align to end of a block
+      }
+      logger.Warnf("readAhead")
+      f.newSlice(block)
+      if block.len > 0 {
+         f.readAhead(block)
+      }
+   }
+}
 </code></pre>
-<h4 id="sliceReader-run"><a href="#sliceReader-run" class="headerlink" title="sliceReader.run"></a>sliceReader.run</h4><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceReader<span class="token punctuation">)</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    f <span class="token operator">:=</span> s<span class="token punctuation">.</span>file
-    f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">defer</span> f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> s<span class="token punctuation">.</span>state <span class="token operator">!=</span> NEW <span class="token operator">||</span> f<span class="token punctuation">.</span><span class="token function">shouldStop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    s<span class="token punctuation">.</span>state <span class="token operator">=</span> BUSY
-    <span class="token comment" spellcheck="true">// 第几个Chunk</span>
-    indx <span class="token operator">:=</span> s<span class="token punctuation">.</span>indx
-    <span class="token comment" spellcheck="true">// inode号</span>
-    inode <span class="token operator">:=</span> f<span class="token punctuation">.</span>inode
-    f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<h4 id="sliceReader-run"><a href="#sliceReader-run" class="headerlink" title="sliceReader.run"></a>sliceReader.run</h4><pre class=" language-lang-go"><code class="language-lang-go">func (s *sliceReader) run() {
+    f := s.file
+    f.Lock()
+    defer f.Unlock()
+    if s.state != NEW || f.shouldStop() {
+        s.done(0, 0)
+    }
+    s.state = BUSY
+    // 第几个Chunk
+    indx := s.indx
+    // inode号
+    inode := f.inode
+    f.Unlock()
 
-    f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 文件大小</span>
-    length <span class="token operator">:=</span> f<span class="token punctuation">.</span>length
-    f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">var</span> chunks <span class="token punctuation">[</span><span class="token punctuation">]</span>meta<span class="token punctuation">.</span>Slice
-    <span class="token comment" spellcheck="true">// it is read metadata info</span>
-    err <span class="token operator">:=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>m<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>meta<span class="token punctuation">.</span>Background<span class="token punctuation">,</span> inode<span class="token punctuation">,</span> indx<span class="token punctuation">,</span> <span class="token operator">&amp;</span>chunks<span class="token punctuation">)</span>
-    f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> s<span class="token punctuation">.</span>state <span class="token operator">!=</span> BUSY <span class="token operator">||</span> f<span class="token punctuation">.</span>err <span class="token operator">!=</span> <span class="token number">0</span> <span class="token operator">||</span> f<span class="token punctuation">.</span>closing <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">if</span> err <span class="token operator">==</span> syscall<span class="token punctuation">.</span>ENOENT <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span>err<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
-        f<span class="token punctuation">.</span>tried<span class="token operator">++</span>
-        trycnt <span class="token operator">:=</span> f<span class="token punctuation">.</span>tried
-        <span class="token keyword">if</span> trycnt <span class="token operator">>=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>maxRetries <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span>syscall<span class="token punctuation">.</span>EIO<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">retry_time</span><span class="token punctuation">(</span>trycnt<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+    f.Lock()
+    // 文件大小
+    length := f.length
+    f.Unlock()
+    var chunks []meta.Slice
+    // it is read metadata info
+    err := f.r.m.Read(meta.Background, inode, indx, &chunks)
+    f.Lock()
+    if s.state != BUSY || f.err != 0 || f.closing {
+        s.done(0, 0)
+    }
+    if err == syscall.ENOENT {
+        s.done(err, 0)
+    } else if err != 0 {
+        f.tried++
+        trycnt := f.tried
+        if trycnt >= f.r.maxRetries {
+            s.done(syscall.EIO, 0)
+        } else {
+            s.done(0, retry_time(trycnt))
+        }
+    }
 
-    s<span class="token punctuation">.</span>currentPos <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">if</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off <span class="token operator">></span> length <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> <span class="token number">0</span>
-        s<span class="token punctuation">.</span>state <span class="token operator">=</span> READY
-        s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> length <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> length <span class="token operator">-</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off
-    <span class="token punctuation">}</span>
-    need <span class="token operator">:=</span> s<span class="token punctuation">.</span>block<span class="token punctuation">.</span><span class="token builtin">len</span>
-    f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    s.currentPos = 0
+    if s.block.off > length {
+        s.block.len = 0
+        s.state = READY
+        s.done(0, 0)
+    } else if s.block.end() > length {
+        s.block.len = length - s.block.off
+    }
+    need := s.block.len
+    f.Unlock()
 
-    p <span class="token operator">:=</span> s<span class="token punctuation">.</span>page<span class="token punctuation">.</span><span class="token function">Slice</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>need<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token keyword">defer</span> p<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">var</span> n <span class="token builtin">int</span>
-    ctx <span class="token operator">:=</span> context<span class="token punctuation">.</span><span class="token function">TODO</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// it is really read bytes</span>
-    <span class="token comment" spellcheck="true">// (uint32(s.block.off))%meta.ChunkSize 决定在该Chunk的哪个位置开始读</span>
-    n <span class="token operator">=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> p<span class="token punctuation">,</span> chunks<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token function">uint32</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>block<span class="token punctuation">.</span>off<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">%</span>meta<span class="token punctuation">.</span>ChunkSize<span class="token punctuation">)</span>
+    p := s.page.Slice(0, int(need))
+    defer p.Release()
+    var n int
+    ctx := context.TODO()
+    // it is really read bytes
+    // (uint32(s.block.off))%meta.ChunkSize 决定在该Chunk的哪个位置开始读
+    n = f.r.Read(ctx, p, chunks, (uint32(s.block.off))%meta.ChunkSize)
 
-    f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> s<span class="token punctuation">.</span>state <span class="token operator">!=</span> BUSY <span class="token operator">||</span> f<span class="token punctuation">.</span><span class="token function">shouldStop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">if</span> n <span class="token operator">==</span> <span class="token function">int</span><span class="token punctuation">(</span>need<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span>state <span class="token operator">=</span> READY
-        s<span class="token punctuation">.</span>currentPos <span class="token operator">=</span> <span class="token function">uint32</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span>
-        s<span class="token punctuation">.</span>file<span class="token punctuation">.</span>tried <span class="token operator">=</span> <span class="token number">0</span>
-        s<span class="token punctuation">.</span>lastAccess <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-        s<span class="token punctuation">.</span>currentPos <span class="token operator">=</span> <span class="token number">0</span> <span class="token comment" spellcheck="true">// start again from beginning</span>
-        err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EIO
-        f<span class="token punctuation">.</span>tried<span class="token operator">++</span>
-        <span class="token boolean">_</span> <span class="token operator">=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>m<span class="token punctuation">.</span><span class="token function">InvalidateChunkCache</span><span class="token punctuation">(</span>meta<span class="token punctuation">.</span>Background<span class="token punctuation">,</span> inode<span class="token punctuation">,</span> indx<span class="token punctuation">)</span>
-        <span class="token keyword">if</span> f<span class="token punctuation">.</span>tried <span class="token operator">>=</span> f<span class="token punctuation">.</span>r<span class="token punctuation">.</span>maxRetries <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span>err<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">retry_time</span><span class="token punctuation">(</span>f<span class="token punctuation">.</span>tried<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    f.Lock()
+    if s.state != BUSY || f.shouldStop() {
+        s.done(0, 0)
+    }
+    if n == int(need) {
+        s.state = READY
+        s.currentPos = uint32(n)
+        s.file.tried = 0
+        s.lastAccess = time.Now()
+        s.done(0, 0)
+    } else {
+        s.currentPos = 0 // start again from beginning
+        err = syscall.EIO
+        f.tried++
+        _ = f.r.m.InvalidateChunkCache(meta.Background, inode, indx)
+        if f.tried >= f.r.maxRetries {
+            s.done(err, 0)
+        } else {
+            s.done(0, retry_time(f.tried))
+        }
+    }
+}
 </code></pre>
 <h4 id="redisMeta-Read"><a href="#redisMeta-Read" class="headerlink" title="redisMeta.Read"></a>redisMeta.Read</h4><ol>
 <li>判断当前inode的index的Chunk是否已经读取过，读取过则返回</li>
@@ -1055,107 +1050,115 @@
 <li>调用buildSlice方法，合并需要的Block</li>
 <li>将合并后的Block缓存在缓存文件中</li>
 </ol>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>redisMeta<span class="token punctuation">)</span> <span class="token function">Read</span><span class="token punctuation">(</span>ctx Context<span class="token punctuation">,</span> inode Ino<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">,</span> chunks <span class="token operator">*</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno <span class="token punctuation">{</span>
-    f <span class="token operator">:=</span> r<span class="token punctuation">.</span>of<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span>inode<span class="token punctuation">)</span>
-    <span class="token keyword">if</span> f <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        f<span class="token punctuation">.</span><span class="token function">RLock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">defer</span> f<span class="token punctuation">.</span><span class="token function">RUnlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true">// 判断当前inode的第indxChunk是否已经有</span>
-    <span class="token keyword">if</span> cs<span class="token punctuation">,</span> ok <span class="token operator">:=</span> r<span class="token punctuation">.</span>of<span class="token punctuation">.</span><span class="token function">ReadChunk</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> indx<span class="token punctuation">)</span><span class="token punctuation">;</span> ok <span class="token punctuation">{</span>
-        <span class="token operator">*</span>chunks <span class="token operator">=</span> cs
-        <span class="token keyword">return</span> <span class="token number">0</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">defer</span> <span class="token function">timeit</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">//从redis中获取inode和indx的value,从而利用反序列的方式读取出来</span>
-    vals<span class="token punctuation">,</span> err <span class="token operator">:=</span> r<span class="token punctuation">.</span>rdb<span class="token punctuation">.</span><span class="token function">LRange</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> r<span class="token punctuation">.</span><span class="token function">chunkKey</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> indx<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1000000</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Result</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> <span class="token function">errno</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    ss <span class="token operator">:=</span> <span class="token function">readSlices</span><span class="token punctuation">(</span>vals<span class="token punctuation">)</span>
-    <span class="token operator">*</span>chunks <span class="token operator">=</span> <span class="token function">buildSlice</span><span class="token punctuation">(</span>ss<span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 缓存下来</span>
-    r<span class="token punctuation">.</span>of<span class="token punctuation">.</span><span class="token function">CacheChunk</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> indx<span class="token punctuation">,</span> <span class="token operator">*</span>chunks<span class="token punctuation">)</span>
-    <span class="token keyword">if</span> <span class="token operator">!</span>r<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>ReadOnly <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>vals<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">5</span> <span class="token operator">||</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>chunks<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">go</span> r<span class="token punctuation">.</span><span class="token function">compactChunk</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> indx<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">return</span> <span class="token number">0</span>
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func (r *redisMeta) Read(ctx Context, inode Ino, indx uint32, chunks *[]Slice) syscall.Errno {
+    f := r.of.find(inode)
+    if f != nil {
+        f.RLock()
+        defer f.RUnlock()
+    }
+    // 判断当前inode的第indxChunk是否已经有
+    if cs, ok := r.of.ReadChunk(inode, indx); ok {
+        *chunks = cs
+        return 0
+    }
+    defer timeit(time.Now())
+    //从redis中获取inode和indx的value,从而利用反序列的方式读取出来
+    vals, err := r.rdb.LRange(ctx, r.chunkKey(inode, indx), 0, 1000000).Result()
+    if err != nil {
+        return errno(err)
+    }
+    ss := readSlices(vals)
+    *chunks = buildSlice(ss)
+    // 缓存下来
+    r.of.CacheChunk(inode, indx, *chunks)
+    if !r.conf.ReadOnly && (len(vals) >= 5 || len(*chunks) >= 5) {
+        go r.compactChunk(inode, indx, false)
+    }
+    return 0
+}
 </code></pre>
-<h2 id="buildSlice详解"><a href="#buildSlice详解" class="headerlink" title="buildSlice详解"></a>buildSlice详解</h2><h3 id="什么是Chunk、Slice和Block？"><a href="#什么是Chunk、Slice和Block？" class="headerlink" title="什么是Chunk、Slice和Block？"></a>什么是Chunk、Slice和Block？</h3><p>​	文件在JuiceFS先被分为固定大小的Chunk「固定上限为64MB」。Slice是Chunk的一小部分，没有固定大小。Block是Slice的一小部分，一个Slice可以被切成多个Block「默认大小为4MB」，Block是JuiceFS中具体存储的物理object。</p>
-<p>​	Slice的cut和visit方法让JuiceFS具备随机写的能力。cut方法是将多个Slice列表按照chunkId升序排列，chunkId大的Slice覆盖chunkId小的Slice范围。visit方法在Slice列表cut后，将其Slice列表从前往后组合成需要获取每个chunkId的Slice的数据范围。</p>
-<h3 id="slice结构"><a href="#slice结构" class="headerlink" title="slice结构"></a>slice结构</h3><table>
+<h2 id="buildSlice详解"><a href="#buildSlice详解" class="headerlink" title="buildSlice详解"></a>buildSlice详解</h2><h3 id="什么是Chunk、Slice和Block？"><a href="#什么是Chunk、Slice和Block？" class="headerlink" title="什么是Chunk、Slice和Block？"></a>什么是Chunk、Slice和Block？</h3><p>​    文件在JuiceFS先被分为固定大小的Chunk「固定上限为64MB」。Slice是Chunk的一小部分，没有固定大小。Block是Slice的一小部分，一个Slice可以被切成多个Block「默认大小为4MB」，Block是JuiceFS中具体存储的物理object。</p>
+<p>​    Slice的cut和visit方法让JuiceFS具备随机写的能力。cut方法是将多个Slice列表按照chunkId升序排列，chunkId大的Slice覆盖chunkId小的Slice范围。visit方法在Slice列表cut后，将其Slice列表从前往后组合成需要获取每个chunkId的Slice的数据范围。</p>
+<h3 id="slice结构"><a href="#slice结构" class="headerlink" title="slice结构"></a>slice结构</h3><div class="table-container">
+<table>
 <thead>
 <tr>
-<th align="center">属性</th>
-<th align="center">解释</th>
+<th style="text-align:center">属性</th>
+<th style="text-align:center">解释</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="center">uint64  chunkId</td>
-<td align="center">Chunk的id</td>
+<tbody>
+<tr>
+<td style="text-align:center">uint64  chunkId</td>
+<td style="text-align:center">Chunk的id</td>
 </tr>
 <tr>
-<td align="center">uint32 pos</td>
-<td align="center">slice在Chunk的开始索引</td>
+<td style="text-align:center">uint32 pos</td>
+<td style="text-align:center">slice在Chunk的开始索引</td>
 </tr>
 <tr>
-<td align="center">uint32 size</td>
-<td align="center">slice大小</td>
+<td style="text-align:center">uint32 size</td>
+<td style="text-align:center">slice大小</td>
 </tr>
 <tr>
-<td align="center">uint32 off</td>
-<td align="center">slice的开始索引</td>
+<td style="text-align:center">uint32 off</td>
+<td style="text-align:center">slice的开始索引</td>
 </tr>
 <tr>
-<td align="center">uint32 len</td>
-<td align="center">slice需要读取数据长度</td>
+<td style="text-align:center">uint32 len</td>
+<td style="text-align:center">slice需要读取数据长度</td>
 </tr>
 <tr>
-<td align="center">*slice left</td>
-<td align="center">左节点</td>
+<td style="text-align:center">*slice left</td>
+<td style="text-align:center">左节点</td>
 </tr>
 <tr>
-<td align="center">*slice right</td>
-<td align="center">右节点</td>
+<td style="text-align:center">*slice right</td>
+<td style="text-align:center">右节点</td>
 </tr>
-</tbody></table>
-<h3 id="Slice结构"><a href="#Slice结构" class="headerlink" title="Slice结构"></a>Slice结构</h3><table>
+</tbody>
+</table>
+</div>
+<h3 id="Slice结构"><a href="#Slice结构" class="headerlink" title="Slice结构"></a>Slice结构</h3><div class="table-container">
+<table>
 <thead>
 <tr>
-<th align="center">属性</th>
-<th align="center">解释</th>
+<th style="text-align:center">属性</th>
+<th style="text-align:center">解释</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="center">uint64  ChunkId</td>
-<td align="center">Chunk id</td>
+<tbody>
+<tr>
+<td style="text-align:center">uint64  ChunkId</td>
+<td style="text-align:center">Chunk id</td>
 </tr>
 <tr>
-<td align="center">uint32 Size</td>
-<td align="center">Slice的大小</td>
+<td style="text-align:center">uint32 Size</td>
+<td style="text-align:center">Slice的大小</td>
 </tr>
 <tr>
-<td align="center">uint32 Off</td>
-<td align="center">Slice开始索引</td>
+<td style="text-align:center">uint32 Off</td>
+<td style="text-align:center">Slice开始索引</td>
 </tr>
 <tr>
-<td align="center">uint32 Len</td>
-<td align="center">Slice需读取长度</td>
+<td style="text-align:center">uint32 Len</td>
+<td style="text-align:center">Slice需读取长度</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <p><em>注意：slice是cut和visit使用的，Slice是visit对slice处理的结果集合</em></p>
-<h3 id="buildSlice"><a href="#buildSlice" class="headerlink" title="buildSlice"></a>buildSlice</h3><p>​	slice是按照chunkId进行升序的slice数组，需要对其进行cut操作。当遍历到i时，slice[i]会覆盖slice[0] - slice[i - 1]与slice[i]的区间，换句话说：slice[i]的区间是每次必须要的如果前面也出现此区间则会覆盖之前的区间。</p>
-<p>​	用root来记录当前已经处理的链表节点「第一次循环时，将s赋给root」。</p>
-<p>​	对slice进行cut后，对root节点的双向链表进行遍历，获取到从开始到结束的Slice数组，便于寻找目标数据。</p>
+<h3 id="buildSlice"><a href="#buildSlice" class="headerlink" title="buildSlice"></a>buildSlice</h3><p>​    slice是按照chunkId进行升序的slice数组，需要对其进行cut操作。当遍历到i时，slice[i]会覆盖slice[0] - slice[i - 1]与slice[i]的区间，换句话说：slice[i]的区间是每次必须要的如果前面也出现此区间则会覆盖之前的区间。</p>
+<p>​    用root来记录当前已经处理的链表节点「第一次循环时，将s赋给root」。</p>
+<p>​    对slice进行cut后，对root节点的双向链表进行遍历，获取到从开始到结束的Slice数组，便于寻找目标数据。</p>
 <h4 id="buildSlice过程"><a href="#buildSlice过程" class="headerlink" title="buildSlice过程"></a>buildSlice过程</h4><ol>
 <li>根据chunkId对sliceList进行升序，遍历sliceList的过程中使用root来记录当前已经切分好的分片序列</li>
 <li>root是一个双向链表，记录着已经切片完成的slice序列</li>
 <li>遍历sliceList过程中，本次循环中的slice的[off,off+len]数据是需要覆盖root链表的区间</li>
 <li>每次遍历sliceList时，先对s.pos左边切分，在对s.pos + s.len进行右切分（[pos,pos+len]是必须要的，所以不用切分）<ol>
-<li>每次调用cut会返回&lt;left,right&gt;</li>
-<li>对pos进行左切分后得到的&lt;left,right&gt;，left是s.pos左边已经切分好的节点，需将left设置为s.left。</li>
-<li>right需要作为root节点对pos右边进行右切分，右切分返回的&lt;left,right&gt;，我们将其right设置为s.right节点</li>
+<li>每次调用cut会返回<left,right></left,right></li>
+<li>对pos进行左切分后得到的<left,right>，left是s.pos左边已经切分好的节点，需将left设置为s.left。</left,right></li>
+<li>right需要作为root节点对pos右边进行右切分，右切分返回的<left,right>，我们将其right设置为s.right节点</left,right></li>
 </ol>
 </li>
 <li>在切片过程中，off和len是随着切片的细化而变化，但pos和size不会变，分别是slice在Chunk中的下标和slice原本的大小。</li>
@@ -1166,133 +1169,127 @@
 <ol>
 <li>用pos记录当前处理到的下标，Slice[] chunk用来记录返回数据，s为当前的节点</li>
 <li>s.pos &gt; pos（当前节点的pos和pos之间是缺少数据的），用当前s的[0,pos]数据来填充这段Slice，将Slice放入chunk中，pos移动到s.pos</li>
-<li>添加当前s到chunk中，pos +&#x3D; s.len（s.len代表当前s切片后的实际需要大小）</li>
+<li>添加当前s到chunk中，pos += s.len（s.len代表当前s切片后的实际需要大小）</li>
 <li>在处理过程中遇到slice片之间断层时，我们将其设置为[0,0,0,len]的一个Slice，这样在真实获取数据时，可以根据Size和Off来标识当前Slice为一个断层Slice</li>
 </ol>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">buildSlice</span><span class="token punctuation">(</span>ss <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>slice<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>Slice <span class="token punctuation">{</span>
-  <span class="token comment" spellcheck="true">// 用root记录当前处理已经cut好的slice；第一次循环只会将root设置为s</span>
-  <span class="token comment" spellcheck="true">// root实则是一个双向链表；每次遍历过程中，s的内容是必须要的，主要是对s.pos在root中的左边位置进行cut和对s.pos+s.len在root中右边位置进行cut</span>
-  <span class="token comment" spellcheck="true">// cut方法有两个返回值，第一个是传入的pos与root切分的左边节点；第二个是由于root左边被切了，右边需要更新对应的开始索引，右边用于对s.pos + s.len进行右切分</span>
-  <span class="token keyword">var</span> root <span class="token operator">*</span>slice
-  <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token keyword">range</span> ss <span class="token punctuation">{</span>
-    s <span class="token operator">:=</span> <span class="token function">new</span><span class="token punctuation">(</span>slice<span class="token punctuation">)</span>
-    <span class="token operator">*</span>s <span class="token operator">=</span> <span class="token operator">*</span>ss<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
-    <span class="token keyword">var</span> right <span class="token operator">*</span>slice
-    <span class="token comment" spellcheck="true">// 以s.pos作为基准对root的[root的最左的节点的pos,pos]和[pos,root的最右的节点的pos + len]</span>
-    <span class="token comment" spellcheck="true">// 左边已经被切出来了，所以将当前s.left更新为切好的第一个返回值</span>
-    s<span class="token punctuation">.</span>left<span class="token punctuation">,</span> right <span class="token operator">=</span> root<span class="token punctuation">.</span><span class="token function">cut</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>pos<span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 以s.pos + s.len作为基准对right「（已经左切分好的root）的右边」进行右切分，得到的以s.pos+s.len的root节点作为s.right「因为遍历的当前节点是需要全部取到的，所以不用管与s重合部分」</span>
-    <span class="token boolean">_</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>right <span class="token operator">=</span> right<span class="token punctuation">.</span><span class="token function">cut</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>pos <span class="token operator">+</span> s<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">//每次将s作为root「当作当前已经处理好的节点」</span>
-    root <span class="token operator">=</span> s
-  <span class="token punctuation">}</span>
-  <span class="token comment" spellcheck="true">// it is cur deal pos</span>
-  <span class="token keyword">var</span> pos <span class="token builtin">uint32</span>
-  <span class="token comment" spellcheck="true">// it is cur deal chunk</span>
-  <span class="token keyword">var</span> chunk <span class="token punctuation">[</span><span class="token punctuation">]</span>Slice
-  root<span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span>s <span class="token operator">*</span>slice<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// 处理断层现象s.pos和上一个pos之间缺少内容，ChunkId = 0来表示这个断层slice</span>
-    <span class="token keyword">if</span> s<span class="token punctuation">.</span>pos <span class="token operator">></span> pos <span class="token punctuation">{</span>
-      chunk <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>chunk<span class="token punctuation">,</span> Slice<span class="token punctuation">{</span>Size<span class="token punctuation">:</span> s<span class="token punctuation">.</span>pos <span class="token operator">-</span> pos<span class="token punctuation">,</span> Len<span class="token punctuation">:</span> s<span class="token punctuation">.</span>pos <span class="token operator">-</span> pos<span class="token punctuation">}</span><span class="token punctuation">)</span>
-      pos <span class="token operator">=</span> s<span class="token punctuation">.</span>pos
-    <span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true">// 每次将cut的Slice填充到slice中</span>
-    chunk <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>chunk<span class="token punctuation">,</span> Slice<span class="token punctuation">{</span>Chunkid<span class="token punctuation">:</span> s<span class="token punctuation">.</span>chunkid<span class="token punctuation">,</span> Size<span class="token punctuation">:</span> s<span class="token punctuation">.</span>size<span class="token punctuation">,</span> Off<span class="token punctuation">:</span> s<span class="token punctuation">.</span>off<span class="token punctuation">,</span> Len<span class="token punctuation">:</span> s<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
-    pos <span class="token operator">+=</span> s<span class="token punctuation">.</span><span class="token builtin">len</span>
-  <span class="token punctuation">}</span><span class="token punctuation">)</span>
-  <span class="token keyword">return</span> chunk
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func buildSlice(ss []*slice) []Slice {
+  // 用root记录当前处理已经cut好的slice；第一次循环只会将root设置为s
+  // root实则是一个双向链表；每次遍历过程中，s的内容是必须要的，主要是对s.pos在root中的左边位置进行cut和对s.pos+s.len在root中右边位置进行cut
+  // cut方法有两个返回值，第一个是传入的pos与root切分的左边节点；第二个是由于root左边被切了，右边需要更新对应的开始索引，右边用于对s.pos + s.len进行右切分
+  var root *slice
+  for i := range ss {
+    s := new(slice)
+    *s = *ss[i]
+    var right *slice
+    // 以s.pos作为基准对root的[root的最左的节点的pos,pos]和[pos,root的最右的节点的pos + len]
+    // 左边已经被切出来了，所以将当前s.left更新为切好的第一个返回值
+    s.left, right = root.cut(s.pos)
+    // 以s.pos + s.len作为基准对right「（已经左切分好的root）的右边」进行右切分，得到的以s.pos+s.len的root节点作为s.right「因为遍历的当前节点是需要全部取到的，所以不用管与s重合部分」
+    _, s.right = right.cut(s.pos + s.len)
+    //每次将s作为root「当作当前已经处理好的节点」
+    root = s
+  }
+  // it is cur deal pos
+  var pos uint32
+  // it is cur deal chunk
+  var chunk []Slice
+  root.visit(func(s *slice) {
+    // 处理断层现象s.pos和上一个pos之间缺少内容，ChunkId = 0来表示这个断层slice
+    if s.pos > pos {
+      chunk = append(chunk, Slice{Size: s.pos - pos, Len: s.pos - pos})
+      pos = s.pos
+    }
+    // 每次将cut的Slice填充到slice中
+    chunk = append(chunk, Slice{Chunkid: s.chunkid, Size: s.size, Off: s.off, Len: s.len})
+    pos += s.len
+  })
+  return chunk
+}
 </code></pre>
-<h3 id="cut"><a href="#cut" class="headerlink" title="cut"></a>cut</h3><p>​	slice cut方法根据当前节点slice对传入的pos进行切分（root代表切分完成的链表节点）。</p>
-<p>​	当前pos可能会覆盖到多个左slice或者多个右slice。当前节点所在的片为4，需要先对pos进行左切片；先寻找到pos所在的片，在2的基础上以pos为基准对其左右进行分割。</p>
-<img src="/2022/05/26/JuiceFS%20Read/pos跨多个左片.png" alt="pos跨多个左片" style="zoom:67%;">
-
-<p>​	对2左分割后得到pos左边的2和pos右边的right。再以right作为基础对pos+len进行右切割，会先从right寻找到pos+len所在的节点，在对pos+len进行右切分。</p>
-<img src="/2022/05/26/JuiceFS%20Read/对pos的左切片.png" alt="pos的左切片" style="zoom:67%;">
-
-<p>​	pos+len所在的节点为4，我们只需要4中pos+len的右部分。图中粉色部分都是被[pos,pos+len]覆盖的区间。</p>
-<img src="/2022/05/26/JuiceFS%20Read/对pos+len右切片.png" alt="pos+len右切片" style="zoom: 67%;">
-
+<h3 id="cut"><a href="#cut" class="headerlink" title="cut"></a>cut</h3><p>​    slice cut方法根据当前节点slice对传入的pos进行切分（root代表切分完成的链表节点）。</p>
+<p>​    当前pos可能会覆盖到多个左slice或者多个右slice。当前节点所在的片为4，需要先对pos进行左切片；先寻找到pos所在的片，在2的基础上以pos为基准对其左右进行分割。</p>
+<p><img src="/2022/05/26/JuiceFS%20Read/pos跨多个左片.png" alt="pos跨多个左片" style="zoom:67%;"></p>
+<p>​    对2左分割后得到pos左边的2和pos右边的right。再以right作为基础对pos+len进行右切割，会先从right寻找到pos+len所在的节点，在对pos+len进行右切分。</p>
+<p><img src="/2022/05/26/JuiceFS%20Read/对pos的左切片.png" alt="pos的左切片" style="zoom:67%;"></p>
+<p>​    pos+len所在的节点为4，我们只需要4中pos+len的右部分。图中粉色部分都是被[pos,pos+len]覆盖的区间。</p>
+<p><img src="/2022/05/26/JuiceFS%20Read/对pos+len右切片.png" alt="pos+len右切片" style="zoom: 67%;"></p>
 <ol>
-<li>当slice.pos &lt;&#x3D; root.pos时会进行左递归找出root中最左与slice.pos重合的slice片段对其进行切分</li>
-<li>当slice.pos &gt;&#x3D; root.pos时会进行右递归找出root中最右与slice.pos + slice.len重合的slice片段对其进行切分</li>
+<li>当slice.pos &lt;= root.pos时会进行左递归找出root中最左与slice.pos重合的slice片段对其进行切分</li>
+<li>当slice.pos &gt;= root.pos时会进行右递归找出root中最右与slice.pos + slice.len重合的slice片段对其进行切分</li>
 <li>当slice.pos在root的片段中当前片段中时，会将root当前片段中与slice重合的部分设置为slice，将root与slice边缘部分对root进行切分。</li>
 </ol>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>slice<span class="token punctuation">)</span> <span class="token function">cut</span><span class="token punctuation">(</span>pos <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>left<span class="token punctuation">,</span> right <span class="token operator">*</span>slice<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> s <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">if</span> pos <span class="token operator">&lt;=</span> s<span class="token punctuation">.</span>pos <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">// pos 在当前s的左边节点中，需要对其进行左边寻找</span>
-        <span class="token comment" spellcheck="true">// 如果缺少slice则会创建新的slice来填充其余部分</span>
-        <span class="token keyword">if</span> s<span class="token punctuation">.</span>left <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span>left <span class="token operator">=</span> <span class="token function">newSlice</span><span class="token punctuation">(</span>pos<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>pos<span class="token operator">-</span>pos<span class="token punctuation">)</span>
-        <span class="token punctuation">}</span>
-        left<span class="token punctuation">,</span> s<span class="token punctuation">.</span>left <span class="token operator">=</span> s<span class="token punctuation">.</span>left<span class="token punctuation">.</span><span class="token function">cut</span><span class="token punctuation">(</span>pos<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> left<span class="token punctuation">,</span> s
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> pos <span class="token operator">&lt;</span> s<span class="token punctuation">.</span>pos<span class="token operator">+</span>s<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">// pos 就在当前s中，对s进行切割</span>
-        l <span class="token operator">:=</span> pos <span class="token operator">-</span> s<span class="token punctuation">.</span>pos
-        right <span class="token operator">=</span> <span class="token function">newSlice</span><span class="token punctuation">(</span>pos<span class="token punctuation">,</span> s<span class="token punctuation">.</span>chunkid<span class="token punctuation">,</span> s<span class="token punctuation">.</span>size<span class="token punctuation">,</span> s<span class="token punctuation">.</span>off<span class="token operator">+</span>l<span class="token punctuation">,</span> s<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token operator">-</span>l<span class="token punctuation">)</span>
-        right<span class="token punctuation">.</span>right <span class="token operator">=</span> s<span class="token punctuation">.</span>right
-        s<span class="token punctuation">.</span><span class="token builtin">len</span> <span class="token operator">=</span> l
-        s<span class="token punctuation">.</span>right <span class="token operator">=</span> <span class="token boolean">nil</span>
-        <span class="token keyword">return</span> s<span class="token punctuation">,</span> right
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">// pos 在当前s的右边节点中，需要对其进行右边寻找</span>
-        <span class="token comment" spellcheck="true">// 如果缺少slice则会创建新的slice来填充其余部分</span>
-        <span class="token keyword">if</span> s<span class="token punctuation">.</span>right <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-            s<span class="token punctuation">.</span>right <span class="token operator">=</span> <span class="token function">newSlice</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>pos<span class="token operator">+</span>s<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> pos<span class="token operator">-</span>s<span class="token punctuation">.</span>pos<span class="token operator">-</span>s<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span>
-        s<span class="token punctuation">.</span>right<span class="token punctuation">,</span> right <span class="token operator">=</span> s<span class="token punctuation">.</span>right<span class="token punctuation">.</span><span class="token function">cut</span><span class="token punctuation">(</span>pos<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> s<span class="token punctuation">,</span> right
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func (s *slice) cut(pos uint32) (left, right *slice) {
+    if s == nil {
+        return nil, nil
+    }
+    if pos <= s.pos {
+        // pos 在当前s的左边节点中，需要对其进行左边寻找
+        // 如果缺少slice则会创建新的slice来填充其余部分
+        if s.left == nil {
+            s.left = newSlice(pos, 0, 0, 0, s.pos-pos)
+        }
+        left, s.left = s.left.cut(pos)
+        return left, s
+    } else if pos < s.pos+s.len {
+        // pos 就在当前s中，对s进行切割
+        l := pos - s.pos
+        right = newSlice(pos, s.chunkid, s.size, s.off+l, s.len-l)
+        right.right = s.right
+        s.len = l
+        s.right = nil
+        return s, right
+    } else {
+        // pos 在当前s的右边节点中，需要对其进行右边寻找
+        // 如果缺少slice则会创建新的slice来填充其余部分
+        if s.right == nil {
+            s.right = newSlice(s.pos+s.len, 0, 0, 0, pos-s.pos-s.len)
+        }
+        s.right, right = s.right.cut(pos)
+        return s, right
+    }
+}
 </code></pre>
 <h2 id="slice-Cut"><a href="#slice-Cut" class="headerlink" title="slice Cut"></a>slice Cut</h2><p>​    </p>
-<img src="/2022/05/26/JuiceFS%20Read/1.png" alt="pos在root范围情况" style="zoom: 50%;">
-
+<p><img src="/2022/05/26/JuiceFS%20Read/1.png" alt="pos在root范围情况" style="zoom: 50%;"></p>
 <ol>
-<li>slice.pos &lt;&#x3D; root.pos<ol>
+<li>slice.pos &lt;= root.pos<ol>
 <li>对root的最左node的pos到slice.pos之间的进行切片处理</li>
-<li>如果当前root.left &#x3D; null且slice.pos !&#x3D; root.pos则代表需要将root.left设置为以[slice.pos,root.pos]为区间的slice，（原有的root在slice.pos-roo.pos之间是空缺的）</li>
-<li>如果当前root.left &#x3D; null则将pair设置为null</li>
-<li>如果当前root.left !&#x3D; null 则向左进行递归，将root.left作为root节点调用cut方法</li>
-<li>处理完root.left切片后，得到&lt;left,right&gt;</li>
+<li>如果当前root.left = null且slice.pos != root.pos则代表需要将root.left设置为以[slice.pos,root.pos]为区间的slice，（原有的root在slice.pos-roo.pos之间是空缺的）</li>
+<li>如果当前root.left = null则将pair设置为null</li>
+<li>如果当前root.left != null 则向左进行递归，将root.left作为root节点调用cut方法</li>
+<li>处理完root.left切片后，得到<left,right></left,right></li>
 <li>将right设置为root.left</li>
-<li>组装这次调用cut方法进行切分的&lt;left,right&gt;，返回结果</li>
+<li>组装这次调用cut方法进行切分的<left,right>，返回结果</left,right></li>
 <li>结合以下图进行理解</li>
 </ol>
 </li>
 </ol>
-<img src="/2022/05/26/JuiceFS%20Read/2.png" alt="第一种情况" style="zoom: 50%;">
-
+<p><img src="/2022/05/26/JuiceFS%20Read/2.png" alt="第一种情况" style="zoom: 50%;"></p>
 <ol>
 <li>slice.pos &lt; root.pos + root.len<ol>
 <li>以slice.pos作为基准线将其左右进行拆分处理，slice.pos在root的内部代表切分slice.pos的左侧不会涉及root.left，只会对root的[root.pos,slice.pos]进行左切分</li>
-<li>先对root中slice.pos右边位置进行处理，l &#x3D; slice.pos - root.pos（l是计算slice.pos和root.pos之间的差值），切出right为[root.chunkId,slice.pos,root.size,root.off + l,root.len - l]。将root.right节点设置为right的right节点</li>
-<li>将当前root节点的len设置为l（已经对root的右边进行切分，root作为左边即需要将len设置为切分后左边的长度），将root与root.right断开（root已经被切分成&lt;root,right&gt; 真实的root.right.left必须是已经切分出的right节点）</li>
-<li>组装这次调用cut方法进行切分的&lt;left,right&gt;，返回结果</li>
+<li>先对root中slice.pos右边位置进行处理，l = slice.pos - root.pos（l是计算slice.pos和root.pos之间的差值），切出right为[root.chunkId,slice.pos,root.size,root.off + l,root.len - l]。将root.right节点设置为right的right节点</li>
+<li>将当前root节点的len设置为l（已经对root的右边进行切分，root作为左边即需要将len设置为切分后左边的长度），将root与root.right断开（root已经被切分成<root,right> 真实的root.right.left必须是已经切分出的right节点）</root,right></li>
+<li>组装这次调用cut方法进行切分的<left,right>，返回结果</left,right></li>
 <li>结合以下图进行理解</li>
 </ol>
 </li>
 </ol>
-<img src="/2022/05/26/JuiceFS%20Read/3.png" alt="第二种情况" style="zoom:50%;">
-
+<p><img src="/2022/05/26/JuiceFS%20Read/3.png" alt="第二种情况" style="zoom:50%;"></p>
 <ol>
-<li>slice.pos &gt;&#x3D; root.pos + root.len<ol>
+<li>slice.pos &gt;= root.pos + root.len<ol>
 <li>以slice.pos作为基准线将其左右进行拆分处理。</li>
-<li>当slice.pos &#x3D; root.pos + root.len，root和slice不会出现断层</li>
-<li>当slcie.pos &gt; root.pos + root.len，root和slice会出现断层，断层代表没有本次内容，但是会创建一个size &#x3D; 0的slice来填充此断层，用作后续cut处理</li>
-<li>如下图所示，root和slice出现断层，会创建rightSlice为[0,4,0,0,1]，其中的size &#x3D; 0，表示这段没有数据，只表示占位。将rightSlice作为root的right节点</li>
+<li>当slice.pos = root.pos + root.len，root和slice不会出现断层</li>
+<li>当slcie.pos &gt; root.pos + root.len，root和slice会出现断层，断层代表没有本次内容，但是会创建一个size = 0的slice来填充此断层，用作后续cut处理</li>
+<li>如下图所示，root和slice出现断层，会创建rightSlice为[0,4,0,0,1]，其中的size = 0，表示这段没有数据，只表示占位。将rightSlice作为root的right节点</li>
 <li>将rightSlice的right节点放入cut中，递归找到root的最右s.pos + s.len &lt; root.pos的节点进行切分。</li>
 <li>将当前rightSlice设置为root.right</li>
-<li>组装这次调用cut方法进行切分的&lt;left,right&gt;，返回结果</li>
+<li>组装这次调用cut方法进行切分的<left,right>，返回结果</left,right></li>
 <li>结合以下图进行理解</li>
 </ol>
 </li>
 </ol>
-<img src="/2022/05/26/JuiceFS%20Read/4.png" alt="第三种情况" style="zoom:50%;">
+<p><img src="/2022/05/26/JuiceFS%20Read/4.png" alt="第三种情况" style="zoom:50%;"></p>
 
                 
             </div>
@@ -2109,7 +2106,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">35.9k</span>
+                        class="white-color">24k</span>
             
             
             
@@ -2352,6 +2349,22 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 
