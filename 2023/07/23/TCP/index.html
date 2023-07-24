@@ -5,12 +5,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="TCP, T_TBlog">
-    <meta name="description" content="简介TCP是可靠的、有序传输、流控制、拥塞控制的传输层通信协议。
+    <meta name="description" content="简介TCP是可靠、有序、流控制、拥塞控制的传输层通信协议。
 可靠：序列号、响应确认、重传策略
-有序传输：序列号
+有序：序列号
 流控制：限制发送端发送数据的速率
-面向连接：先初始化连接才能通信
-可靠TCP中基本单位为一个段，每发送一次也称之为发送一个">
+拥塞控制：防止网络过载
+可靠TCP中基本单位为一个段，每发送一次也称之为发送一个段，服务端收到请求">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -467,21 +467,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-07-23
+                    2023-07-24
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.2k
+                    1.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    4 分
+                    5 分
                 </div>
                 
 
@@ -501,15 +501,15 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TCP是<strong>可靠的</strong>、<strong>有序传输</strong>、<strong>流控制</strong>、<strong>拥塞控制</strong>的传输层通信协议。</p>
+                <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>TCP是<strong>可靠</strong>、<strong>有序</strong>、<strong>流控制</strong>、<strong>拥塞控制</strong>的传输层通信协议。</p>
 <p>可靠：序列号、响应确认、重传策略</p>
-<p>有序传输：序列号</p>
+<p>有序：序列号</p>
 <p>流控制：限制发送端发送数据的速率</p>
-<p>面向连接：先初始化连接才能通信</p>
+<p>拥塞控制：防止网络过载</p>
 <h3 id="可靠"><a href="#可靠" class="headerlink" title="可靠"></a>可靠</h3><p>TCP中基本单位为一个<strong>段</strong>，每发送一次也称之为发送一个段，服务端收到请求后会做出响应，也称之为ACK。这样的机制奠定了TCP可以保证消息传输的可靠性，一旦服务器的ACK在网络中丢失或者出现拥堵，客户端迟迟收不到服务端的ACK，等到客户端触发重发策略时，就会重新发送刚刚的段。</p>
 <h3 id="有序传输"><a href="#有序传输" class="headerlink" title="有序传输"></a>有序传输</h3><p>服务端可以按照序列号进行重排序（互联网错综复杂，并不保证先发送的数据先到。可能发送丢失、堵塞等情况）</p>
 <h3 id="流控制"><a href="#流控制" class="headerlink" title="流控制"></a>流控制</h3><p>TCP限制发送者传输数据的速率以保证可靠的传输。 接收方不断提示发送方可以接收多少数据。 当接收主机的缓冲区填满时，下一个确认将暂停传输并允许处理缓冲区中的数据。</p>
-<h3 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h3><p>TCP每次在通信传输数据前都需要建立连接，也被称为三次握手。</p>
+<h3 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h3><p>防止过多的数据进入网络加重网络的负载</p>
 <h2 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h2><ol>
 <li>SYN：客户端向服务端发起SYN，客户端携带SYN的序列号为随机生成的<strong>A</strong></li>
 <li>SYN-ACK：服务端收到客户端的SYN后，需向客户端返回ACK，ACK的序列号为服务端携带的序列号<strong>A+1</strong>；服务端还需返回SYN序列号给客户端，SYN序列号为随机生成的<strong>B</strong></li>
@@ -522,6 +522,17 @@
 <li>服务端ACK：服务端响应客户端的FIN；客户端的FIN只是告诉服务端我不再发送请求了，但是客户端还是可以接受请求</li>
 <li>服务端FIN：服务端发起FIN请求</li>
 <li>客户端ACK：客户端响应服务端的FIN，在响应后等待一段时间的超时时间客户端即可释放端口和关闭连接</li>
+</ol>
+<h3 id="客户端断开连接状态变换过程"><a href="#客户端断开连接状态变换过程" class="headerlink" title="客户端断开连接状态变换过程"></a>客户端断开连接状态变换过程</h3><ol>
+<li>客户端向服务端发起FIN请求，表示客户端要断开和服务端的连接。发送FIN请求后，客户端进入<code>FIN WAIT 1</code>状态</li>
+<li>等收到服务端的ACK后，客户端无需向服务端作出反馈，客户端从<code>FIN WAIT 1</code>变成<code>FIN WAIT 2</code>状态</li>
+<li>客户端会接收到服务端的FIN请求，表示服务端要断开和客户端的连接。客户端返回ACK给服务端后，从<code>FIN WAIT 2</code>变成<code>TIME WAIT</code>状态</li>
+<li>等待一段超时时间后，客户端变成<code>CLOSED</code>状态</li>
+</ol>
+<h3 id="服务端断开连接状态变换过程"><a href="#服务端断开连接状态变换过程" class="headerlink" title="服务端断开连接状态变换过程"></a>服务端断开连接状态变换过程</h3><ol>
+<li>服务端收到客户端的FIN请求后，返回ACK后服务端从<code>ESTABLISHED</code>变成<code>CLOSE WAIT</code>状态</li>
+<li>服务端变成<code>CLOSE WAIT</code>后可能还需要有数据需要发送，等真正需要关闭时，服务端向客户端发送FIN请求，服务端从<code>CLOSE WAIT</code>变成<code>LAST ACK</code>状态</li>
+<li>服务端后到最后客户端的ACK后，服务端从<code>LAST ACK</code>变成<code>CLOSED</code>状态</li>
 </ol>
 <img src="/2023/07/23/TCP/2560px-Tcp_state_diagram_fixed_new.svg.png" alt="TCP状态转换图" style="zoom:67%;">
 
@@ -541,9 +552,7 @@
 
 
 
-
-
-<p>MSS：(Maximum Segment Size) 最大消息长度</p>
+<h2 id="TCP其它要点"><a href="#TCP其它要点" class="headerlink" title="TCP其它要点"></a>TCP其它要点</h2><p>MSS：(Maximum Segment Size) 最大消息长度</p>
 <p>TCP以1个段为单位，每发送一个段需要等待一次应答，这样效率低下。所以就衍生出流控制的优化</p>
 <p>窗口控制：TCP不必等待每个段的应答再发送下一个段，而是等待更大段的应答。什么意思呢？TCP设置一个更大的段为5，那么只有在发送5个段后等待接收方的5个应答。换句话说以前是单线程发送（等待当前发送的应答），现在可以并发发送（并不需要等待当前应答，只需等待更大段的应答）</p>
 <p>窗口大小指无需等待确认应答而可以继续发送数据的最大值</p>
@@ -559,8 +568,9 @@
 </ol>
 <p>窗口探测：</p>
 <p>为了解决下面的情况：服务端返回ACK在网络中丢失，客户端迟迟等不到响应，从而导致窗口size一直为0，这样客户端就死锁了。TCP在客户端加入窗口探测机制，在迟迟没有等到服务端的ACK时，客户端会发起窗口大小的探测，服务端需返回给客户端<strong>可以确认的最大ACK</strong></p>
-<p>拥塞控制：</p>
-<p>慢启动：</p>
+<p>拥塞控制和慢启动：</p>
+<p>拥塞窗口（CWND）</p>
+<p>刚开始的时候窗口大小设置为1MSS，每次应答，窗口数都会增加。随着包的每次往返，窗口大小也随着1、2、4的指数幂增长。为了防止在之后指数爆增的现象，在窗口大小达到慢启动阈值时（最大阈值为窗口的最大值），会使用下面的公式计算窗口大小<br>$$<br>\frac{1MSS(字节数)^2}{拥塞窗口(字节数)}<br>$$</p>
 
                 
             </div>
@@ -1359,7 +1369,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">35.5k</span>
+                        class="white-color">35.9k</span>
             
             
             
