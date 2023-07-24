@@ -473,14 +473,14 @@ type openfiles struct {
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    301
+                    1.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    5 分
                 </div>
                 
 
@@ -502,11 +502,11 @@ type openfiles struct {
             <div id="articleContent">
                 <h3 id="openfiles"><a href="#openfiles" class="headerlink" title="openfiles"></a>openfiles</h3><p><code>openfiles</code>持有所有打开文件的<code>openFile</code></p>
 <p>每次使用<code>openfiles</code>过程中都会对其上锁</p>
-<pre class=" language-lang-go"><code class="language-lang-go">type openfiles struct {
-    sync.Mutex
-    expire time.Duration     //    过期时间
-    files  map[Ino]*openFile //key-Ino value-openFile的map数组
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> openfiles <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    sync<span class="token punctuation">.</span>Mutex
+    expire time<span class="token punctuation">.</span>Duration     <span class="token comment" spellcheck="true">//	过期时间</span>
+    files  <span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token operator">*</span>openFile <span class="token comment" spellcheck="true">//key-Ino value-openFile的map数组</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="openFile"><a href="#openFile" class="headerlink" title="openFile"></a>openFile</h3><p><code>openFile</code>保存<code>inode</code>文件的读取<code>Slice[]</code></p>
 <h4 id="openFile中的读写锁"><a href="#openFile中的读写锁" class="headerlink" title="openFile中的读写锁"></a>openFile中的读写锁</h4><p><strong>读写锁只是让其它读写线程堵塞住，当获取到锁后，会继续执行</strong></p>
@@ -514,194 +514,194 @@ type openfiles struct {
 <li><code>ino</code>文件在读时会上<strong>读锁</strong>，其它写操作无法获取锁，其它的读操作可以重入获得锁</li>
 <li><code>ino</code>文化在写时会上写锁，其它写读操作无法获取到锁</li>
 </ul>
-<pre class=" language-lang-go"><code class="language-lang-go">type openFile struct {
-    sync.RWMutex
-    attr      Attr               //属性
-    refs      int                //引用次数
-    lastCheck time.Time          //上一次check时间
-    chunks    map[uint32][]Slice //    Read的Slice[]
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> openFile <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    sync<span class="token punctuation">.</span>RWMutex
+    attr      Attr               <span class="token comment" spellcheck="true">//属性</span>
+    refs      <span class="token builtin">int</span>                <span class="token comment" spellcheck="true">//引用次数</span>
+    lastCheck time<span class="token punctuation">.</span>Time          <span class="token comment" spellcheck="true">//上一次check时间</span>
+    chunks    <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint32</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice <span class="token comment" spellcheck="true">//	Read的Slice[]</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><h4 id="newOpenFiles"><a href="#newOpenFiles" class="headerlink" title="newOpenFiles"></a>newOpenFiles</h4><p>在<code>newBaseMeta</code>时初始化全局唯一的<code>openfiles</code>，其中<code>expire</code>需要在<code>mount</code>中配置，例如：<code>--open-cache 10</code></p>
 <p>初始化时会创建一个线程以<code>秒</code>为单位删除<strong>不用</strong>且<strong>过期</strong>的<code>openFile</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func newOpenFiles(expire time.Duration) *openfiles {
-    of := &openfiles{
-        expire: expire,
-        files:  make(map[Ino]*openFile),
-    }
-    go of.cleanup()
-    return of
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">newOpenFiles</span><span class="token punctuation">(</span>expire time<span class="token punctuation">.</span>Duration<span class="token punctuation">)</span> <span class="token operator">*</span>openfiles <span class="token punctuation">{</span>
+    of <span class="token operator">:=</span> <span class="token operator">&amp;</span>openfiles<span class="token punctuation">{</span>
+        expire<span class="token punctuation">:</span> expire<span class="token punctuation">,</span>
+        files<span class="token punctuation">:</span>  <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token operator">*</span>openFile<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">go</span> of<span class="token punctuation">.</span><span class="token function">cleanup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> of
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="cleanup"><a href="#cleanup" class="headerlink" title="cleanup"></a>cleanup</h4><p><code>openfiles</code>被初始化时，<code>cleanup</code>会一直轮询删除过期且不用的<code>openfile</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) cleanup() {
-    for {
-        o.Lock()
-        cutoff := time.Now().Add(-time.Hour)
-        // 一个小时之前都没有check就把他删掉
-        for ino, of := range o.files {
-            if of.refs <= 0 && of.lastCheck.Before(cutoff) {
-                delete(o.files, ino)
-            }
-        }
-        o.Unlock()
-        time.Sleep(time.Second)
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">cleanup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">{</span>
+        o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        cutoff <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token operator">-</span>time<span class="token punctuation">.</span>Hour<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">// 一个小时之前都没有check就把他删掉</span>
+        <span class="token keyword">for</span> ino<span class="token punctuation">,</span> of <span class="token operator">:=</span> <span class="token keyword">range</span> o<span class="token punctuation">.</span>files <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> of<span class="token punctuation">.</span>refs <span class="token operator">&lt;=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> of<span class="token punctuation">.</span>lastCheck<span class="token punctuation">.</span><span class="token function">Before</span><span class="token punctuation">(</span>cutoff<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">delete</span><span class="token punctuation">(</span>o<span class="token punctuation">.</span>files<span class="token punctuation">,</span> ino<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="OpenCheck"><a href="#OpenCheck" class="headerlink" title="OpenCheck"></a>OpenCheck</h4><p>在<code>open</code>时调用此方法，因为<code>openfiles</code>中其它方法的实现能够保证每次<code>open</code>时都会获取到文件最新的<code>Attr</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) OpenCheck(ino Ino, attr *Attr) bool {
-    o.Lock()
-    defer o.Unlock()
-    // 获取ino的openfile
-    of, ok := o.files[ino]
-    if ok && time.Since(of.lastCheck) < o.expire {
-        // 获取到了 且 没有到过期时间 且 attr不为空
-        if attr != nil {
-            *attr = of.attr
-        }
-        // 添加引用次数
-        of.refs++
-        return true
-    }
-    return false
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">OpenCheck</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> attr <span class="token operator">*</span>Attr<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 获取ino的openfile</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> ok <span class="token operator">&amp;&amp;</span> time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>of<span class="token punctuation">.</span>lastCheck<span class="token punctuation">)</span> <span class="token operator">&lt;</span> o<span class="token punctuation">.</span>expire <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 获取到了 且 没有到过期时间 且 attr不为空</span>
+        <span class="token keyword">if</span> attr <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            <span class="token operator">*</span>attr <span class="token operator">=</span> of<span class="token punctuation">.</span>attr
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// 添加引用次数</span>
+        of<span class="token punctuation">.</span>refs<span class="token operator">++</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="Open"><a href="#Open" class="headerlink" title="Open"></a>Open</h4><p><code>open</code>和<code>create</code>时会调用此方法。若<code>open</code>时，<code>openfiles</code>中不存在<code>ino</code>的<code>openFile</code>，在<code>gatAttr</code>后将数据保存在<code>openfiles</code>中</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) Open(ino Ino, attr *Attr) {
-    o.Lock()
-    defer o.Unlock()
-    // 尝试获取file中的openfile
-    of, ok := o.files[ino]
-    if !ok {
-        // 获取不到就创建一个
-        of = &openFile{}
-        of.chunks = make(map[uint32][]Slice)
-        o.files[ino] = of
-    } else if attr != nil && attr.Mtime == of.attr.Mtime && attr.Mtimensec == of.attr.Mtimensec {
-        // 获取到了 且 从上一次打开到现在没有被修改 且 纳秒修改时间check也没有被修改
-        attr.KeepCache = of.attr.KeepCache
-    } else {
-        // 获取到了 上次 --- 这次 已经修改过了
-        of.chunks = make(map[uint32][]Slice)
-    }
-    if attr != nil {
-        of.attr = *attr
-    }
-    // next open can keep cache if not modified
-    of.attr.KeepCache = true
-    of.refs++
-    of.lastCheck = time.Now()
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">Open</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> attr <span class="token operator">*</span>Attr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 尝试获取file中的openfile</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> <span class="token operator">!</span>ok <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 获取不到就创建一个</span>
+        of <span class="token operator">=</span> <span class="token operator">&amp;</span>openFile<span class="token punctuation">{</span><span class="token punctuation">}</span>
+        of<span class="token punctuation">.</span>chunks <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint32</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">)</span>
+        o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span> <span class="token operator">=</span> of
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> attr <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> attr<span class="token punctuation">.</span>Mtime <span class="token operator">==</span> of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>Mtime <span class="token operator">&amp;&amp;</span> attr<span class="token punctuation">.</span>Mtimensec <span class="token operator">==</span> of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>Mtimensec <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 获取到了 且 从上一次打开到现在没有被修改 且 纳秒修改时间check也没有被修改</span>
+        attr<span class="token punctuation">.</span>KeepCache <span class="token operator">=</span> of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>KeepCache
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 获取到了 上次 --- 这次 已经修改过了</span>
+        of<span class="token punctuation">.</span>chunks <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint32</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> attr <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        of<span class="token punctuation">.</span>attr <span class="token operator">=</span> <span class="token operator">*</span>attr
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// next open can keep cache if not modified</span>
+    of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>KeepCache <span class="token operator">=</span> <span class="token boolean">true</span>
+    of<span class="token punctuation">.</span>refs<span class="token operator">++</span>
+    of<span class="token punctuation">.</span>lastCheck <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="Close"><a href="#Close" class="headerlink" title="Close"></a>Close</h4><p><code>release</code>会调用这个方法，将当前<code>ino</code>的<code>openfiles</code>释放</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) Close(ino Ino) bool {
-   o.Lock()
-   defer o.Unlock()
-   of, ok := o.files[ino]
-   if ok {
-      // 将当前的reds - 1
-      of.refs--
-      return of.refs <= 0
-   }
-   return true
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">Close</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+   o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+   <span class="token keyword">if</span> ok <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 将当前的reds - 1</span>
+      of<span class="token punctuation">.</span>refs<span class="token operator">--</span>
+      <span class="token keyword">return</span> of<span class="token punctuation">.</span>refs <span class="token operator">&lt;=</span> <span class="token number">0</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="Check"><a href="#Check" class="headerlink" title="Check"></a>Check</h4><p><code>getAttr</code>时调用此方法，<code>getAttr</code>时不需要获取open的文件句柄，只需要<code>Attr</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) Check(ino Ino, attr *Attr) bool {
-   if attr == nil {
-      panic("attr is nil")
-   }
-   o.Lock()
-   defer o.Unlock()
-   // getAttr时候，从openfile中获取
-   of, ok := o.files[ino]
-   if ok && time.Since(of.lastCheck) < o.expire {
-      *attr = of.attr
-      return true
-   }
-   return false
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">Check</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> attr <span class="token operator">*</span>Attr<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+   <span class="token keyword">if</span> attr <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+      <span class="token function">panic</span><span class="token punctuation">(</span><span class="token string">"attr is nil"</span><span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token comment" spellcheck="true">// getAttr时候，从openfile中获取</span>
+   of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+   <span class="token keyword">if</span> ok <span class="token operator">&amp;&amp;</span> time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>of<span class="token punctuation">.</span>lastCheck<span class="token punctuation">)</span> <span class="token operator">&lt;</span> o<span class="token punctuation">.</span>expire <span class="token punctuation">{</span>
+      <span class="token operator">*</span>attr <span class="token operator">=</span> of<span class="token punctuation">.</span>attr
+      <span class="token keyword">return</span> <span class="token boolean">true</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> <span class="token boolean">false</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h4><p><code>getAttr</code>时调用此方法，只有当前<code>openfiles</code>没有<code>ino</code>的<code>openFile</code> 且 获取<code>ino</code>的<code>Attr</code>成功时，会将<code>Attr</code>存放在<code>openfiles</code>中</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) Update(ino Ino, attr *Attr) bool {
-    if attr == nil {
-        panic("attr is nil")
-    }
-    o.Lock()
-    defer o.Unlock()
-    // 在 redis的getAttr获取到这里ino的attr可能被其他的人修改，所以这里为了以防万一，需要在openfiles中获取最新的attr
-    of, ok := o.files[ino]
-    if ok {
-        if attr.Mtime != of.attr.Mtime || attr.Mtimensec != of.attr.Mtimensec {
-            // 创建新的chunks
-            of.chunks = make(map[uint32][]Slice)
-        } else {
-            // attr新创建的，但是已经修改了
-            attr.KeepCache = of.attr.KeepCache
-        }
-        of.attr = *attr
-        of.lastCheck = time.Now()
-        return true
-    }
-    return false
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">Update</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> attr <span class="token operator">*</span>Attr<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> attr <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        <span class="token function">panic</span><span class="token punctuation">(</span><span class="token string">"attr is nil"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 在 redis的getAttr获取到这里ino的attr可能被其他的人修改，所以这里为了以防万一，需要在openfiles中获取最新的attr</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> ok <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> attr<span class="token punctuation">.</span>Mtime <span class="token operator">!=</span> of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>Mtime <span class="token operator">||</span> attr<span class="token punctuation">.</span>Mtimensec <span class="token operator">!=</span> of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>Mtimensec <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 创建新的chunks</span>
+            of<span class="token punctuation">.</span>chunks <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint32</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// attr新创建的，但是已经修改了</span>
+            attr<span class="token punctuation">.</span>KeepCache <span class="token operator">=</span> of<span class="token punctuation">.</span>attr<span class="token punctuation">.</span>KeepCache
+        <span class="token punctuation">}</span>
+        of<span class="token punctuation">.</span>attr <span class="token operator">=</span> <span class="token operator">*</span>attr
+        of<span class="token punctuation">.</span>lastCheck <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="IsOpen"><a href="#IsOpen" class="headerlink" title="IsOpen"></a>IsOpen</h4><p><code>doRename</code>和<code>doUnlink</code>时调用此方法，判断<code>ino</code>当前是否被打开</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) IsOpen(ino Ino) bool {
-    o.Lock()
-    defer o.Unlock()
-    // 判断其是否打开
-    of, ok := o.files[ino]
-    return ok && of.refs > 0
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">IsOpen</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 判断其是否打开</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> ok <span class="token operator">&amp;&amp;</span> of<span class="token punctuation">.</span>refs <span class="token operator">></span> <span class="token number">0</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="ReadChunk"><a href="#ReadChunk" class="headerlink" title="ReadChunk"></a>ReadChunk</h4><p><code>Read</code>时调用此方法，尝试获取<code>ino</code>第<code>indx</code>的<code>Slice[]</code>信息</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) ReadChunk(ino Ino, indx uint32) ([]Slice, bool) {
-    o.Lock()
-    defer o.Unlock()
-    of, ok := o.files[ino]
-    if !ok {
-        return nil, false
-    }
-    // 获取inoChunk的Slice[]信息
-    cs, ok := of.chunks[indx]
-    return cs, ok
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">ReadChunk</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">,</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> <span class="token operator">!</span>ok <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// 获取inoChunk的Slice[]信息</span>
+    cs<span class="token punctuation">,</span> ok <span class="token operator">:=</span> of<span class="token punctuation">.</span>chunks<span class="token punctuation">[</span>indx<span class="token punctuation">]</span>
+    <span class="token keyword">return</span> cs<span class="token punctuation">,</span> ok
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="CacheChunk"><a href="#CacheChunk" class="headerlink" title="CacheChunk"></a>CacheChunk</h4><p><code>Read</code>时调用此方法，将<code>ino</code>第<code>indx</code>的<code>Slice[]</code>存放在<code>ino</code>的<code>openFile</code>中</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) CacheChunk(ino Ino, indx uint32, cs []Slice) {
-    o.Lock()
-    defer o.Unlock()
-    of, ok := o.files[ino]
-    if ok {
-        // 缓存当前Slice[]
-        of.chunks[indx] = cs
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">CacheChunk</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">,</span> cs <span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> ok <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 缓存当前Slice[]</span>
+        of<span class="token punctuation">.</span>chunks<span class="token punctuation">[</span>indx<span class="token punctuation">]</span> <span class="token operator">=</span> cs
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="InvalidateChunk"><a href="#InvalidateChunk" class="headerlink" title="InvalidateChunk"></a>InvalidateChunk</h4><p>删除<code>ino</code>全部<code>Slice[]</code>或<code>indx</code>的<code>Slice[]</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) InvalidateChunk(ino Ino, indx uint32) {
-    o.Lock()
-    defer o.Unlock()
-    of, ok := o.files[ino]
-    if ok {
-        // 将Slice[]删除 或 整个删除
-        if indx == 0xFFFFFFFF {
-            of.chunks = make(map[uint32][]Slice)
-        } else {
-            delete(of.chunks, indx)
-        }
-        of.lastCheck = time.Unix(0, 0)
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">InvalidateChunk</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    of<span class="token punctuation">,</span> ok <span class="token operator">:=</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+    <span class="token keyword">if</span> ok <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 将Slice[]删除 或 整个删除</span>
+        <span class="token keyword">if</span> indx <span class="token operator">==</span> <span class="token number">0xFFFFFFFF</span> <span class="token punctuation">{</span>
+            of<span class="token punctuation">.</span>chunks <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint32</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Slice<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token function">delete</span><span class="token punctuation">(</span>of<span class="token punctuation">.</span>chunks<span class="token punctuation">,</span> indx<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        of<span class="token punctuation">.</span>lastCheck <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Unix</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="find"><a href="#find" class="headerlink" title="find"></a>find</h4><p>获取<code>ino</code>的<code>openFile</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (o *openfiles) find(ino Ino) *openFile {
-   o.Lock()
-   defer o.Unlock()
-   return o.files[ino]
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>o <span class="token operator">*</span>openfiles<span class="token punctuation">)</span> <span class="token function">find</span><span class="token punctuation">(</span>ino Ino<span class="token punctuation">)</span> <span class="token operator">*</span>openFile <span class="token punctuation">{</span>
+   o<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">defer</span> o<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">return</span> o<span class="token punctuation">.</span>files<span class="token punctuation">[</span>ino<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 </code></pre>
 
                 
@@ -1499,7 +1499,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">24k</span>
+                        class="white-color">35.9k</span>
             
             
             
@@ -1742,22 +1742,6 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 

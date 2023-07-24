@@ -394,28 +394,19 @@
                 </a>
                 
                 
-                <a href="/categories/Nginx/" title="Nginx: 1">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-default "
-                            style="background-color: #E8F8F5;">Nginx
-                        <span class="tag-length">1</span>
-                    </span>
-                </a>
-                
-                
                 <a href="/categories/TCP/" title="TCP: 2">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #FEF9E7;">TCP
+                            style="background-color: #E8F8F5;">TCP
                         <span class="tag-length">2</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/%E9%80%A0%E8%BD%AE%E5%AD%90/" title="造轮子: 1">
+                <a href="/categories/Nginx/" title="Nginx: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #F8F9F9;">造轮子
+                            style="background-color: #FEF9E7;">Nginx
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -424,7 +415,16 @@
                 <a href="/categories/Jna/" title="Jna: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #82E0AA;">Jna
+                            style="background-color: #F8F9F9;">Jna
+                        <span class="tag-length">1</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/categories/%E9%80%A0%E8%BD%AE%E5%AD%90/" title="造轮子: 1">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            style="background-color: #82E0AA;">造轮子
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -474,10 +474,10 @@
                         <div class="summary block-with-text">
                             
                                 本文中介绍两个服务器之间的免密登录，比如从A ssh 到 B 实现免密登录
-如下是.ssh文件夹中文件的权限
+如下是**.ssh**文件夹中文件的权限
 .ssh  mod-700
   ├── authorized_keys  mod-600
-  ├── id_rsa  mod-60
+  ├── id_rsa  mo
                             
                         </div>
                         <div class="publish-info">
@@ -524,10 +524,10 @@
                         <div class="summary block-with-text">
                             
                                 1.介绍open方法在Linux中，open是用于打开文件以供读取、写入或者两者同时进行的系统调用
-#include 
+#include &lt;fcntl.h>
 
 int open(const char *pathname, int flags);
-int open(const c
+int 
                             
                         </div>
                         <div class="publish-info">
@@ -579,7 +579,8 @@ int open(const c
                             
                                 1.文件权限Linux中文件的权限由三元三组的集合组成，其中具体的有三种不同的权限，分别是：R（读取）、W（写入）和X（执行）。使用ls -l命令可查看文件具体权限。
 
-文件权限组成可参考下图（拿上图mnt目录举例，文件类型为目录，则第一位
+
+文件权限组成可参考下图（拿上图mnt目录举例，文件类型为目录，则第一
                             
                         </div>
                         <div class="publish-info">
@@ -743,7 +744,7 @@ int open(const c
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">24k</span>
+                        class="white-color">35.9k</span>
             
             
             
@@ -986,22 +987,6 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 
