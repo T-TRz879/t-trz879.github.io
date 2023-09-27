@@ -475,14 +475,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.3k
+                    2.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    5 分
+                    11 分
                 </div>
                 
 
@@ -505,7 +505,7 @@
                 <h2 id="JuiceFS删除文件时会经历以下过程"><a href="#JuiceFS删除文件时会经历以下过程" class="headerlink" title="JuiceFS删除文件时会经历以下过程"></a><code>JuiceFS</code>删除文件时会经历以下过程</h2><ul>
 <li>删除时判断文件是否被其它终端或用户打开，那么会调用延迟删除，将<code>inode</code>添加入<code>removeFilesMap</code>中，当其它人关闭文件时，会调用删除逻辑</li>
 <li>获取<code>inode</code>的每个<code>c&amp;inode_indx</code>的数量，并对其进行判空操作，并对每个<code>c&amp;inode_indx</code>进行删除</li>
-<li>获取<code>c&amp;inode_indx</code>所有的<code>slice</code>并解析，对每次（100个slice/次）<code>slice[]</code>进行逐个删除</li>
+<li>获取<code>c&amp;inode_indx</code>所有的<code>slice</code>并解析，对每次（100个slice&#x2F;次）<code>slice[]</code>进行逐个删除</li>
 <li>每个<code>slice</code>中记录着<code>chunkId</code>和<code>size</code>，将待删除<code>Block</code>放入消息队列中</li>
 <li>消息队列消费删除消息时，按照如下删除顺序<ul>
 <li>删除<code>pendingKeysMap</code>中待删除<code>key</code></li>
@@ -516,12 +516,12 @@
 <li>等待数据删除完成后且没有错误，就会将<code>c&amp;inode_indx</code>中当前<code>chunk组合slice的Block</code>删除</li>
 </ul>
 <h2 id="目前还未调研的场景"><a href="#目前还未调研的场景" class="headerlink" title="目前还未调研的场景"></a>目前还未调研的场景</h2><ul>
-<li>延迟删除的过程中掉电/服务器挂了，后续会怎么办<ul>
-<li>根据<code>doUnlink</code>的逻辑，检测到其它终端/用户正在打开文件时，删除不会将<code>i&amp;inode</code>信息删除，且<code>delayDelete</code>调用的另外删除逻辑</li>
-<li>服务器掉电/挂了，在服务重启后，<code>JuiceFS</code>会有线程去查看哪些</li>
+<li>延迟删除的过程中掉电&#x2F;服务器挂了，后续会怎么办<ul>
+<li>根据<code>doUnlink</code>的逻辑，检测到其它终端&#x2F;用户正在打开文件时，删除不会将<code>i&amp;inode</code>信息删除，且<code>delayDelete</code>调用的另外删除逻辑</li>
+<li>服务器掉电&#x2F;挂了，在服务重启后，<code>JuiceFS</code>会有线程去查看哪些</li>
 </ul>
 </li>
-<li>延迟删除的过程中其他终端/用户在写，新增数据会删除吗<ul>
+<li>延迟删除的过程中其他终端&#x2F;用户在写，新增数据会删除吗<ul>
 <li>A已经删除文件，但B在A删除之前打开文件并进行修改，B会保存成一个全新的文件</li>
 </ul>
 </li>
@@ -530,32 +530,32 @@
 <li><code>removedFiles</code>用来延迟删除的<code>Map</code></li>
 <li><code>engine</code>当前使用的元数据引擎</li>
 </ul>
-<pre class=" language-lang-go"><code class="language-lang-go">type baseMeta struct {
-    sync.Mutex         // 锁
-    conf       *Config // 挂载目录的配置信息
-    fmt        Format  // 存储当前format磁盘的信息
+<pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> baseMeta <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    sync<span class="token punctuation">.</span>Mutex         <span class="token comment" spellcheck="true">// 锁</span>
+    conf       <span class="token operator">*</span>Config <span class="token comment" spellcheck="true">// 挂载目录的配置信息</span>
+    fmt        Format  <span class="token comment" spellcheck="true">// 存储当前format磁盘的信息</span>
 
     root         Ino
     subTrash     internalNode
-    sid          uint64
-    of           *openfiles   // 缓存Attr和Slice
-    removedFiles map[Ino]bool // 延迟删除Map
-    compacting   map[uint64]bool
-    deleting     chan int
-    symlinks     *sync.Map
-    msgCallbacks *msgCallbacks    // 消息队列
-    newSpace     int64
-    newInodes    int64
-    usedSpace    int64 //当前用了多少空间
-    usedInodes   int64 //当前Inode数量,也就是文件 + 文件夹数量
-    umounting    bool  //是否是未挂载
+    sid          <span class="token builtin">uint64</span>
+    of           <span class="token operator">*</span>openfiles   <span class="token comment" spellcheck="true">// 缓存Attr和Slice</span>
+    removedFiles <span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token builtin">bool</span> <span class="token comment" spellcheck="true">// 延迟删除Map</span>
+    compacting   <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint64</span><span class="token punctuation">]</span><span class="token builtin">bool</span>
+    deleting     <span class="token keyword">chan</span> <span class="token builtin">int</span>
+    symlinks     <span class="token operator">*</span>sync<span class="token punctuation">.</span>Map
+    msgCallbacks <span class="token operator">*</span>msgCallbacks	<span class="token comment" spellcheck="true">// 消息队列</span>
+    newSpace     <span class="token builtin">int64</span>
+    newInodes    <span class="token builtin">int64</span>
+    usedSpace    <span class="token builtin">int64</span> <span class="token comment" spellcheck="true">//当前用了多少空间</span>
+    usedInodes   <span class="token builtin">int64</span> <span class="token comment" spellcheck="true">//当前Inode数量,也就是文件 + 文件夹数量</span>
+    umounting    <span class="token builtin">bool</span>  <span class="token comment" spellcheck="true">//是否是未挂载</span>
 
-    freeMu     sync.Mutex
-    freeInodes freeID //用来对创建文件生成Inode的
-    freeChunks freeID //用来对创建Chunk生成id的
+    freeMu     sync<span class="token punctuation">.</span>Mutex
+    freeInodes freeID <span class="token comment" spellcheck="true">//用来对创建文件生成Inode的</span>
+    freeChunks freeID <span class="token comment" spellcheck="true">//用来对创建Chunk生成id的</span>
 
-    en engine    // 元数据引擎
-}
+    en engine	<span class="token comment" spellcheck="true">// 元数据引擎</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="baseMeta中删除Block的方法"><a href="#baseMeta中删除Block的方法" class="headerlink" title="baseMeta中删除Block的方法"></a><code>baseMeta</code>中删除<code>Block</code>的方法</h3><p><code>rename</code>和<code>unlink</code>时会调用此方法</p>
 <ul>
@@ -563,233 +563,233 @@
 <li>inode：文件inode</li>
 <li>length：文件长度</li>
 </ul>
-<pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) fileDeleted(opened bool, inode Ino, length uint64) {
-    // length整个文件大小
-    // 删除存储数据
-    if opened {
-        // 正在打开，目前无法删除
-        m.Lock()
-        m.removedFiles[inode] = true
-        m.Unlock()
-    } else {
-        // 当前文件现在可以删除
-        go m.en.doDeleteFileData(inode, length)
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">fileDeleted</span><span class="token punctuation">(</span>opened <span class="token builtin">bool</span><span class="token punctuation">,</span> inode Ino<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// length整个文件大小</span>
+    <span class="token comment" spellcheck="true">// 删除存储数据</span>
+    <span class="token keyword">if</span> opened <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 正在打开，目前无法删除</span>
+        m<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        m<span class="token punctuation">.</span>removedFiles<span class="token punctuation">[</span>inode<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+        m<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 当前文件现在可以删除</span>
+        <span class="token keyword">go</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doDeleteFileData</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> length<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h3 id="engine接口中的删除方法"><a href="#engine接口中的删除方法" class="headerlink" title="engine接口中的删除方法"></a><code>engine</code>接口中的删除方法</h3><pre class=" language-lang-go"><code class="language-lang-go">type engine interface{
-    // 延迟删除
-    doDeleteSustainedInode(sid uint64, inode Ino) error
-    doFindDeletedFiles(ts int64, limit int) (map[Ino]uint64, error) // limit < 0 means all
-    // 正常删除
-    doDeleteFileData(inode Ino, length uint64)
-    doCleanupSlices()
-    doDeleteSlice(chunkid uint64, size uint32) error
-}
+<h3 id="engine接口中的删除方法"><a href="#engine接口中的删除方法" class="headerlink" title="engine接口中的删除方法"></a><code>engine</code>接口中的删除方法</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> engine <span class="token keyword">interface</span><span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 延迟删除</span>
+    <span class="token function">doDeleteSustainedInode</span><span class="token punctuation">(</span>sid <span class="token builtin">uint64</span><span class="token punctuation">,</span> inode Ino<span class="token punctuation">)</span> <span class="token builtin">error</span>
+    <span class="token function">doFindDeletedFiles</span><span class="token punctuation">(</span>ts <span class="token builtin">int64</span><span class="token punctuation">,</span> limit <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token builtin">uint64</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// limit &lt; 0 means all</span>
+    <span class="token comment" spellcheck="true">// 正常删除</span>
+    <span class="token function">doDeleteFileData</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">)</span>
+    <span class="token function">doCleanupSlices</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token function">doDeleteSlice</span><span class="token punctuation">(</span>chunkid <span class="token builtin">uint64</span><span class="token punctuation">,</span> size <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token builtin">error</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <blockquote>
 <p>注意：本文采用<code>Redis</code>作为元数据引擎</p>
 </blockquote>
 <h3 id="redisMeta-doDeleteFileData"><a href="#redisMeta-doDeleteFileData" class="headerlink" title="redisMeta.doDeleteFileData"></a><code>redisMeta.doDeleteFileData</code></h3><p>利用<code>redis</code>的<code>Pipeline</code>每次获取<code>1000</code>条<code>inode</code>的<code>c&amp;inode_indx</code>数据，直到<code>indx*ChunkSize</code>超过<code>length</code>。<code>c&amp;inode_indx</code>中存放着<code>inode</code>当前Chunk的<code>slice</code>列表，<code>slice</code>中记录着每个<code>Block</code>的名称组成属性。</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (r *redisMeta) doDeleteFileData(inode Ino, length uint64) {
-   logger.Infof("redisMeta doDeleteFileData ino:%d length:%d", inode, length)
-   r.doDeleteFileData_(inode, length, "")
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>redisMeta<span class="token punctuation">)</span> <span class="token function">doDeleteFileData</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   logger<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"redisMeta doDeleteFileData ino:%d length:%d"</span><span class="token punctuation">,</span> inode<span class="token punctuation">,</span> length<span class="token punctuation">)</span>
+   r<span class="token punctuation">.</span><span class="token function">doDeleteFileData_</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> length<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 
-func (r *redisMeta) doDeleteFileData_(inode Ino, length uint64, tracking string) {
-   var ctx = Background
-   var indx uint32
-   p := r.rdb.Pipeline()
-   // 使用redis的pipeline 将所有的keys操作让如一个管道中传给redis进行操作，最后将结果返回
-   for uint64(indx)*ChunkSize < length {
-      var keys []string
-      for i := 0; uint64(indx)*ChunkSize < length && i < 1000; i++ {
-         // c&inode_indx
-         key := r.chunkKey(inode, indx)
-         keys = append(keys, key)
-         _ = p.LLen(ctx, key)
-         indx++
-      }
-      cmds, err := p.Exec(ctx)
-      if err != nil {
-         logger.Warnf("delete chunks of inode %d: %s", inode, err)
-         return
-      }
-      // cmds是取出每个key的列表长度，也就是当前c&inode_indx中的block数
-      for i, cmd := range cmds {
-         val, err := cmd.(*redis.IntCmd).Result()
-         if err == redis.Nil || val == 0 {
-            continue
-         }
-         idx, _ := strconv.Atoi(strings.Split(keys[i], "_")[1])
-         // 根据获取inode的block存放的信息，来对每一个Chunk进行删除
-         err = r.deleteChunk(inode, uint32(idx))
-         if err != nil {
-            logger.Warnf("delete chunk %s: %s", keys[i], err)
-            return
-         }
-      }
-   }
-   if tracking == "" {
-      tracking = inode.String() + ":" + strconv.FormatInt(int64(length), 10)
-   }
-   _ = r.rdb.ZRem(ctx, delfiles, tracking)
-}
+<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>redisMeta<span class="token punctuation">)</span> <span class="token function">doDeleteFileData_</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> length <span class="token builtin">uint64</span><span class="token punctuation">,</span> tracking <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token keyword">var</span> ctx <span class="token operator">=</span> Background
+   <span class="token keyword">var</span> indx <span class="token builtin">uint32</span>
+   p <span class="token operator">:=</span> r<span class="token punctuation">.</span>rdb<span class="token punctuation">.</span><span class="token function">Pipeline</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token comment" spellcheck="true">// 使用redis的pipeline 将所有的keys操作让如一个管道中传给redis进行操作，最后将结果返回</span>
+   <span class="token keyword">for</span> <span class="token function">uint64</span><span class="token punctuation">(</span>indx<span class="token punctuation">)</span><span class="token operator">*</span>ChunkSize <span class="token operator">&lt;</span> length <span class="token punctuation">{</span>
+      <span class="token keyword">var</span> keys <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+      <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token function">uint64</span><span class="token punctuation">(</span>indx<span class="token punctuation">)</span><span class="token operator">*</span>ChunkSize <span class="token operator">&lt;</span> length <span class="token operator">&amp;&amp;</span> i <span class="token operator">&lt;</span> <span class="token number">1000</span><span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+         <span class="token comment" spellcheck="true">// c&amp;inode_indx</span>
+         key <span class="token operator">:=</span> r<span class="token punctuation">.</span><span class="token function">chunkKey</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> indx<span class="token punctuation">)</span>
+         keys <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>keys<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+         <span class="token boolean">_</span> <span class="token operator">=</span> p<span class="token punctuation">.</span><span class="token function">LLen</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+         indx<span class="token operator">++</span>
+      <span class="token punctuation">}</span>
+      cmds<span class="token punctuation">,</span> err <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">Exec</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+      <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+         logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"delete chunks of inode %d: %s"</span><span class="token punctuation">,</span> inode<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+         <span class="token keyword">return</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">// cmds是取出每个key的列表长度，也就是当前c&amp;inode_indx中的block数</span>
+      <span class="token keyword">for</span> i<span class="token punctuation">,</span> cmd <span class="token operator">:=</span> <span class="token keyword">range</span> cmds <span class="token punctuation">{</span>
+         val<span class="token punctuation">,</span> err <span class="token operator">:=</span> cmd<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>redis<span class="token punctuation">.</span>IntCmd<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Result</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+         <span class="token keyword">if</span> err <span class="token operator">==</span> redis<span class="token punctuation">.</span>Nil <span class="token operator">||</span> val <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            <span class="token keyword">continue</span>
+         <span class="token punctuation">}</span>
+         idx<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> strconv<span class="token punctuation">.</span><span class="token function">Atoi</span><span class="token punctuation">(</span>strings<span class="token punctuation">.</span><span class="token function">Split</span><span class="token punctuation">(</span>keys<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"_"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+         <span class="token comment" spellcheck="true">// 根据获取inode的block存放的信息，来对每一个Chunk进行删除</span>
+         err <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">deleteChunk</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> <span class="token function">uint32</span><span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">)</span>
+         <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"delete chunk %s: %s"</span><span class="token punctuation">,</span> keys<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+            <span class="token keyword">return</span>
+         <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">if</span> tracking <span class="token operator">==</span> <span class="token string">""</span> <span class="token punctuation">{</span>
+      tracking <span class="token operator">=</span> inode<span class="token punctuation">.</span><span class="token function">String</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">":"</span> <span class="token operator">+</span> strconv<span class="token punctuation">.</span><span class="token function">FormatInt</span><span class="token punctuation">(</span><span class="token function">int64</span><span class="token punctuation">(</span>length<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   <span class="token boolean">_</span> <span class="token operator">=</span> r<span class="token punctuation">.</span>rdb<span class="token punctuation">.</span><span class="token function">ZRem</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> delfiles<span class="token punctuation">,</span> tracking<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="redisMeta-deleteChunk"><a href="#redisMeta-deleteChunk" class="headerlink" title="redisMeta.deleteChunk"></a><code>redisMeta.deleteChunk</code></h3><p>根据<code>inode</code>和<code>indx</code>可以定位具体是哪个<code>c&amp;inode_indx</code>，进而取出当前第<code>indx Chunk</code>的<code>slice列表</code>，由于<code>slice列表</code>可能很多，每次只取<code>100</code>条，直到取完为止。</p>
 <p>获取每个<code>slice</code>并解析放入<code>slice[]</code>中，解析的过程中就在删除slice，并遍历调用删除操作</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (r *redisMeta) deleteChunk(inode Ino, indx uint32) error {
-   var ctx = Background
-   key := r.chunkKey(inode, indx)
-   for {
-      // 用来保存所有待删除的slices
-      var slices []*slice
-      var rs []*redis.IntCmd
-      err := r.txn(ctx, func(tx *redis.Tx) error {
-         slices = nil
-         // 获取c&inode_indx中 0-100的内容
-         vals, err := tx.LRange(ctx, key, 0, 100).Result()
-         if err == redis.Nil {
-            return nil
-         }
-         _, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
-            for _, v := range vals {
-               rb := utils.ReadBuffer([]byte(v))
-               _ = rb.Get32() // pos
-               chunkid := rb.Get64()
-               size := rb.Get32()
-               slices = append(slices, &slice{chunkid: chunkid, size: size})
-                // 删除c&inode_indx中的slice
-               pipe.LPop(ctx, key)
-               rs = append(rs, pipe.HIncrBy(ctx, sliceRefs, r.sliceKey(chunkid, size), -1))
-            }
-            return nil
-         })
-         return err
-      }, key)
-      if err != nil {
-         return fmt.Errorf("delete slice from chunk %s fail: %s, retry later", key, err)
-      }
-      // 删除slices
-      for i, s := range slices {
-         if rs[i].Val() < 0 {
-            r.deleteSlice(s.chunkid, s.size)
-         }
-      }
-      // 如果小于100 则说明后面没有了
-      if len(slices) < 100 {
-         break
-      }
-   }
-   return nil
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>redisMeta<span class="token punctuation">)</span> <span class="token function">deleteChunk</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+   <span class="token keyword">var</span> ctx <span class="token operator">=</span> Background
+   key <span class="token operator">:=</span> r<span class="token punctuation">.</span><span class="token function">chunkKey</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> indx<span class="token punctuation">)</span>
+   <span class="token keyword">for</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 用来保存所有待删除的slices</span>
+      <span class="token keyword">var</span> slices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>slice
+      <span class="token keyword">var</span> rs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>redis<span class="token punctuation">.</span>IntCmd
+      err <span class="token operator">:=</span> r<span class="token punctuation">.</span><span class="token function">txn</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>tx <span class="token operator">*</span>redis<span class="token punctuation">.</span>Tx<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+         slices <span class="token operator">=</span> <span class="token boolean">nil</span>
+         <span class="token comment" spellcheck="true">// 获取c&amp;inode_indx中 0-100的内容</span>
+         vals<span class="token punctuation">,</span> err <span class="token operator">:=</span> tx<span class="token punctuation">.</span><span class="token function">LRange</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> key<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Result</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+         <span class="token keyword">if</span> err <span class="token operator">==</span> redis<span class="token punctuation">.</span>Nil <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">nil</span>
+         <span class="token punctuation">}</span>
+         <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> tx<span class="token punctuation">.</span><span class="token function">TxPipelined</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>pipe redis<span class="token punctuation">.</span>Pipeliner<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> v <span class="token operator">:=</span> <span class="token keyword">range</span> vals <span class="token punctuation">{</span>
+               rb <span class="token operator">:=</span> utils<span class="token punctuation">.</span><span class="token function">ReadBuffer</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+               <span class="token boolean">_</span> <span class="token operator">=</span> rb<span class="token punctuation">.</span><span class="token function">Get32</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// pos</span>
+               chunkid <span class="token operator">:=</span> rb<span class="token punctuation">.</span><span class="token function">Get64</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+               size <span class="token operator">:=</span> rb<span class="token punctuation">.</span><span class="token function">Get32</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+               slices <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>slices<span class="token punctuation">,</span> <span class="token operator">&amp;</span>slice<span class="token punctuation">{</span>chunkid<span class="token punctuation">:</span> chunkid<span class="token punctuation">,</span> size<span class="token punctuation">:</span> size<span class="token punctuation">}</span><span class="token punctuation">)</span>
+                <span class="token comment" spellcheck="true">// 删除c&amp;inode_indx中的slice</span>
+               pipe<span class="token punctuation">.</span><span class="token function">LPop</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+               rs <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>rs<span class="token punctuation">,</span> pipe<span class="token punctuation">.</span><span class="token function">HIncrBy</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> sliceRefs<span class="token punctuation">,</span> r<span class="token punctuation">.</span><span class="token function">sliceKey</span><span class="token punctuation">(</span>chunkid<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token boolean">nil</span>
+         <span class="token punctuation">}</span><span class="token punctuation">)</span>
+         <span class="token keyword">return</span> err
+      <span class="token punctuation">}</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+      <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+         <span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"delete slice from chunk %s fail: %s, retry later"</span><span class="token punctuation">,</span> key<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">// 删除slices</span>
+      <span class="token keyword">for</span> i<span class="token punctuation">,</span> s <span class="token operator">:=</span> <span class="token keyword">range</span> slices <span class="token punctuation">{</span>
+         <span class="token keyword">if</span> rs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">Val</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            r<span class="token punctuation">.</span><span class="token function">deleteSlice</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>chunkid<span class="token punctuation">,</span> s<span class="token punctuation">.</span>size<span class="token punctuation">)</span>
+         <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">// 如果小于100 则说明后面没有了</span>
+      <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>slices<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">100</span> <span class="token punctuation">{</span>
+         <span class="token keyword">break</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="baseMeta-deleteSlice"><a href="#baseMeta-deleteSlice" class="headerlink" title="baseMeta.deleteSlice"></a><code>baseMeta.deleteSlice</code></h3><p>调用<code>Msg</code>来删除实体数据，实体数据删除成功后，删除<code>slice</code>的引用</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) deleteSlice(chunkid uint64, size uint32) {
-   if m.conf.MaxDeletes == 0 {
-      return
-   }
-   m.deleting <- 1
-   defer func() { <-m.deleting }()
-   // 删除本地缓存、对象存储中的数据
-   err := m.newMsg(DeleteChunk, chunkid, size)
-   if err != nil {
-      logger.Warnf("delete chunk %d (%d bytes): %s", chunkid, size, err)
-   } else {
-      // 删除chunkId的sliceRef的引用
-      err := m.en.doDeleteSlice(chunkid, size)
-      if err != nil {
-         logger.Errorf("delete slice %d: %s", chunkid, err)
-      }
-   }
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">deleteSlice</span><span class="token punctuation">(</span>chunkid <span class="token builtin">uint64</span><span class="token punctuation">,</span> size <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token keyword">if</span> m<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>MaxDeletes <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span>
+   <span class="token punctuation">}</span>
+   m<span class="token punctuation">.</span>deleting <span class="token operator">&lt;-</span> <span class="token number">1</span>
+   <span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token operator">&lt;-</span>m<span class="token punctuation">.</span>deleting <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token comment" spellcheck="true">// 删除本地缓存、对象存储中的数据</span>
+   err <span class="token operator">:=</span> m<span class="token punctuation">.</span><span class="token function">newMsg</span><span class="token punctuation">(</span>DeleteChunk<span class="token punctuation">,</span> chunkid<span class="token punctuation">,</span> size<span class="token punctuation">)</span>
+   <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+      logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"delete chunk %d (%d bytes): %s"</span><span class="token punctuation">,</span> chunkid<span class="token punctuation">,</span> size<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 删除chunkId的sliceRef的引用</span>
+      err <span class="token operator">:=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doDeleteSlice</span><span class="token punctuation">(</span>chunkid<span class="token punctuation">,</span> size<span class="token punctuation">)</span>
+      <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+         logger<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"delete slice %d: %s"</span><span class="token punctuation">,</span> chunkid<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="registerMetaMsg"><a href="#registerMetaMsg" class="headerlink" title="registerMetaMsg"></a><code>registerMetaMsg</code></h3><p><code>mount</code>时会将<code>DeleteChunk</code>和<code>CompactChunk</code>两个消息队列初始化完成。</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func registerMetaMsg(m meta.Meta, store chunk.ChunkStore, chunkConf *chunk.Config) {
-    m.OnMsg(meta.DeleteChunk, func(args ...interface{}) error {
-        return store.Remove(args[0].(uint64), int(args[1].(uint32)))
-    })
-    m.OnMsg(meta.CompactChunk, func(args ...interface{}) error {
-        return vfs.Compact(*chunkConf, store, args[0].([]meta.Slice), args[1].(uint64))
-    })
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">registerMetaMsg</span><span class="token punctuation">(</span>m meta<span class="token punctuation">.</span>Meta<span class="token punctuation">,</span> store chunk<span class="token punctuation">.</span>ChunkStore<span class="token punctuation">,</span> chunkConf <span class="token operator">*</span>chunk<span class="token punctuation">.</span>Config<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    m<span class="token punctuation">.</span><span class="token function">OnMsg</span><span class="token punctuation">(</span>meta<span class="token punctuation">.</span>DeleteChunk<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>args <span class="token operator">...</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> store<span class="token punctuation">.</span><span class="token function">Remove</span><span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">uint64</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">uint32</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    m<span class="token punctuation">.</span><span class="token function">OnMsg</span><span class="token punctuation">(</span>meta<span class="token punctuation">.</span>CompactChunk<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>args <span class="token operator">...</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> vfs<span class="token punctuation">.</span><span class="token function">Compact</span><span class="token punctuation">(</span><span class="token operator">*</span>chunkConf<span class="token punctuation">,</span> store<span class="token punctuation">,</span> args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>meta<span class="token punctuation">.</span>Slice<span class="token punctuation">)</span><span class="token punctuation">,</span> args<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">uint64</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="cachedStore-Remove"><a href="#cachedStore-Remove" class="headerlink" title="cachedStore.Remove"></a><code>cachedStore.Remove</code></h3><p>初始化<code>rChunk</code>删除对象</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (store *cachedStore) Remove(chunkid uint64, length int) error {
-   r := chunkForRead(chunkid, length, store)
-   return r.Remove()
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>store <span class="token operator">*</span>cachedStore<span class="token punctuation">)</span> <span class="token function">Remove</span><span class="token punctuation">(</span>chunkid <span class="token builtin">uint64</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+   r <span class="token operator">:=</span> <span class="token function">chunkForRead</span><span class="token punctuation">(</span>chunkid<span class="token punctuation">,</span> length<span class="token punctuation">,</span> store<span class="token punctuation">)</span>
+   <span class="token keyword">return</span> r<span class="token punctuation">.</span><span class="token function">Remove</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="rChunk-Remove"><a href="#rChunk-Remove" class="headerlink" title="rChunk.Remove"></a><code>rChunk.Remove</code></h3><p>根据<code>c.length</code>遍历删除所有的<code>Block</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *rChunk) Remove() error {
-   if c.length == 0 {
-      // no block
-      return nil
-   }
-   // 根据c.length计算有多少个Block
-   lastIndx := (c.length - 1) / c.store.conf.BlockSize
-   var err error
-   for i := 0; i <= lastIndx; i++ {
-      // c.id_i_len
-      // there could be multiple clients try to remove the same chunk in the same time,
-      // any of them should succeed if any blocks is removed
-      key := c.key(i)
-      c.store.pendingMutex.Lock()
-      // 删除pending中本次待删除key
-      delete(c.store.pendingKeys, key)
-      c.store.pendingMutex.Unlock()
-      // 删除本地缓存
-      c.store.bcache.remove(key)
-      // 删除远端的数据
-      if e := c.delete(i); e != nil {
-         err = e
-      }
-   }
-   return err
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">Remove</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+   <span class="token keyword">if</span> c<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// no block</span>
+      <span class="token keyword">return</span> <span class="token boolean">nil</span>
+   <span class="token punctuation">}</span>
+   <span class="token comment" spellcheck="true">// 根据c.length计算有多少个Block</span>
+   lastIndx <span class="token operator">:=</span> <span class="token punctuation">(</span>c<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize
+   <span class="token keyword">var</span> err <span class="token builtin">error</span>
+   <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> lastIndx<span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// c.id_i_len</span>
+      <span class="token comment" spellcheck="true">// there could be multiple clients try to remove the same chunk in the same time,</span>
+      <span class="token comment" spellcheck="true">// any of them should succeed if any blocks is removed</span>
+      key <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">key</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+      c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>pendingMutex<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// 删除pending中本次待删除key</span>
+      <span class="token function">delete</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>pendingKeys<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+      c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>pendingMutex<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// 删除本地缓存</span>
+      c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>bcache<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// 删除远端的数据</span>
+      <span class="token keyword">if</span> e <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">delete</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span> e <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+         err <span class="token operator">=</span> e
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> err
+<span class="token punctuation">}</span>
 </code></pre>
 <h2 id="延迟删除"><a href="#延迟删除" class="headerlink" title="延迟删除"></a>延迟删除</h2><h3 id="baseMeta-Close"><a href="#baseMeta-Close" class="headerlink" title="baseMeta.Close"></a><code>baseMeta.Close</code></h3><p>关闭文件时，会判断文件是否有延迟删除</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) Close(ctx Context, inode Ino) syscall.Errno {
-   if m.of.Close(inode) {
-      m.Lock()
-      defer m.Unlock()
-      if m.removedFiles[inode] {
-         delete(m.removedFiles, inode)
-         go func() {
-            _ = m.en.doDeleteSustainedInode(m.sid, inode)
-         }()
-      }
-   }
-   return 0
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">Close</span><span class="token punctuation">(</span>ctx Context<span class="token punctuation">,</span> inode Ino<span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno <span class="token punctuation">{</span>
+   <span class="token keyword">if</span> m<span class="token punctuation">.</span>of<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span>inode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      m<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token keyword">defer</span> m<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token keyword">if</span> m<span class="token punctuation">.</span>removedFiles<span class="token punctuation">[</span>inode<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+         <span class="token function">delete</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span>removedFiles<span class="token punctuation">,</span> inode<span class="token punctuation">)</span>
+         <span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token boolean">_</span> <span class="token operator">=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doDeleteSustainedInode</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span>sid<span class="token punctuation">,</span> inode<span class="token punctuation">)</span>
+         <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> <span class="token number">0</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="redisMeta-doDeleteSustainedInode"><a href="#redisMeta-doDeleteSustainedInode" class="headerlink" title="redisMeta.doDeleteSustainedInode"></a><code>redisMeta.doDeleteSustainedInode</code></h3><p>首先删除<code>inode</code>的所有元数据，并更新<code>totalInodes</code>和<code>useSapce</code></p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (r *redisMeta) doDeleteSustainedInode(sid uint64, inode Ino) error {
-   var attr Attr
-   var ctx = Background
-   a, err := r.rdb.Get(ctx, r.inodeKey(inode)).Bytes()
-   if err == redis.Nil {
-      return nil
-   }
-   if err != nil {
-      return err
-   }
-   r.parseAttr(a, &attr)
-   _, err = r.rdb.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
-       // 删除元数据
-      pipe.ZAdd(ctx, delfiles, &redis.Z{Score: float64(time.Now().Unix()), Member: r.toDelete(inode, attr.Length)})
-      pipe.Del(ctx, r.inodeKey(inode))
-      pipe.IncrBy(ctx, usedSpace, -align4K(attr.Length))
-      pipe.Decr(ctx, totalInodes)
-      pipe.SRem(ctx, r.sustained(sid), strconv.Itoa(int(inode)))
-      return nil
-   })
-   if err == nil {
-       // 调用删除数据逻辑
-      go r.doDeleteFileData(inode, attr.Length)
-   }
-   return err
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>redisMeta<span class="token punctuation">)</span> <span class="token function">doDeleteSustainedInode</span><span class="token punctuation">(</span>sid <span class="token builtin">uint64</span><span class="token punctuation">,</span> inode Ino<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+   <span class="token keyword">var</span> attr Attr
+   <span class="token keyword">var</span> ctx <span class="token operator">=</span> Background
+   a<span class="token punctuation">,</span> err <span class="token operator">:=</span> r<span class="token punctuation">.</span>rdb<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> r<span class="token punctuation">.</span><span class="token function">inodeKey</span><span class="token punctuation">(</span>inode<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Bytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">if</span> err <span class="token operator">==</span> redis<span class="token punctuation">.</span>Nil <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token boolean">nil</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> err
+   <span class="token punctuation">}</span>
+   r<span class="token punctuation">.</span><span class="token function">parseAttr</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> <span class="token operator">&amp;</span>attr<span class="token punctuation">)</span>
+   <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> r<span class="token punctuation">.</span>rdb<span class="token punctuation">.</span><span class="token function">TxPipelined</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>pipe redis<span class="token punctuation">.</span>Pipeliner<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+       <span class="token comment" spellcheck="true">// 删除元数据</span>
+      pipe<span class="token punctuation">.</span><span class="token function">ZAdd</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> delfiles<span class="token punctuation">,</span> <span class="token operator">&amp;</span>redis<span class="token punctuation">.</span>Z<span class="token punctuation">{</span>Score<span class="token punctuation">:</span> <span class="token function">float64</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Unix</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Member<span class="token punctuation">:</span> r<span class="token punctuation">.</span><span class="token function">toDelete</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> attr<span class="token punctuation">.</span>Length<span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+      pipe<span class="token punctuation">.</span><span class="token function">Del</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> r<span class="token punctuation">.</span><span class="token function">inodeKey</span><span class="token punctuation">(</span>inode<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      pipe<span class="token punctuation">.</span><span class="token function">IncrBy</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> usedSpace<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token function">align4K</span><span class="token punctuation">(</span>attr<span class="token punctuation">.</span>Length<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      pipe<span class="token punctuation">.</span><span class="token function">Decr</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> totalInodes<span class="token punctuation">)</span>
+      pipe<span class="token punctuation">.</span><span class="token function">SRem</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> r<span class="token punctuation">.</span><span class="token function">sustained</span><span class="token punctuation">(</span>sid<span class="token punctuation">)</span><span class="token punctuation">,</span> strconv<span class="token punctuation">.</span><span class="token function">Itoa</span><span class="token punctuation">(</span><span class="token function">int</span><span class="token punctuation">(</span>inode<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span> <span class="token boolean">nil</span>
+   <span class="token punctuation">}</span><span class="token punctuation">)</span>
+   <span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+       <span class="token comment" spellcheck="true">// 调用删除数据逻辑</span>
+      <span class="token keyword">go</span> r<span class="token punctuation">.</span><span class="token function">doDeleteFileData</span><span class="token punctuation">(</span>inode<span class="token punctuation">,</span> attr<span class="token punctuation">.</span>Length<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> err
+<span class="token punctuation">}</span>
 </code></pre>
 <h2 id="JuiceFS中的回收站"><a href="#JuiceFS中的回收站" class="headerlink" title="JuiceFS中的回收站"></a><code>JuiceFS</code>中的回收站</h2><p>一共有三种情况会涉及到回收站：</p>
 <ul>
@@ -798,24 +798,24 @@ func (r *redisMeta) doDeleteFileData_(inode Ino, length uint64, tracking string)
 <li><code>rename</code>重命名时dstFile存在</li>
 </ul>
 <h3 id="baseMeta-cleanupTrash"><a href="#baseMeta-cleanupTrash" class="headerlink" title="baseMeta.cleanupTrash"></a><code>baseMeta.cleanupTrash</code></h3><p>每小时执行一次，每次运行前都会检查元数据引擎中保存的<code>lastCleanupTrash</code>字段的值，在过去一小时内是否有更新过。</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) cleanupTrash() {
-    for {
-        // 每隔1小时执行一次
-        utils.SleepWithJitter(time.Hour)
-        if st := m.en.doGetAttr(Background, TrashInode, nil); st != 0 {
-            if st != syscall.ENOENT {
-                logger.Warnf("getattr inode %d: %s", TrashInode, st)
-            }
-            continue
-        }
-        // 校验上一次清除时间也是觉得需不需要进行清除 diff = 1hour
-        if ok, err := m.en.setIfSmall("lastCleanupTrash", time.Now().Unix(), 3600); err != nil {
-            logger.Warnf("checking counter lastCleanupTrash: %s", err)
-        } else if ok {
-            go m.doCleanupTrash(false)
-        }
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">cleanupTrash</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 每隔1小时执行一次</span>
+        utils<span class="token punctuation">.</span><span class="token function">SleepWithJitter</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Hour<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> st <span class="token operator">:=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doGetAttr</span><span class="token punctuation">(</span>Background<span class="token punctuation">,</span> TrashInode<span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span><span class="token punctuation">;</span> st <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> st <span class="token operator">!=</span> syscall<span class="token punctuation">.</span>ENOENT <span class="token punctuation">{</span>
+                logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"getattr inode %d: %s"</span><span class="token punctuation">,</span> TrashInode<span class="token punctuation">,</span> st<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">continue</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// 校验上一次清除时间也是觉得需不需要进行清除 diff = 1hour</span>
+        <span class="token keyword">if</span> ok<span class="token punctuation">,</span> err <span class="token operator">:=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">setIfSmall</span><span class="token punctuation">(</span><span class="token string">"lastCleanupTrash"</span><span class="token punctuation">,</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Unix</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">3600</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"checking counter lastCleanupTrash: %s"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> ok <span class="token punctuation">{</span>
+            <span class="token keyword">go</span> m<span class="token punctuation">.</span><span class="token function">doCleanupTrash</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="baseMeta-doCleanupTrash"><a href="#baseMeta-doCleanupTrash" class="headerlink" title="baseMeta.doCleanupTrash"></a><code>baseMeta.doCleanupTrash</code></h3><ul>
 <li>获取<code>.trash</code>所有的时间文件夹</li>
@@ -826,69 +826,69 @@ func (r *redisMeta) doDeleteFileData_(inode Ino, length uint64, tracking string)
 </ul>
 </li>
 </ul>
-<pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) doCleanupTrash(force bool) {
-   logger.Debugf("cleanup trash: started")
-   ctx := Background
-   now := time.Now()
-   var st syscall.Errno
-   var entries []*Entry
-   if st = m.en.doReaddir(ctx, TrashInode, 0, &entries); st != 0 {
-      logger.Warnf("readdir trash %d: %s", TrashInode, st)
-      return
-   }
-   sort.Slice(entries, func(i, j int) bool { return entries[i].Inode < entries[j].Inode })
-   var count int
-   defer func() {
-      if count > 0 {
-         logger.Infof("cleanup trash: deleted %d files in %v", count, time.Since(now))
-      }
-   }()
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">doCleanupTrash</span><span class="token punctuation">(</span>force <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   logger<span class="token punctuation">.</span><span class="token function">Debugf</span><span class="token punctuation">(</span><span class="token string">"cleanup trash: started"</span><span class="token punctuation">)</span>
+   ctx <span class="token operator">:=</span> Background
+   now <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">var</span> st syscall<span class="token punctuation">.</span>Errno
+   <span class="token keyword">var</span> entries <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>Entry
+   <span class="token keyword">if</span> st <span class="token operator">=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doReaddir</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> TrashInode<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>entries<span class="token punctuation">)</span><span class="token punctuation">;</span> st <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"readdir trash %d: %s"</span><span class="token punctuation">,</span> TrashInode<span class="token punctuation">,</span> st<span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+   <span class="token punctuation">}</span>
+   sort<span class="token punctuation">.</span><span class="token function">Slice</span><span class="token punctuation">(</span>entries<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> entries<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>Inode <span class="token operator">&lt;</span> entries<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">.</span>Inode <span class="token punctuation">}</span><span class="token punctuation">)</span>
+   <span class="token keyword">var</span> count <span class="token builtin">int</span>
+   <span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> count <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
+         logger<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"cleanup trash: deleted %d files in %v"</span><span class="token punctuation">,</span> count<span class="token punctuation">,</span> time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
-   edge := now.Add(-time.Duration(24*m.fmt.TrashDays+1) * time.Hour)
-   for _, e := range entries {
-      ts, err := time.Parse("2006-01-02-15", string(e.Name))
-      if err != nil {
-         logger.Warnf("bad entry as a subTrash: %s", e.Name)
-         continue
-      }
-      if ts.Before(edge) || force {
-         var subEntries []*Entry
-         if st = m.en.doReaddir(ctx, e.Inode, 0, &subEntries); st != 0 {
-            logger.Warnf("readdir subTrash %d: %s", e.Inode, st)
-            continue
-         }
-         // 其中是否有删除失败的情况
-         rmdir := true
-         for _, se := range subEntries {
-            if se.Attr.Typ == TypeDirectory {
-               // 删除文件夹
-               st = m.en.doRmdir(ctx, e.Inode, string(se.Name))
-            } else {
-               // 其余的都是文件
-               st = m.en.doUnlink(ctx, e.Inode, string(se.Name))
-            }
-            if st == 0 {
-               count++
-            } else {
-               logger.Warnf("delete from trash %s/%s: %s", e.Name, se.Name, st)
-               rmdir = false
-               continue
-            }
-            if count%10000 == 0 && time.Since(now) > 50*time.Minute {
-               return
-            }
-         }
-         // 所有都删除成功后，将其回收站日期目录删除
-         if rmdir {
-            if st = m.en.doRmdir(ctx, TrashInode, string(e.Name)); st != 0 {
-               logger.Warnf("rmdir subTrash %s: %s", e.Name, st)
-            }
-         }
-      } else {
-         break
-      }
-   }
-}
+   edge <span class="token operator">:=</span> now<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token operator">-</span>time<span class="token punctuation">.</span><span class="token function">Duration</span><span class="token punctuation">(</span><span class="token number">24</span><span class="token operator">*</span>m<span class="token punctuation">.</span>fmt<span class="token punctuation">.</span>TrashDays<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Hour<span class="token punctuation">)</span>
+   <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> e <span class="token operator">:=</span> <span class="token keyword">range</span> entries <span class="token punctuation">{</span>
+      ts<span class="token punctuation">,</span> err <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Parse</span><span class="token punctuation">(</span><span class="token string">"2006-01-02-15"</span><span class="token punctuation">,</span> <span class="token function">string</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>Name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+         logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"bad entry as a subTrash: %s"</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+         <span class="token keyword">continue</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">if</span> ts<span class="token punctuation">.</span><span class="token function">Before</span><span class="token punctuation">(</span>edge<span class="token punctuation">)</span> <span class="token operator">||</span> force <span class="token punctuation">{</span>
+         <span class="token keyword">var</span> subEntries <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>Entry
+         <span class="token keyword">if</span> st <span class="token operator">=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doReaddir</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> e<span class="token punctuation">.</span>Inode<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>subEntries<span class="token punctuation">)</span><span class="token punctuation">;</span> st <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"readdir subTrash %d: %s"</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>Inode<span class="token punctuation">,</span> st<span class="token punctuation">)</span>
+            <span class="token keyword">continue</span>
+         <span class="token punctuation">}</span>
+         <span class="token comment" spellcheck="true">// 其中是否有删除失败的情况</span>
+         rmdir <span class="token operator">:=</span> <span class="token boolean">true</span>
+         <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> se <span class="token operator">:=</span> <span class="token keyword">range</span> subEntries <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> se<span class="token punctuation">.</span>Attr<span class="token punctuation">.</span>Typ <span class="token operator">==</span> TypeDirectory <span class="token punctuation">{</span>
+               <span class="token comment" spellcheck="true">// 删除文件夹</span>
+               st <span class="token operator">=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doRmdir</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> e<span class="token punctuation">.</span>Inode<span class="token punctuation">,</span> <span class="token function">string</span><span class="token punctuation">(</span>se<span class="token punctuation">.</span>Name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+               <span class="token comment" spellcheck="true">// 其余的都是文件</span>
+               st <span class="token operator">=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doUnlink</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> e<span class="token punctuation">.</span>Inode<span class="token punctuation">,</span> <span class="token function">string</span><span class="token punctuation">(</span>se<span class="token punctuation">.</span>Name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> st <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+               count<span class="token operator">++</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+               logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"delete from trash %s/%s: %s"</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>Name<span class="token punctuation">,</span> se<span class="token punctuation">.</span>Name<span class="token punctuation">,</span> st<span class="token punctuation">)</span>
+               rmdir <span class="token operator">=</span> <span class="token boolean">false</span>
+               <span class="token keyword">continue</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> count<span class="token operator">%</span><span class="token number">10000</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>now<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">50</span><span class="token operator">*</span>time<span class="token punctuation">.</span>Minute <span class="token punctuation">{</span>
+               <span class="token keyword">return</span>
+            <span class="token punctuation">}</span>
+         <span class="token punctuation">}</span>
+         <span class="token comment" spellcheck="true">// 所有都删除成功后，将其回收站日期目录删除</span>
+         <span class="token keyword">if</span> rmdir <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> st <span class="token operator">=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">doRmdir</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> TrashInode<span class="token punctuation">,</span> <span class="token function">string</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>Name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> st <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+               logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"rmdir subTrash %s: %s"</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>Name<span class="token punctuation">,</span> st<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+         <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+         <span class="token keyword">break</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 
                 
@@ -1475,8 +1475,8 @@ func (r *redisMeta) doDeleteFileData_(inode Ino, length uint64, tracking string)
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Jna/" class="post-category">
-                                    Jna
+                            <a href="/categories/Java/" class="post-category">
+                                    Java
                                 </a>
                             
                             
@@ -1485,6 +1485,10 @@ func (r *redisMeta) doDeleteFileData_(inode Ino, length uint64, tracking string)
                 </div>
                 
                 <div class="card-action article-tags">
+                    
+                    <a href="/tags/Jna/">
+                        <span class="chip bg-color">Jna</span>
+                    </a>
                     
                     <a href="/tags/%E8%B7%A8%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8/">
                         <span class="chip bg-color">跨语言调用</span>
@@ -1686,7 +1690,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">25.4k</span>
+                        class="white-color">38.1k</span>
             
             
             
