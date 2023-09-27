@@ -534,32 +534,20 @@
 <li>服务端变成<code>CLOSE WAIT</code>后可能还需要有数据需要发送，等真正需要关闭时，服务端向客户端发送FIN请求，服务端从<code>CLOSE WAIT</code>变成<code>LAST ACK</code>状态</li>
 <li>服务端后到最后客户端的ACK后，服务端从<code>LAST ACK</code>变成<code>CLOSED</code>状态</li>
 </ol>
-<img src="/2023/07/23/TCP/2560px-Tcp_state_diagram_fixed_new.svg.png" alt="TCP状态转换图" style="zoom:67%;">
-
-
-
+<p><img src="/2023/07/23/TCP/2560px-Tcp_state_diagram_fixed_new.svg.png" alt="TCP状态转换图" style="zoom:67%;"></p>
 <h2 id="抓TCP包"><a href="#抓TCP包" class="headerlink" title="抓TCP包"></a>抓TCP包</h2><p>使用<code>go</code>编写监听<code>8080</code>端口的服务端，使用<code>telnet</code>模拟客户端发送请求</p>
-<img src="/2023/07/23/TCP/image-20230722134454300.png" alt="telnet发送请求" style="zoom:50%;">
-
+<p><img src="/2023/07/23/TCP/image-20230722134454300.png" alt="telnet发送请求" style="zoom:50%;"></p>
 <p>可以明显看到连接开始到结束的<strong>三次握手</strong>、<strong>传输数据</strong>、<strong>Keep-Alive</strong>、<strong>调整滑动窗口大小</strong>和<strong>四次挥手</strong></p>
-<img src="/2023/07/23/TCP/image-20230722122318462.png" alt="WireShark抓包结果" style="zoom: 30%;">
-
+<p><img src="/2023/07/23/TCP/image-20230722122318462.png" alt="WireShark抓包结果" style="zoom: 30%;"></p>
 <p>wireShark的流控制图</p>
-<img src="/2023/07/23/TCP/image-20230722122815342.png" alt="WireShark Flow图" style="zoom:40%;">
-
+<p><img src="/2023/07/23/TCP/image-20230722122815342.png" alt="WireShark Flow图" style="zoom:40%;"></p>
 <p>按照上述过程画出的流程图</p>
-<img src="/2023/07/23/TCP/TCP握手挥手流程.jpg" alt="TCP握手挥手流程" style="zoom:50%;">
-
-
-
+<p><img src="/2023/07/23/TCP/TCP握手挥手流程.jpg" alt="TCP握手挥手流程" style="zoom:50%;"></p>
 <h2 id="TCP其它要点"><a href="#TCP其它要点" class="headerlink" title="TCP其它要点"></a>TCP其它要点</h2><p>MSS：(Maximum Segment Size) 最大消息长度</p>
 <p>TCP以1个段为单位，每发送一个段需要等待一次应答，这样效率低下。所以就衍生出流控制的优化</p>
 <p>窗口控制：TCP不必等待每个段的应答再发送下一个段，而是等待更大段的应答。什么意思呢？TCP设置一个更大的段为5，那么只有在发送5个段后等待接收方的5个应答。换句话说以前是单线程发送（等待当前发送的应答），现在可以并发发送（并不需要等待当前应答，只需等待更大段的应答）</p>
 <p>窗口大小指无需等待确认应答而可以继续发送数据的最大值</p>
-<img src="/2023/07/23/TCP/1920px-Tcp.svg-20230723121318056.png" alt="TCP滑动窗口控制" style="zoom: 40%;">
-
-
-
+<p><img src="/2023/07/23/TCP/1920px-Tcp.svg-20230723121318056.png" alt="TCP滑动窗口控制" style="zoom: 40%;"></p>
 <p>高速重发策略：一个段在发送过程中丢失或者应答在返回过程中丢失，发送方也不会立刻重发。直到发送发连续收到3次重复的ack时才会重发段</p>
 <p>流控制：</p>
 <ol>
@@ -570,8 +558,9 @@
 <p>为了解决下面的情况：服务端返回ACK在网络中丢失，客户端迟迟等不到响应，从而导致窗口size一直为0，这样客户端就死锁了。TCP在客户端加入窗口探测机制，在迟迟没有等到服务端的ACK时，客户端会发起窗口大小的探测，服务端需返回给客户端<strong>可以确认的最大ACK</strong></p>
 <p>拥塞控制和慢启动：</p>
 <p>拥塞窗口（CWND）</p>
-<p>刚开始的时候窗口大小设置为1MSS，每次应答，窗口数都会增加。随着包的每次往返，窗口大小也随着1、2、4的指数幂增长。为了防止在之后指数爆增的现象，在窗口大小达到慢启动阈值时（最大阈值为窗口的最大值），会使用下面的公式计算窗口大小<br>$$<br>\frac{1MSS(字节数)^2}{拥塞窗口(字节数)}<br>$$</p>
-
+<p>刚开始的时候窗口大小设置为1MSS，每次应答，窗口数都会增加。随着包的每次往返，窗口大小也随着1、2、4的指数幂增长。为了防止在之后指数爆增的现象，在窗口大小达到慢启动阈值时（最大阈值为窗口的最大值），会使用下面的公式计算窗口大小</p>
+<script type="math/tex; mode=display">
+\frac{1MSS(字节数)^2}{拥塞窗口(字节数)}</script>
                 
             </div>
             <hr/>
@@ -1375,7 +1364,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">36.2k</span>
+                        class="white-color">25.4k</span>
             
             
             

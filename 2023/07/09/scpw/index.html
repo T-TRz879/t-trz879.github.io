@@ -521,8 +521,8 @@
 <li><code>-t</code>：表示向远程系统传输文件。当你在本地系统上运行<code>scp</code>命令复制文件到远程系统时，远程系统上的<code>scp</code>进程会以<code>-t</code>选项运行。</li>
 <li><code>-d</code>：表示目标是一个目录。当复制多个文件或者一个目录时，<code>scp</code>会以<code>-d</code>选项运行，这告诉<code>scp</code>应该在目标系统上创建一个目录来存放复制的文件。</li>
 <li><code>-r</code>：表示递归复制。当复制一个目录及其所有子目录和文件时，<code>scp</code>会以<code>-r</code>选项运行。</li>
-<li><code>-p</code>：表示保留文件的修改&#x2F;访问时间和权限。当以<code>-p</code>选项运行时，<code>scp</code>会尝试在目标文件上设置与源文件相同的修改&#x2F;访问时间和权限。</li>
-<li><code>-l</code>：限制使用的带宽，以 Kbit&#x2F;s 为单位。</li>
+<li><code>-p</code>：表示保留文件的修改/访问时间和权限。当以<code>-p</code>选项运行时，<code>scp</code>会尝试在目标文件上设置与源文件相同的修改/访问时间和权限。</li>
+<li><code>-l</code>：限制使用的带宽，以 Kbit/s 为单位。</li>
 </ol>
 <h4 id="（3）scp内部命令"><a href="#（3）scp内部命令" class="headerlink" title="（3）scp内部命令"></a>（3）scp内部命令</h4><p><code>scp</code>在底层使用了一套简单的文本协议来控制文件和目录的复制操作。这个协议包含一些命令，这些命令是在<code>scp</code>的源代码中定义的，并以单个字符的形式发送。这些命令用来传输文件名、时间、文件类型和是否结束等。</p>
 <ol>
@@ -554,8 +554,7 @@
 <li><code>1</code>：错误。这个响应码表示前面的操作失败了，后面会跟随一行文本，解释了发生了什么错误。</li>
 <li><code>2</code>：致命错误。这个响应码表示发生了一个严重的错误，<code>scp</code>进程无法继续执行。后面会跟随一行文本，解释了发生了什么错误。</li>
 </ol>
-<h2 id="三、实现"><a href="#三、实现" class="headerlink" title="三、实现"></a>三、实现</h2><img src="/2023/07/09/scpw/scpw.gif" alt="scpw-demo" style="zoom:80%;">
-
+<h2 id="三、实现"><a href="#三、实现" class="headerlink" title="三、实现"></a>三、实现</h2><p><img src="/2023/07/09/scpw/scpw.gif" alt="scpw-demo" style="zoom:80%;"></p>
 <p><code>scpw</code>项目中提供了如下实现</p>
 <ol>
 <li>传输文件到远程</li>
@@ -1364,7 +1363,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">36.2k</span>
+                        class="white-color">25.4k</span>
             
             
             
