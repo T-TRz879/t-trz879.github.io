@@ -6,10 +6,10 @@
     <meta charset="utf-8">
     <meta name="keywords" content="Linux免密登陆, T_TBlog">
     <meta name="description" content="本文中介绍两个服务器之间的免密登录，比如从A ssh 到 B 实现免密登录
-如下是**.ssh**文件夹中文件的权限
+如下是.ssh文件夹中文件的权限
 .ssh  mod-700
   ├── authorized_keys  mod-600
-  ├── id_rsa  mo">
+  ├── id_rsa  mod-60">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -473,7 +473,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    361
+                    356
                 </div>
                 
 
@@ -501,24 +501,24 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>本文中介绍两个服务器之间的免密登录，比如从A ssh 到 B 实现免密登录</p>
-<p>如下是**<code>.ssh</code>**文件夹中文件的权限</p>
-<pre class=" language-yaml"><code class="language-yaml">.ssh  mod<span class="token punctuation">-</span><span class="token number">700</span>
-  ├── authorized_keys  mod<span class="token punctuation">-</span><span class="token number">600</span>
-  ├── id_rsa  mod<span class="token punctuation">-</span><span class="token number">600</span>
-  ├── id_rsa.pub  mod<span class="token punctuation">-</span><span class="token number">644</span>
-  └── known_hosts  mod<span class="token punctuation">-</span><span class="token number">644</span>
+<p>如下是<strong><code>.ssh</code></strong>文件夹中文件的权限</p>
+<pre class=" language-lang-yaml"><code class="language-lang-yaml">.ssh  mod-700
+  ├── authorized_keys  mod-600
+  ├── id_rsa  mod-600
+  ├── id_rsa.pub  mod-644
+  └── known_hosts  mod-644
 </code></pre>
 <p>在服务器A中生成专门用来连接服务器B的<strong>公钥</strong>和<strong>私钥</strong></p>
-<pre class=" language-shell"><code class="language-shell"># -C 用来添加描述
+<pre class=" language-lang-shell"><code class="language-lang-shell"># -C 用来添加描述
 # ~/.ssh/server_A 是生成公钥和私钥的所在位置和文件名前缀
 ssh-keygen -t rsa -C 'server_A' -f ~/.ssh/server_A
 </code></pre>
-<p>将服务器A中**<code>~/.ssh/server_A.pub</code><strong>的内容添加到服务器B的</strong><code>~/.ssh/authorized_keys </code>**中</p>
-<pre class=" language-shell"><code class="language-shell"># 此操作在服务器B上，server_A是提前上传到服务器B中的
+<p>将服务器A中<strong><code>~/.ssh/server_A.pub</code></strong>的内容添加到服务器B的<strong><code>~/.ssh/authorized_keys</code></strong>中</p>
+<pre class=" language-lang-shell"><code class="language-lang-shell"># 此操作在服务器B上，server_A是提前上传到服务器B中的
 cat server_A.pub >> ~/.ssh/authorized_keys
 </code></pre>
-<p>修改服务器B中的**<code>sshd.service</code>**配置</p>
-<pre class=" language-shell"><code class="language-shell">vim /etc/ssh/sshd_config
+<p>修改服务器B中的<strong><code>sshd.service</code></strong>配置</p>
+<pre class=" language-lang-shell"><code class="language-lang-shell">vim /etc/ssh/sshd_config
 
 # 开启免密登录
 PubkeyAuthentication yes
@@ -527,14 +527,14 @@ AuthorizedKeysFile      .ssh/authorized_keys
 # 将密码登录的配置改为no，最好在免密登录成功后再取消
 PasswordAuthentication no
 </code></pre>
-<p>重启**<code>sshd.service</code>**服务</p>
-<pre class=" language-shell"><code class="language-shell">sudo systemctl restart sshd.service
+<p>重启<strong><code>sshd.service</code></strong>服务</p>
+<pre class=" language-lang-shell"><code class="language-lang-shell">sudo systemctl restart sshd.service
 </code></pre>
 <p>在服务器A中尝试使用免密连接服务器B</p>
-<pre class=" language-shell"><code class="language-shell">ssh ${user}@${service_B}
+<pre class=" language-lang-shell"><code class="language-lang-shell">ssh ${user}@${service_B}
 </code></pre>
-<p>如果连接不上服务器B，可以通过查看**<code>sshd.service</code>**的日志</p>
-<pre class=" language-shell"><code class="language-shell">vim /etc/ssh/sshd_config
+<p>如果连接不上服务器B，可以通过查看<strong><code>sshd.service</code></strong>的日志</p>
+<pre class=" language-lang-shell"><code class="language-lang-shell">vim /etc/ssh/sshd_config
 
 # 开启debug模式，解决问题后最好关闭日志
 LogLevel DEBUG
@@ -546,8 +546,8 @@ sudo systemctl restart sshd.service
 tailf /var/log/secure
 </code></pre>
 <p>错误1</p>
-<p>Authentication refused: bad ownership or modes for file &#x2F;root&#x2F;.ssh&#x2F;authorize</p>
-<p><strong>检查 ~&#x2F;.ssh此文件夹中的文件权限是否符合文章开头的权限</strong></p>
+<p>Authentication refused: bad ownership or modes for file /root/.ssh/authorize</p>
+<p><strong>检查 ~/.ssh此文件夹中的文件权限是否符合文章开头的权限</strong></p>
 
                 
             </div>
@@ -1344,7 +1344,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">25.5k</span>
             
             
             

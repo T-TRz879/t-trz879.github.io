@@ -474,7 +474,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    796
+                    772
                 </div>
                 
 
@@ -507,91 +507,90 @@
 <h2 id="三、如何解决粘包"><a href="#三、如何解决粘包" class="headerlink" title="三、如何解决粘包"></a>三、如何解决粘包</h2><p>解决TCP粘包的常见方法是在应用层采用一定的数据包设计机制。常见的做法是在每个数据包前面加上表示数据长度的字段（这通常被称为 “消息长度前缀”），接收端根据这个长度可以知道每个数据包的边界在哪里。另外，还可以采用特殊的分隔符来分割每个数据包，但这就需要你确保这个分隔符不会在数据包中的其他地方出现。</p>
 <p>需要注意的是，解决TCP粘包问题需要发送方和接收方的共同配合。只有双方都按照相同的协议来发送和接收数据，才能成功解决粘包问题。</p>
 <p>使用<code>go</code>实现“消息长度前缀”</p>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestTcp</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// 客户端接受</span>
-        <span class="token function">accept</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Second <span class="token operator">*</span> <span class="token number">5</span><span class="token punctuation">)</span>
-  <span class="token comment" spellcheck="true">// 服务端发送</span>
-    <span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Second <span class="token operator">*</span> <span class="token number">5</span><span class="token punctuation">)</span>
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">func TestTcp(t *testing.T) {
+    go func() {
+    // 客户端接受
+        accept()
+    }()
+    time.Sleep(time.Second * 5)
+  // 服务端发送
+    send()
+    time.Sleep(time.Second * 5)
+}
 
 
-<span class="token keyword">func</span> <span class="token function">accept</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
-    listener<span class="token punctuation">,</span> err <span class="token operator">:=</span> net<span class="token punctuation">.</span><span class="token function">Listen</span><span class="token punctuation">(</span><span class="token string">"tcp"</span><span class="token punctuation">,</span> <span class="token string">":8080"</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> err
-    <span class="token punctuation">}</span>
-    <span class="token keyword">defer</span> listener<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+func accept() error {
+    listener, err := net.Listen("tcp", ":8080")
+    if err != nil {
+        return err
+    }
+    defer listener.Close()
 
-    conn<span class="token punctuation">,</span> err <span class="token operator">:=</span> listener<span class="token punctuation">.</span><span class="token function">Accept</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> err
-    <span class="token punctuation">}</span>
-    <span class="token keyword">defer</span> conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    conn, err := listener.Accept()
+    if err != nil {
+        return err
+    }
+    defer conn.Close()
 
-    reader <span class="token operator">:=</span> bufio<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span>conn<span class="token punctuation">)</span>
-    <span class="token keyword">for</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// 解析前缀长度</span>
-        peek<span class="token punctuation">,</span> err <span class="token operator">:=</span> reader<span class="token punctuation">.</span><span class="token function">Peek</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span>
-        <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> err
-        <span class="token punctuation">}</span>
-        buf <span class="token operator">:=</span> bytes<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span>peek<span class="token punctuation">)</span>
-        <span class="token keyword">var</span> dataLen <span class="token builtin">int64</span>
-        err <span class="token operator">=</span> binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>dataLen<span class="token punctuation">)</span>
-        <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> err
-        <span class="token punctuation">}</span>
-        <span class="token keyword">for</span> <span class="token function">int64</span><span class="token punctuation">(</span>reader<span class="token punctuation">.</span><span class="token function">Buffered</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> dataLen<span class="token operator">+</span><span class="token number">8</span> <span class="token punctuation">{</span>
-            time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Millisecond <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span>
-    <span class="token comment" spellcheck="true">// 读取数据</span>
-        data <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> dataLen<span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span>
-        <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> reader<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
-        <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-            <span class="token keyword">return</span> err
-        <span class="token punctuation">}</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"收到的消息: %s\n"</span><span class="token punctuation">,</span> <span class="token function">string</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    reader := bufio.NewReader(conn)
+    for {
+    // 解析前缀长度
+        peek, err := reader.Peek(8)
+        if err != nil {
+            return err
+        }
+        buf := bytes.NewReader(peek)
+        var dataLen int64
+        err = binary.Read(buf, binary.BigEndian, &dataLen)
+        if err != nil {
+            return err
+        }
+        for int64(reader.Buffered()) < dataLen+8 {
+            time.Sleep(time.Millisecond * 100)
+        }
+    // 读取数据
+        data := make([]byte, dataLen+8)
+        _, err = reader.Read(data)
+        if err != nil {
+            return err
+        }
+        fmt.Printf("收到的消息: %s\n", string(data[8:]))
+    }
+}
 
-<span class="token keyword">func</span> <span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    conn<span class="token punctuation">,</span> err <span class="token operator">:=</span> net<span class="token punctuation">.</span><span class="token function">Dial</span><span class="token punctuation">(</span><span class="token string">"tcp"</span><span class="token punctuation">,</span> <span class="token string">"localhost:8080"</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">defer</span> conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+func send() {
+    conn, err := net.Dial("tcp", "localhost:8080")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer conn.Close()
 
-    data1 <span class="token operator">:=</span> <span class="token string">"你好，我是第一条数据"</span>
-    en1<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> <span class="token function">encode</span><span class="token punctuation">(</span>data1<span class="token punctuation">)</span>
-    <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> conn<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>en1<span class="token punctuation">)</span>
+    data1 := "你好，我是第一条数据"
+    en1, _ := encode(data1)
+    _, _ = conn.Write(en1)
 
-    data2 <span class="token operator">:=</span> <span class="token string">"你好，我是第二条数据"</span>
-    en2<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> <span class="token function">encode</span><span class="token punctuation">(</span>data2<span class="token punctuation">)</span>
-    <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> conn<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>en2<span class="token punctuation">)</span>
+    data2 := "你好，我是第二条数据"
+    en2, _ := encode(data2)
+    _, _ = conn.Write(en2)
 
-    data3 <span class="token operator">:=</span> <span class="token string">"拜拜"</span>
-    en3<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> <span class="token function">encode</span><span class="token punctuation">(</span>data3<span class="token punctuation">)</span>
-    <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> conn<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>en3<span class="token punctuation">)</span>
-<span class="token punctuation">}</span>
+    data3 := "拜拜"
+    en3, _ := encode(data3)
+    _, _ = conn.Write(en3)
+}
 
-<span class="token keyword">func</span> <span class="token function">encode</span><span class="token punctuation">(</span>message <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    msgLen <span class="token operator">:=</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>message<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    res <span class="token operator">:=</span> <span class="token operator">&amp;</span>bytes<span class="token punctuation">.</span>Buffer<span class="token punctuation">{</span><span class="token punctuation">}</span>
-    err <span class="token operator">:=</span> binary<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> msgLen<span class="token punctuation">)</span>
-    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> err
-    <span class="token punctuation">}</span>
-    err <span class="token operator">=</span> binary<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span>message<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> err
-    <span class="token punctuation">}</span>
-    <span class="token keyword">return</span> res<span class="token punctuation">.</span><span class="token function">Bytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+func encode(message string) ([]byte, error) {
+    msgLen := int64(len(message))
+    res := &bytes.Buffer{}
+    err := binary.Write(res, binary.BigEndian, msgLen)
+    if err != nil {
+        return nil, err
+    }
+    err = binary.Write(res, binary.BigEndian, []byte(message))
+    if err != nil {
+        return nil, err
+    }
+    return res.Bytes(), nil
 </code></pre>
-<p>[参考文章]: <a target="_blank" rel="noopener" href="https://wangbjun.site/2019/coding/golang/golang-tcp-package.html">https://wangbjun.site/2019/coding/golang/golang-tcp-package.html</a>	“Golang处理TCP“粘包”问题”</p>
 
                 
             </div>
@@ -1388,7 +1387,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">25.5k</span>
             
             
             

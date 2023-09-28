@@ -7,10 +7,7 @@
     <meta name="keywords" content="Java中的线程池, T_TBlog">
     <meta name="description" content="1.使用线程池的好处官网解释：减少频繁创建和销毁线程，提高CPU利用率；提供管理线程、统计任务执行次数、批量执行任务和批量执行任务时配置超时时间等额外功能
 
-
-
-
-2.线程池的七大参数public ThreadPoolExecutor(in">
+2.线程池的七大参数public ThreadPoolExecutor(int c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -478,14 +475,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.9k
+                    1.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    8 分
+                    4 分
                 </div>
                 
 
@@ -506,40 +503,36 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="1-使用线程池的好处"><a href="#1-使用线程池的好处" class="headerlink" title="1.使用线程池的好处"></a>1.使用线程池的好处</h1><p>官网解释：减少频繁创建和销毁线程，提高CPU利用率；提供管理线程、统计任务执行次数、批量执行任务和批量执行任务时配置超时时间等额外功能</p>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926222602895.png" alt="image-20230926222602895" style="zoom:67%;">
-
-
-
-<h1 id="2-线程池的七大参数"><a href="#2-线程池的七大参数" class="headerlink" title="2.线程池的七大参数"></a>2.线程池的七大参数</h1><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token function">ThreadPoolExecutor</span><span class="token punctuation">(</span><span class="token keyword">int</span> corePoolSize<span class="token punctuation">,</span>
-                          <span class="token keyword">int</span> maximumPoolSize<span class="token punctuation">,</span>
-                          <span class="token keyword">long</span> keepAliveTime<span class="token punctuation">,</span>
-                          TimeUnit unit<span class="token punctuation">,</span>
-                          BlockingQueue<span class="token operator">&lt;</span>Runnable<span class="token operator">></span> workQueue<span class="token punctuation">,</span>
-                          ThreadFactory threadFactory<span class="token punctuation">,</span>
-                          RejectedExecutionHandler handler<span class="token punctuation">)</span>
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926222602895.png" alt="官方回答使用线程池的好处" style="zoom:67%;"></p>
+<h1 id="2-线程池的七大参数"><a href="#2-线程池的七大参数" class="headerlink" title="2.线程池的七大参数"></a>2.线程池的七大参数</h1><pre class=" language-lang-java"><code class="language-lang-java">public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue<Runnable> workQueue,
+                          ThreadFactory threadFactory,
+                          RejectedExecutionHandler handler)
 </code></pre>
 <ul>
 <li><strong>corePoolSize</strong>：核心线程数</li>
-<li><strong>maximumPoolSize</strong>：最大线程数（核心线程数+非核心线程数&#x3D;最大线程数）</li>
+<li><strong>maximumPoolSize</strong>：最大线程数（核心线程数+非核心线程数=最大线程数）</li>
 <li><strong>keepAliveTime</strong>：线程无任务执行时最长<strong>active</strong>时间（一般来说，这个参数只对非核心线程有用，但下面的方法可以让核心线程也受用<code>allowCoreThreadTimeOut(boolean)</code>）</li>
 <li><strong>unit</strong>：<code>keepAliveTime</code>的时间单位</li>
 <li><strong>workQueue</strong>：任务等待队列</li>
 <li><strong>threadFactory</strong>：线程工厂</li>
 <li><strong>handler</strong>：拒绝策略</li>
 </ul>
-<h1 id="3-线程池中的线程调度"><a href="#3-线程池中的线程调度" class="headerlink" title="3.线程池中的线程调度"></a>3.线程池中的线程调度</h1><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230925154330872.png" alt="image-20230925154330872" style="zoom: 80%;">
-
+<h1 id="3-线程池中的线程调度"><a href="#3-线程池中的线程调度" class="headerlink" title="3.线程池中的线程调度"></a>3.线程池中的线程调度</h1><p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230925154330872.png" alt="线程调度" style="zoom: 80%;"></p>
 <ol>
 <li>线程池是否<strong>RUNNING</strong>状态，如果不在<strong>RUNNING</strong>状态则拒绝</li>
-<li>工作线程数（<strong>workerCount</strong>）小于核心线程数（<strong>corePoolSize</strong>），创建<strong>核心线程</strong>处理（<em><strong>如果有线程空闲，则还是会创建线程处理</strong></em>）</li>
+<li>工作线程数（<strong>workerCount</strong>）小于核心线程数（<strong>corePoolSize</strong>），创建<strong>核心线程</strong>处理（<strong><em>如果有线程空闲，则还是会创建线程处理</em></strong>）</li>
 <li>工作线程数（<strong>workerCount</strong>）大于等于核心线程数（<strong>corePoolSize</strong>），等待队列未满时，任务进入队列阻塞</li>
 <li>工作线程数（<strong>workerCount</strong>）大于等于核心线程数（<strong>corePoolSize</strong>）且当前工作线程数（<strong>workerCount</strong>）小于最大线程数（<strong>maximumPoolSize</strong>），等待队列满时，创建<strong>非核心线程</strong>处理</li>
 <li>工作线程数（<strong>workerCount</strong>）大于等于最大线程数（<strong>maximumPoolSize</strong>）且等待队列满时，采用拒绝策略</li>
 </ol>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">execute</span><span class="token punctuation">(</span>Runnable command<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span>command <span class="token operator">==</span> null<span class="token punctuation">)</span>
-    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">NullPointerException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token comment" spellcheck="true">/*
+<pre class=" language-lang-java"><code class="language-lang-java">public void execute(Runnable command) {
+  if (command == null)
+    throw new NullPointerException();
+  /*
    * Proceed in 3 steps:
    *
    * 1. If fewer than corePoolSize threads are running, try to
@@ -558,34 +551,34 @@
    * 3. If we cannot queue task, then we try to add a new
    * thread.  If it fails, we know we are shut down or saturated
    * and so reject the task.
-   */</span>
-  <span class="token keyword">int</span> c <span class="token operator">=</span> ctl<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token comment" spellcheck="true">// 工作线程数 &lt; 核心线程数 => 尝试添加任务</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">workerCountOf</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span> <span class="token operator">&lt;</span> corePoolSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">addWorker</span><span class="token punctuation">(</span>command<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-      <span class="token keyword">return</span><span class="token punctuation">;</span>
-    c <span class="token operator">=</span> ctl<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-  <span class="token comment" spellcheck="true">// 工作线程数 >= 核心线程数，任务加入队列成功就不需要创建额外的线程来处理</span>
-  <span class="token comment" spellcheck="true">// 如果任务加入队列失败就走到最下面的else if中</span>
-  <span class="token comment" spellcheck="true">// 线程池RUNNING 且 尝试添加任务成功</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isRunning</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> workQueue<span class="token punctuation">.</span><span class="token function">offer</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">int</span> recheck <span class="token operator">=</span> ctl<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">// duobleCheck 线程池是否RUNNING，如果非运行中，则移除刚刚添加的任务</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span> <span class="token function">isRunning</span><span class="token punctuation">(</span>recheck<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">remove</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">)</span>
-      <span class="token comment" spellcheck="true">// 拒绝任务</span>
-      <span class="token function">reject</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">workerCountOf</span><span class="token punctuation">(</span>recheck<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
-      <span class="token comment" spellcheck="true">// 线程池正在RUNNING</span>
-      <span class="token function">addWorker</span><span class="token punctuation">(</span>null<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-  <span class="token comment" spellcheck="true">// 此时能走到下面这行就说明 队列已经满 或 线程池非运行状态（很少）</span>
-  <span class="token comment" spellcheck="true">// 需要创建新的线程 第二个参数为 是否核心线程</span>
-  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">addWorker</span><span class="token punctuation">(</span>command<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token function">reject</span><span class="token punctuation">(</span>command<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+   */
+  int c = ctl.get();
+  // 工作线程数 < 核心线程数 => 尝试添加任务
+  if (workerCountOf(c) < corePoolSize) {
+    if (addWorker(command, true))
+      return;
+    c = ctl.get();
+  }
+  // 工作线程数 >= 核心线程数，任务加入队列成功就不需要创建额外的线程来处理
+  // 如果任务加入队列失败就走到最下面的else if中
+  // 线程池RUNNING 且 尝试添加任务成功
+  if (isRunning(c) && workQueue.offer(command)) {
+    int recheck = ctl.get();
+    // duobleCheck 线程池是否RUNNING，如果非运行中，则移除刚刚添加的任务
+    if (! isRunning(recheck) && remove(command))
+      // 拒绝任务
+      reject(command);
+    else if (workerCountOf(recheck) == 0)
+      // 线程池正在RUNNING
+      addWorker(null, false);
+  }
+  // 此时能走到下面这行就说明 队列已经满 或 线程池非运行状态（很少）
+  // 需要创建新的线程 第二个参数为 是否核心线程
+  else if (!addWorker(command, false))
+    reject(command);
+}
 </code></pre>
-<h1 id="4-线程的状态"><a href="#4-线程的状态" class="headerlink" title="4.线程的状态"></a>4.线程的状态</h1><h2 id="4-1-五种状态"><a href="#4-1-五种状态" class="headerlink" title="4.1 五种状态"></a>4.1 五种状态</h2><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**  官方回答
+<h1 id="4-线程的状态"><a href="#4-线程的状态" class="headerlink" title="4.线程的状态"></a>4.线程的状态</h1><h2 id="4-1-五种状态"><a href="#4-1-五种状态" class="headerlink" title="4.1 五种状态"></a>4.1 五种状态</h2><pre class=" language-lang-java"><code class="language-lang-java">/**  官方回答
          *   RUNNING:  Accept new tasks and process queued tasks
      *   SHUTDOWN: Don't accept new tasks, but process queued tasks
      *   STOP:     Don't accept new tasks, don't process queued tasks,
@@ -595,7 +588,7 @@
      *             will run the terminated() hook method
      *   TERMINATED: terminated() has completed
      *
-     */</span>
+     */
 </code></pre>
 <ol>
 <li><strong>RUNNING</strong>：能接受新的任务，能处理等待队列中的任务</li>
@@ -604,7 +597,7 @@
 <li><strong>TIDYING</strong>：所有任务都被中断，工作线程数为0</li>
 <li><strong>TERMINATED</strong>：当钩子函数terminated()被执行完后，线程池彻底终止</li>
 </ol>
-<h2 id="4-2-状态扭转"><a href="#4-2-状态扭转" class="headerlink" title="4.2 状态扭转"></a>4.2 状态扭转</h2><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**	 官方回答
+<h2 id="4-2-状态扭转"><a href="#4-2-状态扭转" class="headerlink" title="4.2 状态扭转"></a>4.2 状态扭转</h2><pre class=" language-lang-java"><code class="language-lang-java">/**     官方回答
          * RUNNING -> SHUTDOWN
      *    On invocation of shutdown()
      * (RUNNING or SHUTDOWN) -> STOP
@@ -616,11 +609,11 @@
      * TIDYING -> TERMINATED
      *    When the terminated() hook method has completed
      *
-     */</span>
+     */
 </code></pre>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926225716656.png" alt="image-20230926225716656" style="zoom:70%;">
-
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926225716656.png" alt="线程池状态扭转" style="zoom:70%;"></p>
 <h2 id="4-3-状态在代码中的实现"><a href="#4-3-状态在代码中的实现" class="headerlink" title="4.3 状态在代码中的实现"></a>4.3 状态在代码中的实现</h2><p>线程池的<strong>运行状态</strong>和<strong>工作线程数</strong>采用位运算一起存放在名为<code>ctl</code>的<code>AtomicInteger</code>类型中。其中<strong>高3位</strong>代表运行状态，<strong>低29位</strong>代表工作线程数</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -629,7 +622,8 @@
 <th>状态描述</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>RUNNING</td>
 <td>-1 &lt;&lt; 29</td>
 <td>111 00000000000000000000000000000</td>
@@ -654,34 +648,36 @@
 <td>3 &lt;&lt; 29</td>
 <td>011 00000000000000000000000000000</td>
 </tr>
-</tbody></table>
-<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// worker count 掩码</span>
-<span class="token comment" spellcheck="true">// 100000000000000000000000000000(29个0) - 1 = 1111111111111111111111111111(29个1)</span>
-<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> COUNT_MASK <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> COUNT_BITS<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+</tbody>
+</table>
+</div>
+<pre class=" language-lang-java"><code class="language-lang-java">// worker count 掩码
+// 100000000000000000000000000000(29个0) - 1 = 1111111111111111111111111111(29个1)
+private static final int COUNT_MASK = (1 << COUNT_BITS) - 1;
 </code></pre>
-<h4 id="1）ctl初始值"><a href="#1）ctl初始值" class="headerlink" title="1）ctl初始值"></a>1）<code>ctl</code>初始值</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// RUNNING 和 0 进行 | 运算，将state和wrokerCount都存进ctl中</span>
-<span class="token keyword">private</span> <span class="token keyword">final</span> AtomicInteger ctl <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AtomicInteger</span><span class="token punctuation">(</span><span class="token function">ctlOf</span><span class="token punctuation">(</span>RUNNING<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">ctlOf</span><span class="token punctuation">(</span><span class="token keyword">int</span> rs<span class="token punctuation">,</span> <span class="token keyword">int</span> wc<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> rs <span class="token operator">|</span> wc<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<h4 id="1）ctl初始值"><a href="#1）ctl初始值" class="headerlink" title="1）ctl初始值"></a>1）<code>ctl</code>初始值</h4><pre class=" language-lang-java"><code class="language-lang-java">// RUNNING 和 0 进行 | 运算，将state和wrokerCount都存进ctl中
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+private static int ctlOf(int rs, int wc) { return rs | wc; }
 </code></pre>
-<h4 id="2）根据ctl计算出当前线程池状态"><a href="#2）根据ctl计算出当前线程池状态" class="headerlink" title="2）根据ctl计算出当前线程池状态"></a>2）根据<code>ctl</code>计算出当前线程池状态</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// ~COUNT_MASK后是 111 00000000000000000000000000000 和 c 与运算 正好可以算出状态</span>
-<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">runStateOf</span><span class="token punctuation">(</span><span class="token keyword">int</span> c<span class="token punctuation">)</span>     <span class="token punctuation">{</span> <span class="token keyword">return</span> c <span class="token operator">&amp;</span> <span class="token operator">~</span>COUNT_MASK<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<h4 id="2）根据ctl计算出当前线程池状态"><a href="#2）根据ctl计算出当前线程池状态" class="headerlink" title="2）根据ctl计算出当前线程池状态"></a>2）根据<code>ctl</code>计算出当前线程池状态</h4><pre class=" language-lang-java"><code class="language-lang-java">// ~COUNT_MASK后是 111 00000000000000000000000000000 和 c 与运算 正好可以算出状态
+private static int runStateOf(int c)     { return c & ~COUNT_MASK; }
 </code></pre>
-<h4 id="3）根据ctl计算出当前工作线程数"><a href="#3）根据ctl计算出当前工作线程数" class="headerlink" title="3）根据ctl计算出当前工作线程数"></a>3）根据<code>ctl</code>计算出当前工作线程数</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// COUNT_MASK是 1111111111111111111111111111 和 c 与运算 正好可以算出低29位的工作线程数</span>
-<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">workerCountOf</span><span class="token punctuation">(</span><span class="token keyword">int</span> c<span class="token punctuation">)</span>  <span class="token punctuation">{</span> <span class="token keyword">return</span> c <span class="token operator">&amp;</span> COUNT_MASK<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<h4 id="3）根据ctl计算出当前工作线程数"><a href="#3）根据ctl计算出当前工作线程数" class="headerlink" title="3）根据ctl计算出当前工作线程数"></a>3）根据<code>ctl</code>计算出当前工作线程数</h4><pre class=" language-lang-java"><code class="language-lang-java">// COUNT_MASK是 1111111111111111111111111111 和 c 与运算 正好可以算出低29位的工作线程数
+private static int workerCountOf(int c)  { return c & COUNT_MASK; }
 </code></pre>
-<h4 id="4）判断线程池是否在运行中"><a href="#4）判断线程池是否在运行中" class="headerlink" title="4）判断线程池是否在运行中"></a>4）判断线程池是否在运行中</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// RUNNING 状态是负数</span>
-<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">isRunning</span><span class="token punctuation">(</span><span class="token keyword">int</span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">return</span> c <span class="token operator">&lt;</span> SHUTDOWN<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h4 id="4）判断线程池是否在运行中"><a href="#4）判断线程池是否在运行中" class="headerlink" title="4）判断线程池是否在运行中"></a>4）判断线程池是否在运行中</h4><pre class=" language-lang-java"><code class="language-lang-java">// RUNNING 状态是负数
+private static boolean isRunning(int c) {
+    return c < SHUTDOWN;
+}
 </code></pre>
-<h4 id="5）判断线程池的状态是否大于等于是xx状态"><a href="#5）判断线程池的状态是否大于等于是xx状态" class="headerlink" title="5）判断线程池的状态是否大于等于是xx状态"></a>5）判断线程池的状态是否大于等于是xx状态</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 由于RUNNING到TERMINATED是递增的，所以可以按照这样的形式判断</span>
-<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">runStateAtLeast</span><span class="token punctuation">(</span><span class="token keyword">int</span> c<span class="token punctuation">,</span> <span class="token keyword">int</span> s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">return</span> c <span class="token operator">>=</span> s<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h4 id="5）判断线程池的状态是否大于等于是xx状态"><a href="#5）判断线程池的状态是否大于等于是xx状态" class="headerlink" title="5）判断线程池的状态是否大于等于是xx状态"></a>5）判断线程池的状态是否大于等于是xx状态</h4><pre class=" language-lang-java"><code class="language-lang-java">// 由于RUNNING到TERMINATED是递增的，所以可以按照这样的形式判断
+private static boolean runStateAtLeast(int c, int s) {
+    return c >= s;
+}
 </code></pre>
-<h4 id="6）判断线程池的状态是否小于xx状态"><a href="#6）判断线程池的状态是否小于xx状态" class="headerlink" title="6）判断线程池的状态是否小于xx状态"></a>6）判断线程池的状态是否小于xx状态</h4><pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">boolean</span> <span class="token function">runStateLessThan</span><span class="token punctuation">(</span><span class="token keyword">int</span> c<span class="token punctuation">,</span> <span class="token keyword">int</span> s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">return</span> c <span class="token operator">&lt;</span> s<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h4 id="6）判断线程池的状态是否小于xx状态"><a href="#6）判断线程池的状态是否小于xx状态" class="headerlink" title="6）判断线程池的状态是否小于xx状态"></a>6）判断线程池的状态是否小于xx状态</h4><pre class=" language-lang-java"><code class="language-lang-java">private static boolean runStateLessThan(int c, int s) {
+    return c < s;
+}
 </code></pre>
 <h1 id="5-线程池的继承关系"><a href="#5-线程池的继承关系" class="headerlink" title="5.线程池的继承关系"></a>5.线程池的继承关系</h1><ol>
 <li><strong>Executor</strong>：线程池最底层接口，定义了线程池的核心方法<code>execute</code></li>
@@ -689,30 +685,20 @@
 <li><strong>AbstractExecutorService</strong>：实现ExecutorService接口中的通用方法</li>
 <li><strong>ThreadPoolExecutor</strong>：实现线程池的核心逻辑</li>
 </ol>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/ThreadPoolExecutor-5736900.png" alt="ThreadPoolExecutor" style="zoom:70%;">
-
-
-
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/ThreadPoolExecutor-5736900.png" alt="线程池UML图" style="zoom:70%;"></p>
 <h1 id="6-线程创建管理复用和销毁"><a href="#6-线程创建管理复用和销毁" class="headerlink" title="6.线程创建管理复用和销毁"></a>6.线程创建管理复用和销毁</h1><h2 id="6-1-核心线程创建和管理"><a href="#6-1-核心线程创建和管理" class="headerlink" title="6.1 核心线程创建和管理"></a>6.1 核心线程创建和管理</h2><p>线程池初始化时核心线程设置为<strong>n</strong>，现有<strong>n</strong>个任务需要被执行。空闲的核心线程并不会执行任务，会一直创建新线程，直到<code>工作线程数 = 核心线程数</code></p>
 <p>默认情况下<strong>核心线程</strong>一旦创建直到线程池销毁都是<strong>active</strong>状态。如果配置了<code>allowCoreThreadTimeOut=true</code>，那么核心线程也会像<strong>非核心线程</strong>等待<strong>KeepAlive</strong>时间后被销毁</p>
 <h2 id="6-2-非核心线程创建和管理"><a href="#6-2-非核心线程创建和管理" class="headerlink" title="6.2 非核心线程创建和管理"></a>6.2 非核心线程创建和管理</h2><p>满足<code>核心线程数 &lt;= 工作线程数 &lt; 最大线程数 &amp;&amp; 等待队列已满</code>，线程池会创建<strong>非核心线程</strong></p>
 <p><strong>非核心线程</strong>等待<strong>KeepAlive</strong>时间后被销毁 </p>
 <h2 id="6-3-线程复用"><a href="#6-3-线程复用" class="headerlink" title="6.3 线程复用"></a>6.3 线程复用</h2><p>例如：<code>工作线程数 &gt;= 核心线程数 &amp;&amp; 等待队列未满</code>时，并不会创建新的线程处理任务，核心线程处理手中和等待队列中的任务</p>
 <p>如下图的场景中<code>核心线程数 &lt;= 工作线程数 &lt; 最大线程数 &amp;&amp; 等待队列满</code>时。<strong>核心线程worker2</strong>空闲了，会从等待队列中获取任务，放到自己线程中执行</p>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230927214809131.png" alt="image-20230927214809131" style="zoom:50%;">
-
-
-
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230927214809131.png" alt="线程池复用线程" style="zoom:50%;"></p>
 <h2 id="6-4-线程销毁"><a href="#6-4-线程销毁" class="headerlink" title="6.4 线程销毁"></a>6.4 线程销毁</h2><p>虽然线程池中<strong>核心线程</strong>会一直<strong>active</strong>，<strong>非核心线程</strong>会定期销毁。但并没有明确区分核心和非核心，在代码中并没有明确字段标识，所以核心线程和非核心线程是<strong>逻辑概念</strong>，只保证在等待<strong>KeepAlive</strong>时间后，线程池中最多只有核心线程数个线程在运行</p>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230928210350978.png" alt="image-20230928210350978" style="zoom:50%;">
-
-
-
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230928210350978.png" alt="线程池销毁线程" style="zoom:50%;"></p>
 <h1 id="7-线程池方法的使用"><a href="#7-线程池方法的使用" class="headerlink" title="7.线程池方法的使用"></a>7.线程池方法的使用</h1><h2 id="1）showdown"><a href="#1）showdown" class="headerlink" title="1）showdown()"></a>1）showdown()</h2><p><strong>官网解释</strong>：允许之前提交的任务被执行。换句话说，允许等待的任务被执行和正在执行的任务，不允许任务被提交到队列</p>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926214942350.png" alt="image-20230926214942350" style="zoom:67%;">
-
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926214942350.png" alt="showdown方法" style="zoom:67%;"></p>
 <h2 id="2）showdownNow"><a href="#2）showdownNow" class="headerlink" title="2）showdownNow()"></a>2）showdownNow()</h2><p><strong>官方解释</strong>：防止等待的任务被执行和尝试停止正在执行的任务</p>
-<img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926215253103.png" alt="image-20230926215253103" style="zoom:67%;">
+<p><img src="/2023/09/24/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/image-20230926215253103.png" alt="showdownNow方法" style="zoom:67%;"></p>
 
                 
             </div>
@@ -1523,7 +1509,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">25.5k</span>
             
             
             

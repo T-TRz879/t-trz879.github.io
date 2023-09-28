@@ -474,7 +474,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    362
+                    351
                 </div>
                 
 
@@ -503,28 +503,21 @@
             <div id="articleContent">
                 <h3 id="1-什么是umask"><a href="#1-什么是umask" class="headerlink" title="1.什么是umask"></a>1.什么是<code>umask</code></h3><p>当程序创建文件时，文件权限受到掩码的限制。如果掩码的位设置为“1”，则相应的初始文件权限将被禁用。掩码中设置为“0”的位意味着相应的权限将由程序和文件系统决定</p>
 <p>一些系统中<code>umask</code>是四位，例如：<code>0022</code>。而另一些是三位，例如<code>002</code>。四位比三位多最左边的<strong>黏性位</strong>，该黏性位的作用会在后续文件章节中展开</p>
-<h3 id="2-如何查看系统中umask"><a href="#2-如何查看系统中umask" class="headerlink" title="2.如何查看系统中umask"></a>2.如何查看系统中<code>umask</code></h3><pre class=" language-sh"><code class="language-sh"># 以下三个命令都可查看
+<h3 id="2-如何查看系统中umask"><a href="#2-如何查看系统中umask" class="headerlink" title="2.如何查看系统中umask"></a>2.如何查看系统中<code>umask</code></h3><pre class=" language-lang-sh"><code class="language-lang-sh"># 以下三个命令都可查看
 umask
 umask -S
 umask -p
 </code></pre>
-<img src="/2023/06/15/umask/image-20230617000010298.png" alt="umask命令" style="zoom:50%;">
-
-
-
-<h3 id="3-重设置umask"><a href="#3-重设置umask" class="headerlink" title="3.重设置umask"></a>3.重设置<code>umask</code></h3><pre class=" language-sh"><code class="language-sh">umask #{掩码值}
+<p><img src="/2023/06/15/umask/image-20230617000010298.png" alt="umask命令" style="zoom:50%;"></p>
+<h3 id="3-重设置umask"><a href="#3-重设置umask" class="headerlink" title="3.重设置umask"></a>3.重设置<code>umask</code></h3><pre class=" language-lang-sh"><code class="language-lang-sh">umask #{掩码值}
 # 例如：umask 0222
 </code></pre>
-<img src="/2023/06/15/umask/image-20230617000411165.png" alt="重设mask" style="zoom:50%;">
-
+<p><img src="/2023/06/15/umask/image-20230617000411165.png" alt="重设mask" style="zoom:50%;"></p>
 <p>开头介绍<code>umask</code>值只会影响一开始创建的文件权限，接下来试验一下</p>
 <p>创建新文件夹<code>umask-test</code>，其权限为<code>r-xr-xr-x</code>，对应八进制为<code>555</code>，那么这个权限值如何得出的呢？</p>
-<img src="/2023/06/15/umask/image-20230617000646794.png" alt="创建文件夹" style="zoom:50%;">
-
-
-
+<p><img src="/2023/06/15/umask/image-20230617000646794.png" alt="创建文件夹" style="zoom:50%;"></p>
 <h3 id="4-umask计算方式"><a href="#4-umask计算方式" class="headerlink" title="4.umask计算方式"></a>4.<code>umask</code>计算方式</h3><p><strong>类-unix系统</strong>中文件的默认权限是<code>0666</code>，文件夹的默认权限是<code>0777</code>。那为什么在不同的系统中创建的文件最后显示<code>0644</code>或者<code>0624</code>，这是为什么呢？</p>
-<pre class=" language-sh"><code class="language-sh"># 假如 umask=0022 -> rwxrw-rw-
+<pre class=" language-lang-sh"><code class="language-lang-sh"># 假如 umask=0022 -> rwxrw-rw-
 # 用户创建dir的文件夹，dir文件夹的权限会由以下公式计算得出
 # 文件夹的默认权限为 0777 -> rwxrwxrwx
 # 文件夹   0777   rwxrwxrwx
@@ -532,7 +525,6 @@ umask -p
 # ------------------------
 # 最终权限  0755   rwxrw-rw-
 </code></pre>
-<p>[参考1]: <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Umask">https://en.wikipedia.org/wiki/Umask</a>	“umask-wiki”</p>
 
                 
             </div>
@@ -1333,7 +1325,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">25.5k</span>
             
             
             

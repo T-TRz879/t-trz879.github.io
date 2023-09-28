@@ -7,8 +7,7 @@
     <meta name="keywords" content="GetObject读取大文件报错, T_TBlog">
     <meta name="description" content="最近在压测GetObject接口，发现一些奇怪的问题，测试脚本20个并发，在获取通过PutObject接口上传的对象时是正常的，但到UploadPart接口上传的对象时，跑一会后s3-sdk就会报错。错误内容如下
 
-
-一开始对这个日志毫无头">
+一开始对这个日志毫无头绪">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -508,12 +507,10 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>最近在压测<code>GetObject</code>接口，发现一些奇怪的问题，测试脚本20个并发，在获取通过<code>PutObject</code>接口上传的对象时是正常的，但到<code>UploadPart</code>接口上传的对象时，跑一会后s3-sdk就会报错。错误内容如下</p>
-<img src="/2023/08/17/GetObject%E8%AF%BB%E5%8F%96%E5%A4%A7%E6%96%87%E4%BB%B6%E6%8A%A5%E9%94%99/8A58C151-3BF5-4675-9526-6AE12EE5B46A_1_105_c.jpeg" alt="s3-sdk报错日志" style="zoom: 70%;">
-
+<p><img src="/2023/08/17/GetObject%E8%AF%BB%E5%8F%96%E5%A4%A7%E6%96%87%E4%BB%B6%E6%8A%A5%E9%94%99/8A58C151-3BF5-4675-9526-6AE12EE5B46A_1_105_c.jpeg" alt="s3-sdk报错日志" style="zoom: 70%;"></p>
 <p>一开始对这个日志毫无头绪，通过<code>netstat -nap | grep &#39;9001&#39;</code>查看gateway和minio的连接数，大概40多个，一看怎么这么多。明明就20个并发，怎么有40个连接？</p>
 <p>这是改造前的<code>SubInfo</code>请求对象存储的示意图（一个<code>SubInfo</code>对应一个分片），其中存在一定资源浪费问题</p>
-<img src="/2023/08/17/GetObject%E8%AF%BB%E5%8F%96%E5%A4%A7%E6%96%87%E4%BB%B6%E6%8A%A5%E9%94%99/image-20230817221157013.png" alt="改造前的SubInfo流处理" style="zoom:50%;">
-
+<p><img src="/2023/08/17/GetObject%E8%AF%BB%E5%8F%96%E5%A4%A7%E6%96%87%E4%BB%B6%E6%8A%A5%E9%94%99/image-20230817221157013.png" alt="改造前的SubInfo流处理" style="zoom:50%;"></p>
 <p>问题：如果<code>SubInfo</code>到达二位数或者三位数的级别，所有<code>SubInfo</code>都同时去请求对象存储获取流数据，比如会将s3-sdk的<strong>连接数占满</strong>、<strong>靠后的流不能及时被处理，导致会有连接超时风险</strong>和<strong>gateway服务器和minio服务器间的带宽被流占满</strong></p>
 <p>解决方案：不需要一下子啊把所有<code>SubInfo</code>都初始化，可以预初始化两个，通过Java中的<code>Semaphore</code>来保证最多有两个<code>SubInfo</code>流在被处理，处理完一个就往后创建一个，形成滑动窗口初始化处理。（实际代码比描述的更为复杂，还需要考虑释放本次GetObject的所有资源）</p>
 
@@ -1320,7 +1317,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">25.5k</span>
             
             
             
