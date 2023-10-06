@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="JuiceFS Write, T_TBlog">
-    <meta name="description" content="Write相关类和接口​    最顶层是一个DataWriter，它维护着一个由文件Inode为key，fileWriter为value的map集合，这样可以更好的管理所有的文件。​    每个fileWriter中都会有一个chuks，其">
+    <meta name="description" content="Write相关类和接口​	最顶层是一个DataWriter，它维护着一个由文件Inode为key，fileWriter为value的map集合，这样可以更好的管理所有的文件。​	每个fileWriter中都会有一个chuks，其是由Chun">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -477,14 +477,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.9k
+                    4.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    17 分
+                    22 分
                 </div>
                 
 
@@ -504,155 +504,160 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="Write相关类和接口"><a href="#Write相关类和接口" class="headerlink" title="Write相关类和接口"></a>Write相关类和接口</h2><p>​    最顶层是一个DataWriter，它维护着一个由文件Inode为key，fileWriter为value的map集合，这样可以更好的管理所有的文件。<br>​    每个fileWriter中都会有一个chuks，其是由Chunk自增编号「文件写入的offset / 64MB」为key，chunkWriter为value的map集合，和DataWriter维护fileWriter一样的逻辑。<br>​    每个chunkWriter有slices列表，其中记录着当前Chunk的所有sliceWriter。<br>​    一个sliceWriter中有一个Writer接口，一个Writer被wChunk继承，wChunk中存放了一个Page二维数组，用来存储sliceWriter中的data数据，将其放入page中等待其它线程调用Flush方法将Page中数据写入Blcok中。</p>
-<p><img src="/2022/05/21/JuiceFS%20Write/Write类和接口结构.png" alt="Write类和接口结构" style="zoom:50%;"></p>
-<h3 id="dataWriter"><a href="#dataWriter" class="headerlink" title="dataWriter"></a>dataWriter</h3><pre class=" language-lang-go"><code class="language-lang-go">type dataWriter struct {
-    sync.Mutex
-    m          meta.Meta    //文件的metadata信息
-    store      chunk.ChunkStore
-    reader     DataReader    
-    blockSize  int    //blockSize大小
-    bufferSize int64    //缓冲区大小
-    files      map[Ino]*fileWriter    // 每个Ino的file的map
-    maxRetries uint32
-}
-</code></pre>
-<pre class=" language-lang-go"><code class="language-lang-go">// 创建dataWriter时，用单独一个线程轮询flushAll方法。此方法是将Page中数据写入Block中和释放slice
-func (w *dataWriter) flushAll()
-func (w *dataWriter) Open(inode Ino, len uint64) FileWriter
-func (w *dataWriter) find(inode Ino) *fileWriter
-func (w *dataWriter) free(f *fileWriter)
-func (w *dataWriter) Flush(ctx meta.Context, inode Ino) syscall.Errno
-func (w *dataWriter) GetLength(inode Ino) uint64
-func (w *dataWriter) Truncate(inode Ino, len uint64)
-func (w *dataWriter) usedBufferSize() int64
-</code></pre>
-<h3 id="fileWriter"><a href="#fileWriter" class="headerlink" title="fileWriter"></a>fileWriter</h3><pre class=" language-lang-go"><code class="language-lang-go">type fileWriter struct {
-    sync.Mutex
-    w *dataWriter
+                <h2 id="Write相关类和接口"><a href="#Write相关类和接口" class="headerlink" title="Write相关类和接口"></a>Write相关类和接口</h2><p>​	最顶层是一个DataWriter，它维护着一个由文件Inode为key，fileWriter为value的map集合，这样可以更好的管理所有的文件。<br>​	每个fileWriter中都会有一个chuks，其是由Chunk自增编号「文件写入的offset &#x2F; 64MB」为key，chunkWriter为value的map集合，和DataWriter维护fileWriter一样的逻辑。<br>​	每个chunkWriter有slices列表，其中记录着当前Chunk的所有sliceWriter。<br>​	一个sliceWriter中有一个Writer接口，一个Writer被wChunk继承，wChunk中存放了一个Page二维数组，用来存储sliceWriter中的data数据，将其放入page中等待其它线程调用Flush方法将Page中数据写入Blcok中。</p>
+<img src="/2022/05/21/JuiceFS%20Write/Write类和接口结构.png" alt="Write类和接口结构" style="zoom:50%;">
 
-    inode        Ino    // file inode号
-    length       uint64    // file的length
-    err          syscall.Errno
-    flushwaiting uint16    // 当前在flush的数量
-    writewaiting uint16    // 当前在写入的数量
-    refs         uint16    // 当前在操作fileWriter的线程数量
-    chunks       map[uint32]*chunkWriter    // 每个file有多个Chunk,用自增编号作为key存储每个Chunk对应的chunkWriter
+<h3 id="dataWriter"><a href="#dataWriter" class="headerlink" title="dataWriter"></a>dataWriter</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> dataWriter <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    sync<span class="token punctuation">.</span>Mutex
+    m          meta<span class="token punctuation">.</span>Meta	<span class="token comment" spellcheck="true">//文件的metadata信息</span>
+    store      chunk<span class="token punctuation">.</span>ChunkStore
+    reader     DataReader	
+    blockSize  <span class="token builtin">int</span>	<span class="token comment" spellcheck="true">//blockSize大小</span>
+    bufferSize <span class="token builtin">int64</span>	<span class="token comment" spellcheck="true">//缓冲区大小</span>
+    files      <span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token operator">*</span>fileWriter	<span class="token comment" spellcheck="true">// 每个Ino的file的map</span>
+    maxRetries <span class="token builtin">uint32</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 创建dataWriter时，用单独一个线程轮询flushAll方法。此方法是将Page中数据写入Block中和释放slice</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">flushAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">Open</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> <span class="token builtin">len</span> <span class="token builtin">uint64</span><span class="token punctuation">)</span> FileWriter
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">find</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">)</span> <span class="token operator">*</span>fileWriter
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">free</span><span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">Flush</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> inode Ino<span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">GetLength</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">)</span> <span class="token builtin">uint64</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">Truncate</span><span class="token punctuation">(</span>inode Ino<span class="token punctuation">,</span> <span class="token builtin">len</span> <span class="token builtin">uint64</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">usedBufferSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int64</span>
+</code></pre>
+<h3 id="fileWriter"><a href="#fileWriter" class="headerlink" title="fileWriter"></a>fileWriter</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> fileWriter <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    sync<span class="token punctuation">.</span>Mutex
+    w <span class="token operator">*</span>dataWriter
 
-    flushcond *utils.Cond // wait for chunks==nil (flush)
-    writecond *utils.Cond // wait for flushwaiting==0 (write)
-}
+    inode        Ino	<span class="token comment" spellcheck="true">// file inode号</span>
+    length       <span class="token builtin">uint64</span>	<span class="token comment" spellcheck="true">// file的length</span>
+    err          syscall<span class="token punctuation">.</span>Errno
+    flushwaiting <span class="token builtin">uint16</span>	<span class="token comment" spellcheck="true">// 当前在flush的数量</span>
+    writewaiting <span class="token builtin">uint16</span>	<span class="token comment" spellcheck="true">// 当前在写入的数量</span>
+    refs         <span class="token builtin">uint16</span>	<span class="token comment" spellcheck="true">// 当前在操作fileWriter的线程数量</span>
+    chunks       <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint32</span><span class="token punctuation">]</span><span class="token operator">*</span>chunkWriter	<span class="token comment" spellcheck="true">// 每个file有多个Chunk,用自增编号作为key存储每个Chunk对应的chunkWriter</span>
+
+    flushcond <span class="token operator">*</span>utils<span class="token punctuation">.</span>Cond <span class="token comment" spellcheck="true">// wait for chunks==nil (flush)</span>
+    writecond <span class="token operator">*</span>utils<span class="token punctuation">.</span>Cond <span class="token comment" spellcheck="true">// wait for flushwaiting==0 (write)</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<pre class=" language-lang-go"><code class="language-lang-go">// i是对应Chunk的下标，若不存在则创建一个新的
-func (f *fileWriter) findChunk(i uint32) *chunkWriter
-func (f *fileWriter) freeChunk(c *chunkWriter)
-// 第二层write,indx为chunkId,off为在Chunk中的开始位置
-func (f *fileWriter) writeChunk(ctx meta.Context, indx uint32, off uint32, data []byte) syscall.Errno
-func (f *fileWriter) totalSlices() int
-// 第一层write,在此方法中会决定当前off应该第几个Chunk中
-func (f *fileWriter) Write(ctx meta.Context, off uint64, data []byte) syscall.Errno
-// 具体的flush方法
-func (f *fileWriter) flush(ctx meta.Context, writeback bool) syscall.Errno
-// 对外的Flush接口会调用本类的flush方法
-func (f *fileWriter) Flush(ctx meta.Context) syscall.Errno
-func (f *fileWriter) Close(ctx meta.Context) syscall.Errno
-func (f *fileWriter) GetLength() uint64
-func (f *fileWriter) Truncate(length uint64)
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// i是对应Chunk的下标，若不存在则创建一个新的</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">findChunk</span><span class="token punctuation">(</span>i <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token operator">*</span>chunkWriter
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">freeChunk</span><span class="token punctuation">(</span>c <span class="token operator">*</span>chunkWriter<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">// 第二层write,indx为chunkId,off为在Chunk中的开始位置</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">writeChunk</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">,</span> off <span class="token builtin">uint32</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">totalSlices</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
+<span class="token comment" spellcheck="true">// 第一层write,在此方法中会决定当前off应该第几个Chunk中</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">Write</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> off <span class="token builtin">uint64</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
+<span class="token comment" spellcheck="true">// 具体的flush方法</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">flush</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> writeback <span class="token builtin">bool</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
+<span class="token comment" spellcheck="true">// 对外的Flush接口会调用本类的flush方法</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">Flush</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">Close</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">GetLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">uint64</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">Truncate</span><span class="token punctuation">(</span>length <span class="token builtin">uint64</span><span class="token punctuation">)</span>
 </code></pre>
-<h3 id="chunkWriter"><a href="#chunkWriter" class="headerlink" title="chunkWriter"></a>chunkWriter</h3><pre class=" language-lang-go"><code class="language-lang-go">type chunkWriter struct {
-    indx   uint32        // chunk的编号「并不是id，此编号用来告知当前data需写入第几个Chunk」
-    file   *fileWriter    //一个chunkWriter对应一个fileWriter,但一个fileWriter对应多个chunkWriter
-    slices []*sliceWriter    // 每个Chunk有多个Slice,存放sliceWriter数组
-}
+<h3 id="chunkWriter"><a href="#chunkWriter" class="headerlink" title="chunkWriter"></a>chunkWriter</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> chunkWriter <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    indx   <span class="token builtin">uint32</span>		<span class="token comment" spellcheck="true">// chunk的编号「并不是id，此编号用来告知当前data需写入第几个Chunk」</span>
+    file   <span class="token operator">*</span>fileWriter	<span class="token comment" spellcheck="true">//一个chunkWriter对应一个fileWriter,但一个fileWriter对应多个chunkWriter</span>
+    slices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>sliceWriter	<span class="token comment" spellcheck="true">// 每个Chunk有多个Slice,存放sliceWriter数组</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<pre class=" language-lang-go"><code class="language-lang-go">//寻找当前的pos应该属于当前Chunk的Slice
-func (c *chunkWriter) findWritableSlice(pos uint32, size uint32) *sliceWriter
-func (c *chunkWriter) commitThread()
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">//寻找当前的pos应该属于当前Chunk的Slice</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>chunkWriter<span class="token punctuation">)</span> <span class="token function">findWritableSlice</span><span class="token punctuation">(</span>pos <span class="token builtin">uint32</span><span class="token punctuation">,</span> size <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token operator">*</span>sliceWriter
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>chunkWriter<span class="token punctuation">)</span> <span class="token function">commitThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
-<h3 id="sliceWriter"><a href="#sliceWriter" class="headerlink" title="sliceWriter"></a>sliceWriter</h3><pre class=" language-lang-go"><code class="language-lang-go">type sliceWriter struct {
-    id      uint64    //chunkId
-    chunk   *chunkWriter    //一个Slice对应一个chunkWriter,一个chunkWriter对应多个sliceWriter
-    off     uint32    //当前slice在Chunk中的开始下标
-    length  uint32    //当前slice的真实长度 每次用slen来更新length
-    soff    uint32    //
-    slen    uint32    //当前slice的长度根据写入数据进行更新
-    writer  chunk.Writer    //chunk文件的Writer接口
-    freezed bool    //是否被冻结
-    done    bool    
-    err     syscall.Errno
-    notify  *utils.Cond
-    started time.Time
-    lastMod time.Time
-}
+<h3 id="sliceWriter"><a href="#sliceWriter" class="headerlink" title="sliceWriter"></a>sliceWriter</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> sliceWriter <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    id      <span class="token builtin">uint64</span>	<span class="token comment" spellcheck="true">//chunkId</span>
+    chunk   <span class="token operator">*</span>chunkWriter	<span class="token comment" spellcheck="true">//一个Slice对应一个chunkWriter,一个chunkWriter对应多个sliceWriter</span>
+    off     <span class="token builtin">uint32</span>	<span class="token comment" spellcheck="true">//当前slice在Chunk中的开始下标</span>
+    length  <span class="token builtin">uint32</span>	<span class="token comment" spellcheck="true">//当前slice的真实长度 每次用slen来更新length</span>
+    soff    <span class="token builtin">uint32</span>	<span class="token comment" spellcheck="true">//</span>
+    slen    <span class="token builtin">uint32</span>	<span class="token comment" spellcheck="true">//当前slice的长度根据写入数据进行更新</span>
+    writer  chunk<span class="token punctuation">.</span>Writer	<span class="token comment" spellcheck="true">//chunk文件的Writer接口</span>
+    freezed <span class="token builtin">bool</span>	<span class="token comment" spellcheck="true">//是否被冻结</span>
+    done    <span class="token builtin">bool</span>	
+    err     syscall<span class="token punctuation">.</span>Errno
+    notify  <span class="token operator">*</span>utils<span class="token punctuation">.</span>Cond
+    started time<span class="token punctuation">.</span>Time
+    lastMod time<span class="token punctuation">.</span>Time
+<span class="token punctuation">}</span>
 </code></pre>
-<pre class=" language-lang-go"><code class="language-lang-go">func (s *sliceWriter) prepareID(ctx meta.Context, retry bool)
-func (s *sliceWriter) markDone()
-func (s *sliceWriter) flushData()
-//slice中的write方法
-func (s *sliceWriter) write(ctx meta.Context, off uint32, data []uint8) syscall.Errno
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">prepareID</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> retry <span class="token builtin">bool</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">markDone</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">flushData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">//slice中的write方法</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">write</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> off <span class="token builtin">uint32</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint8</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno
 </code></pre>
-<h3 id="wChunk"><a href="#wChunk" class="headerlink" title="wChunk"></a>wChunk</h3><pre class=" language-lang-go"><code class="language-lang-go">type wChunk struct {
+<h3 id="wChunk"><a href="#wChunk" class="headerlink" title="wChunk"></a>wChunk</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> wChunk <span class="token keyword">struct</span> <span class="token punctuation">{</span>
     rChunk
-    pages       [][]*Page    //16 * 64存储block的page,整个page大小为64MB,每一个page[i]都是4MB
-    uploaded    int
-    errors      chan error
-    uploadError error
-    pendings    int
-}
+    pages       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>Page	<span class="token comment" spellcheck="true">//16 * 64存储block的page,整个page大小为64MB,每一个page[i]都是4MB</span>
+    uploaded    <span class="token builtin">int</span>
+    errors      <span class="token keyword">chan</span> <span class="token builtin">error</span>
+    uploadError <span class="token builtin">error</span>
+    pendings    <span class="token builtin">int</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *wChunk) SetID(id uint64)
-// 主要是将p中的数据写入Page[][]的二维数组中
-func (c *wChunk) WriteAt(p []byte, off int64) (n int, err error)
-func (c *wChunk) put(key string, p *Page) error
-func (c *wChunk) syncUpload(key string, block *Page)
-func (c *wChunk) asyncUpload(key string, block *Page, stagingPath string)
-func (c *wChunk) upload(indx int)
-func (c *wChunk) ID() uint64
-func (c *wChunk) Len() int
-func (c *wChunk) FlushTo(offset int) error
-func (c *wChunk) Finish(length int) error
-func (c *wChunk) Abort()
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">SetID</span><span class="token punctuation">(</span>id <span class="token builtin">uint64</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">// 主要是将p中的数据写入Page[][]的二维数组中</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">WriteAt</span><span class="token punctuation">(</span>p <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> off <span class="token builtin">int64</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">put</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">,</span> p <span class="token operator">*</span>Page<span class="token punctuation">)</span> <span class="token builtin">error</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">syncUpload</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">,</span> block <span class="token operator">*</span>Page<span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">asyncUpload</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">,</span> block <span class="token operator">*</span>Page<span class="token punctuation">,</span> stagingPath <span class="token builtin">string</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">upload</span><span class="token punctuation">(</span>indx <span class="token builtin">int</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">ID</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">uint64</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">FlushTo</span><span class="token punctuation">(</span>offset <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">error</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">Finish</span><span class="token punctuation">(</span>length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">error</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">Abort</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre>
-<h3 id="rChunk"><a href="#rChunk" class="headerlink" title="rChunk"></a>rChunk</h3><pre class=" language-lang-go"><code class="language-lang-go">type rChunk struct {
-    id     uint64
-    length int
-    store  *cachedStore
-}
+<h3 id="rChunk"><a href="#rChunk" class="headerlink" title="rChunk"></a>rChunk</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> rChunk <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    id     <span class="token builtin">uint64</span>
+    length <span class="token builtin">int</span>
+    store  <span class="token operator">*</span>cachedStore
+<span class="token punctuation">}</span>
 </code></pre>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *rChunk) blockSize(indx int) int
-func (c *rChunk) key(indx int) string
-func (c *rChunk) index(off int) int
-func (c *rChunk) keys() []string
-func (c *rChunk) ReadAt(ctx context.Context, page *Page, off int) (n int, err error)
-func (c *rChunk) delete(indx int) error
-func (c *rChunk) Remove() error
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">blockSize</span><span class="token punctuation">(</span>indx <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">key</span><span class="token punctuation">(</span>indx <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">string</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">index</span><span class="token punctuation">(</span>off <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">keys</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">ReadAt</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> page <span class="token operator">*</span>Page<span class="token punctuation">,</span> off <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">delete</span><span class="token punctuation">(</span>indx <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">error</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">Remove</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span>
 </code></pre>
-<h3 id="Page"><a href="#Page" class="headerlink" title="Page"></a>Page</h3><pre class=" language-lang-go"><code class="language-lang-go">type Page struct {
-  refs    int32
-  offheap bool
-  dep     *Page    //下一个Page对象
-  Data    []byte    //数据
-  stack   []byte
-}
+<h3 id="Page"><a href="#Page" class="headerlink" title="Page"></a>Page</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> Page <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+  refs    <span class="token builtin">int32</span>
+  offheap <span class="token builtin">bool</span>
+  dep     <span class="token operator">*</span>Page	<span class="token comment" spellcheck="true">//下一个Page对象</span>
+  Data    <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>	<span class="token comment" spellcheck="true">//数据</span>
+  stack   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h2 id="Write流程"><a href="#Write流程" class="headerlink" title="Write流程"></a>Write流程</h2><h3 id="Kernel到JuiceFS流程"><a href="#Kernel到JuiceFS流程" class="headerlink" title="Kernel到JuiceFS流程"></a>Kernel到JuiceFS流程</h3><p>​    JuiceFS将一个文件最终拆分成多个4MB的Block存储在磁盘中。基础流程大概如下：首先会经过Kernel Fuse的Wirte接口。此接口会将用户写入的文件每次以128KB大小的数据流调用JuiceFS Client的Write接口，JuiceFS Client的Write接口会将每次128KB数据缓存在内存中，等达到Block阈值4MB时，会将一个Block数据写入到磁盘中。</p>
+<h2 id="Write流程"><a href="#Write流程" class="headerlink" title="Write流程"></a>Write流程</h2><h3 id="Kernel到JuiceFS流程"><a href="#Kernel到JuiceFS流程" class="headerlink" title="Kernel到JuiceFS流程"></a>Kernel到JuiceFS流程</h3><p>​	JuiceFS将一个文件最终拆分成多个4MB的Block存储在磁盘中。基础流程大概如下：首先会经过Kernel Fuse的Wirte接口。此接口会将用户写入的文件每次以128KB大小的数据流调用JuiceFS Client的Write接口，JuiceFS Client的Write接口会将每次128KB数据缓存在内存中，等达到Block阈值4MB时，会将一个Block数据写入到磁盘中。</p>
 <ol>
 <li>Application将数据以1MB以128KB每片的形式将其发送到Kernel提供的接口</li>
 <li>Kernel将每个128KB的数据传送到User Space的JuiceFS Clinet中</li>
 <li>JuiceFS Client将Kernel传来的数据放入Slice中，一个Slice中有一个或多个Block</li>
-<li>JuiceFS Client等待一个Block放满后，或者一个Chunk放满「64MB」后会将其写入具体的存储介质中「上传对象存储/保存在本地磁盘」</li>
+<li>JuiceFS Client等待一个Block放满后，或者一个Chunk放满「64MB」后会将其写入具体的存储介质中「上传对象存储&#x2F;保存在本地磁盘」</li>
 </ol>
-<p><img src="/2022/05/21/JuiceFS%20Write/f81025e9.png" alt="JuiceFS Write"></p>
-<h3 id="各种Write流程"><a href="#各种Write流程" class="headerlink" title="各种Write流程"></a>各种Write流程</h3><p><img src="/2022/05/21/JuiceFS%20Write/KernelFuse调用JuiceFS Write流程图.png" alt="KernelFuse调用JuiceFS Write流程图" style="zoom:80%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/f81025e9.png" alt="JuiceFS Write">
+
+<h3 id="各种Write流程"><a href="#各种Write流程" class="headerlink" title="各种Write流程"></a>各种Write流程</h3><img src="/2022/05/21/JuiceFS%20Write/KernelFuse调用JuiceFS Write流程图.png" alt="KernelFuse调用JuiceFS Write流程图" style="zoom:80%;">
+
 <h3 id="Write方法调用流程"><a href="#Write方法调用流程" class="headerlink" title="Write方法调用流程"></a>Write方法调用流程</h3><ol>
 <li>File和VFS中都有相应的write接口，前者是相对对象存储相关的，而后者是文件挂载相关的。通过得知file的信息，如Inode、位置、名称等，会创建一个fileWriter对象将当前file信息放入其中，当前file的操作都会调用fileWriter对象</li>
-<li>fileWriter.write()中根据off计算当前数据需要写入第几个Chunk中「off/64MB」和在Chunk中哪个位置开始写入「off%64MB」</li>
+<li>fileWriter.write()中根据off计算当前数据需要写入第几个Chunk中「off&#x2F;64MB」和在Chunk中哪个位置开始写入「off%64MB」</li>
 <li>fileWriter.writeChunk()中根据indx查询具体Chunk，Chunk存在，则直接获取；反之需根据传入indx创建当前Chunk。根据返回的chunkWriter对象，在其中寻找具体需写入且已存在的sliceWriter对象，不存在则返回空</li>
 <li>通过sliceWriter调用write写入具体的slice</li>
 <li>wChunk的writeAt方法会将需写入的数据放入具体的page中「wChunk使用的Page二维数组中」</li>
 </ol>
-<p><img src="/2022/05/21/JuiceFS%20Write/C5E5D60E-0A97-4661-B7BD-5C2B2CE46E33.png" alt="类方法调用流程" style="zoom:50%;"></p>
-<p><img src="/2022/05/21/JuiceFS%20Write/JuiceFS Write基本流程图.png" alt="JuiceFS Write基本流程" style="zoom: 80%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/C5E5D60E-0A97-4661-B7BD-5C2B2CE46E33.png" alt="类方法调用流程" style="zoom:50%;">
+
+<img src="/2022/05/21/JuiceFS%20Write/JuiceFS Write基本流程图.png" alt="JuiceFS Write基本流程" style="zoom: 80%;">
+
 <h2 id="Write主要代码"><a href="#Write主要代码" class="headerlink" title="Write主要代码"></a>Write主要代码</h2><h3 id="fileWriter-Write"><a href="#fileWriter-Write" class="headerlink" title="fileWriter.Write"></a>fileWriter.Write</h3><ol>
 <li><p>判断fileWriter中chunkWriterMap中的所有sliceWriter数量是否大于1000，大于1000则让其等一会</p>
 </li>
@@ -660,17 +665,18 @@ func (c *rChunk) Remove() error
 </li>
 <li><p>fileWriter的其它线程正在flush，当前线程需要等待。如果等待超时且用户取消操作则取消本次write</p>
 </li>
-<li><p>通过off计算出indx「off / 64MB」和pos「off % 64MB」，可得知在key为indx的Chunk中从其Chunk的下标为pos的位置开始写入data个数据</p>
+<li><p>通过off计算出indx「off &#x2F; 64MB」和pos「off % 64MB」，可得知在key为indx的Chunk中从其Chunk的下标为pos的位置开始写入data个数据</p>
 </li>
 <li><p>对data数据进行处理，但其中会出现如下两种情况。「假设当前data中有100长度的数据」</p>
 <ul>
 <li>[0,99]的数据位于同一个Chunk</li>
 </ul>
-<p><img src="/2022/05/21/JuiceFS%20Write/非跨Chunk.png" alt="不跨Chunk" style="zoom: 50%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/非跨Chunk.png" alt="不跨Chunk" style="zoom: 50%;">
+
 <ul>
 <li>[0,40]位于第一个Chunk，[41,99]位于第二个Chunk</li>
 </ul>
-<p><img src="/2022/05/21/JuiceFS%20Write/跨Chunk.png" alt="跨Chunk" style="zoom:50%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/跨Chunk.png" alt="跨Chunk" style="zoom:50%;">
 </li>
 <li><p>利用go对数据的切片操作可对data.len进行循环，每次结束将当前剩余的数据切出来，用作下一次循环</p>
 <ol>
@@ -682,66 +688,66 @@ func (c *rChunk) Remove() error
 <li><p>更新fileWriter中目前已经写入的数据长度</p>
 </li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">// off是当前文件的需要从off开始写入data中的数据
-func (f *fileWriter) Write(ctx meta.Context, off uint64, data []byte) syscall.Errno {
-    for {
-    // 当前fileWriter中所有的silcesWriter数量 >= 1000 让其等一会
-        if f.totalSlices() < 1000 {
-            break
-        }
-        time.Sleep(time.Millisecond)
-    }
-  // 判断当前已经使用过的内存和实际内存的关系
-    if f.w.usedBufferSize() > f.w.bufferSize {
-        // slow down
-        time.Sleep(time.Millisecond * 10)
-        for f.w.usedBufferSize() > f.w.bufferSize*2 {
-            time.Sleep(time.Millisecond * 100)
-        }
-    }
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// off是当前文件的需要从off开始写入data中的数据</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">Write</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> off <span class="token builtin">uint64</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 当前fileWriter中所有的silcesWriter数量 >= 1000 让其等一会</span>
+        <span class="token keyword">if</span> f<span class="token punctuation">.</span><span class="token function">totalSlices</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">1000</span> <span class="token punctuation">{</span>
+            <span class="token keyword">break</span>
+        <span class="token punctuation">}</span>
+        time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Millisecond<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">// 判断当前已经使用过的内存和实际内存的关系</span>
+    <span class="token keyword">if</span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span><span class="token function">usedBufferSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span>bufferSize <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// slow down</span>
+        time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Millisecond <span class="token operator">*</span> <span class="token number">10</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span><span class="token function">usedBufferSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span>bufferSize<span class="token operator">*</span><span class="token number">2</span> <span class="token punctuation">{</span>
+            time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Millisecond <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    s := time.Now()
-    f.Lock()
-    defer f.Unlock() 
-  // data中的数据大小
-    size := uint64(len(data))
-    f.writewaiting++
-  // 写入等待超时
-    for f.flushwaiting > 0 {
-        if f.writecond.WaitWithTimeout(time.Second) && ctx.Canceled() {
-            f.writewaiting--
-            logger.Warnf("write %d interrupted after %d", f.inode, time.Since(s))
-            return syscall.EINTR
-        }
-    }
-    f.writewaiting--
-    // indx代表写入第几个Chunk
-  // pos代表从第indx的Chunk的下标pos开始写
-  // meta.ChunkSize = 64MB
-    indx := uint32(off / meta.ChunkSize)
-    pos := uint32(off % meta.ChunkSize)
-  // 将本次的data数据处理完，可能出现跨Chunk 最多执行两次
-    for len(data) > 0 {
-        n := uint32(len(data))
-        if pos+n > meta.ChunkSize {
-            // 如果 pos + n > 64MB 本次只把 [0,64MB - pos]大小的内容写入到indx的Chunk中
-            n = meta.ChunkSize - pos
-        }
-        // data[:n] 取得[0,n - 1]的数据
-        if st := f.writeChunk(ctx, indx, pos, data[:n]); st != 0 {
-            return st
-        }
-        // 下一次需将data[n:]写入Chunk
-        data = data[n:]
-        indx++
-        // 更新写入(实际n个)数据后的pos,只有两种可能 小于64Mb或等于64MB
-        pos = (pos + n) % meta.ChunkSize
-    }
-    if off+size > f.length {
-        f.length = off + size
-    }
-    return f.err
-}
+    s <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> 
+  <span class="token comment" spellcheck="true">// data中的数据大小</span>
+    size <span class="token operator">:=</span> <span class="token function">uint64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    f<span class="token punctuation">.</span>writewaiting<span class="token operator">++</span>
+  <span class="token comment" spellcheck="true">// 写入等待超时</span>
+    <span class="token keyword">for</span> f<span class="token punctuation">.</span>flushwaiting <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> f<span class="token punctuation">.</span>writecond<span class="token punctuation">.</span><span class="token function">WaitWithTimeout</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> ctx<span class="token punctuation">.</span><span class="token function">Canceled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            f<span class="token punctuation">.</span>writewaiting<span class="token operator">--</span>
+            logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"write %d interrupted after %d"</span><span class="token punctuation">,</span> f<span class="token punctuation">.</span>inode<span class="token punctuation">,</span> time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> syscall<span class="token punctuation">.</span>EINTR
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    f<span class="token punctuation">.</span>writewaiting<span class="token operator">--</span>
+    <span class="token comment" spellcheck="true">// indx代表写入第几个Chunk</span>
+  <span class="token comment" spellcheck="true">// pos代表从第indx的Chunk的下标pos开始写</span>
+  <span class="token comment" spellcheck="true">// meta.ChunkSize = 64MB</span>
+    indx <span class="token operator">:=</span> <span class="token function">uint32</span><span class="token punctuation">(</span>off <span class="token operator">/</span> meta<span class="token punctuation">.</span>ChunkSize<span class="token punctuation">)</span>
+    pos <span class="token operator">:=</span> <span class="token function">uint32</span><span class="token punctuation">(</span>off <span class="token operator">%</span> meta<span class="token punctuation">.</span>ChunkSize<span class="token punctuation">)</span>
+  <span class="token comment" spellcheck="true">// 将本次的data数据处理完，可能出现跨Chunk 最多执行两次</span>
+    <span class="token keyword">for</span> <span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        n <span class="token operator">:=</span> <span class="token function">uint32</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> pos<span class="token operator">+</span>n <span class="token operator">></span> meta<span class="token punctuation">.</span>ChunkSize <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 如果 pos + n > 64MB 本次只把 [0,64MB - pos]大小的内容写入到indx的Chunk中</span>
+            n <span class="token operator">=</span> meta<span class="token punctuation">.</span>ChunkSize <span class="token operator">-</span> pos
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// data[:n] 取得[0,n - 1]的数据</span>
+        <span class="token keyword">if</span> st <span class="token operator">:=</span> f<span class="token punctuation">.</span><span class="token function">writeChunk</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> indx<span class="token punctuation">,</span> pos<span class="token punctuation">,</span> data<span class="token punctuation">[</span><span class="token punctuation">:</span>n<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span> st <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> st
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// 下一次需将data[n:]写入Chunk</span>
+        data <span class="token operator">=</span> data<span class="token punctuation">[</span>n<span class="token punctuation">:</span><span class="token punctuation">]</span>
+        indx<span class="token operator">++</span>
+        <span class="token comment" spellcheck="true">// 更新写入(实际n个)数据后的pos,只有两种可能 小于64Mb或等于64MB</span>
+        pos <span class="token operator">=</span> <span class="token punctuation">(</span>pos <span class="token operator">+</span> n<span class="token punctuation">)</span> <span class="token operator">%</span> meta<span class="token punctuation">.</span>ChunkSize
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> off<span class="token operator">+</span>size <span class="token operator">></span> f<span class="token punctuation">.</span>length <span class="token punctuation">{</span>
+        f<span class="token punctuation">.</span>length <span class="token operator">=</span> off <span class="token operator">+</span> size
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> f<span class="token punctuation">.</span>err
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="fileWriter-writeChunk"><a href="#fileWriter-writeChunk" class="headerlink" title="fileWriter.writeChunk"></a>fileWriter.writeChunk</h3><ol>
 <li>通过indx寻找Chunk，如果当前Chunk不存在则创建</li>
@@ -749,46 +755,46 @@ func (f *fileWriter) Write(ctx meta.Context, off uint64, data []byte) syscall.Er
 <li>如果sliceWriter未找到，则需要创建新的sliceWriter</li>
 <li>使用当前Chunk写入数据长度传入sliceWriter.write方法</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">// indx指写入第几个Chunk off是当前Chunk需要从off开始写入data个数据 这里的off[0,64MB)
-func (f *fileWriter) writeChunk(ctx meta.Context, indx uint32, off uint32, data []byte) syscall.Errno {
-    // 寻找fileWriter中indx的chunkWriter
-    c := f.findChunk(indx)
-    // 在上一步「找到/创建的」chunkWriter中寻找sliceWriter
-    s := c.findWritableSlice(off, uint32(len(data)))
-  // 不存在就创建一个新的sliceWriter对象
-    if s == nil {
-        s = &sliceWriter{
-            chunk:   c,
-            off:     off,    // 当前Chunk中的已经写入的索引
-            writer:  f.w.store.NewWriter(0),
-            notify:  utils.NewCond(&f.Mutex),
-            started: time.Now(),
-        }
-        c.slices = append(c.slices, s)
-        if len(c.slices) == 1 {
-            f.w.Lock()
-            f.refs++
-            f.w.Unlock()
-      // 将chunkWriter中的sliceWriter列表按顺序写入Block
-            go c.commitThread()
-        }
-    }
-    // off-s.off代表 当前写入数据索引 与 当前Chunk在文件开始索引 的差值
-    // off是当前Chunk的写入位置 s.off是当前slice在Chunk中的开始位置 一旦slice创建s.off就固定了
-    // 所以要用off - s.off得到当前slice的写入位置
-    return s.write(ctx, off-s.off, data)
-}
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// indx指写入第几个Chunk off是当前Chunk需要从off开始写入data个数据 这里的off[0,64MB)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">writeChunk</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> indx <span class="token builtin">uint32</span><span class="token punctuation">,</span> off <span class="token builtin">uint32</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 寻找fileWriter中indx的chunkWriter</span>
+    c <span class="token operator">:=</span> f<span class="token punctuation">.</span><span class="token function">findChunk</span><span class="token punctuation">(</span>indx<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 在上一步「找到/创建的」chunkWriter中寻找sliceWriter</span>
+    s <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">findWritableSlice</span><span class="token punctuation">(</span>off<span class="token punctuation">,</span> <span class="token function">uint32</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token comment" spellcheck="true">// 不存在就创建一个新的sliceWriter对象</span>
+    <span class="token keyword">if</span> s <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        s <span class="token operator">=</span> <span class="token operator">&amp;</span>sliceWriter<span class="token punctuation">{</span>
+            chunk<span class="token punctuation">:</span>   c<span class="token punctuation">,</span>
+            off<span class="token punctuation">:</span>     off<span class="token punctuation">,</span>	<span class="token comment" spellcheck="true">// 当前Chunk中的已经写入的索引</span>
+            writer<span class="token punctuation">:</span>  f<span class="token punctuation">.</span>w<span class="token punctuation">.</span>store<span class="token punctuation">.</span><span class="token function">NewWriter</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            notify<span class="token punctuation">:</span>  utils<span class="token punctuation">.</span><span class="token function">NewCond</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>f<span class="token punctuation">.</span>Mutex<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            started<span class="token punctuation">:</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span>
+        c<span class="token punctuation">.</span>slices <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>slices<span class="token punctuation">,</span> s<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>slices<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span> <span class="token punctuation">{</span>
+            f<span class="token punctuation">.</span>w<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            f<span class="token punctuation">.</span>refs<span class="token operator">++</span>
+            f<span class="token punctuation">.</span>w<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// 将chunkWriter中的sliceWriter列表按顺序写入Block</span>
+            <span class="token keyword">go</span> c<span class="token punctuation">.</span><span class="token function">commitThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// off-s.off代表 当前写入数据索引 与 当前Chunk在文件开始索引 的差值</span>
+    <span class="token comment" spellcheck="true">// off是当前Chunk的写入位置 s.off是当前slice在Chunk中的开始位置 一旦slice创建s.off就固定了</span>
+    <span class="token comment" spellcheck="true">// 所以要用off - s.off得到当前slice的写入位置</span>
+    <span class="token keyword">return</span> s<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> off<span class="token operator">-</span>s<span class="token punctuation">.</span>off<span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h4 id="fileWriter-findChunk"><a href="#fileWriter-findChunk" class="headerlink" title="fileWriter.findChunk"></a>fileWriter.findChunk</h4><pre class=" language-lang-go"><code class="language-lang-go">// i = indx指该写入的指定Chunk
-func (f *fileWriter) findChunk(i uint32) *chunkWriter {
-   // 如果f.chunks[i] 不存在则初始化
-   c := f.chunks[i]
-   if c == nil {
-      c = &chunkWriter{indx: i, file: f}
-      f.chunks[i] = c
-   }
-   return c
-}
+<h4 id="fileWriter-findChunk"><a href="#fileWriter-findChunk" class="headerlink" title="fileWriter.findChunk"></a>fileWriter.findChunk</h4><pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// i = indx指该写入的指定Chunk</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>f <span class="token operator">*</span>fileWriter<span class="token punctuation">)</span> <span class="token function">findChunk</span><span class="token punctuation">(</span>i <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token operator">*</span>chunkWriter <span class="token punctuation">{</span>
+   <span class="token comment" spellcheck="true">// 如果f.chunks[i] 不存在则初始化</span>
+   c <span class="token operator">:=</span> f<span class="token punctuation">.</span>chunks<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+   <span class="token keyword">if</span> c <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+      c <span class="token operator">=</span> <span class="token operator">&amp;</span>chunkWriter<span class="token punctuation">{</span>indx<span class="token punctuation">:</span> i<span class="token punctuation">,</span> file<span class="token punctuation">:</span> f<span class="token punctuation">}</span>
+      f<span class="token punctuation">.</span>chunks<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> c
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> c
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="fileWriter-findWritableSlice"><a href="#fileWriter-findWritableSlice" class="headerlink" title="fileWriter.findWritableSlice"></a>fileWriter.findWritableSlice</h4><ol>
 <li><p>对当前chunkWriter中的slices进行遍历，判断是否有pos所在的slice</p>
@@ -799,44 +805,45 @@ func (f *fileWriter) findChunk(i uint32) *chunkWriter {
 <ul>
 <li>flushoff为BlockSize的整数倍</li>
 </ul>
-<p><img src="/2022/05/21/JuiceFS%20Write/Block整数倍的flushoff.png" alt="Block整数倍的flushoff" style="zoom:50%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/Block整数倍的flushoff.png" alt="Block整数倍的flushoff" style="zoom:50%;">
+
 <ul>
 <li>flushoff不为BlockSize的整数倍</li>
 </ul>
-<p><img src="/2022/05/21/JuiceFS%20Write/非Block整数倍的flushoff.png" alt="非Block整数倍的flushoff" style="zoom:50%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/非Block整数倍的flushoff.png" alt="非Block整数倍的flushoff" style="zoom:50%;">
 </li>
 <li><p>flushoff计算出当前正在写入的slice中具体Block的开始索引「s.off+flushoff」和结束索引「s.off+s.slen」，该操作可以对其进行覆盖写</p>
-<p><img src="/2022/05/21/JuiceFS%20Write/pos和flushoff的关系.png" alt="pos和flushoff的关系" style="zoom: 50%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/pos和flushoff的关系.png" alt="pos和flushoff的关系" style="zoom: 50%;">
 </li>
 <li><p>从后往前寻找超过4次并没有寻找到具体的slice，则需要将slice进行flush操作</p>
 </li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">// pos是该Chunk需要从pos开始写入size个数据 这里的off[0,64MB)
-func (c *chunkWriter) findWritableSlice(pos uint32, size uint32) *sliceWriter { 
-  // blockSize为4MB
-   blockSize := uint32(c.file.w.blockSize)
-  // 如果c.slices不存在则在会创建具体的slice
-   for i := range c.slices {s
-     // 从后往前寻找pos所在的slice
-      s := c.slices[len(c.slices)-1-i]
-      if !s.freezed {
-         flushoff := s.slen / blockSize * blockSize
-         if pos >= s.off+flushoff && pos <= s.off+s.slen {
-            return s
-         } else if i > 3 {
-            // 当前s不可有内容写入，需要对其进行flush
-            s.freezed = true
-            go s.flushData()
-         }
-      }
-      if pos < s.off+s.slen && s.off < pos+size {
-         // overlaped 这块JuiceFS没有实现
-         // TODO: write into multiple slices
-         return nil
-      }
-   }
-   return nil
-}
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// pos是该Chunk需要从pos开始写入size个数据 这里的off[0,64MB)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>chunkWriter<span class="token punctuation">)</span> <span class="token function">findWritableSlice</span><span class="token punctuation">(</span>pos <span class="token builtin">uint32</span><span class="token punctuation">,</span> size <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token operator">*</span>sliceWriter <span class="token punctuation">{</span> 
+  <span class="token comment" spellcheck="true">// blockSize为4MB</span>
+   blockSize <span class="token operator">:=</span> <span class="token function">uint32</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>file<span class="token punctuation">.</span>w<span class="token punctuation">.</span>blockSize<span class="token punctuation">)</span>
+  <span class="token comment" spellcheck="true">// 如果c.slices不存在则在会创建具体的slice</span>
+   <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token keyword">range</span> c<span class="token punctuation">.</span>slices <span class="token punctuation">{</span>s
+     <span class="token comment" spellcheck="true">// 从后往前寻找pos所在的slice</span>
+      s <span class="token operator">:=</span> c<span class="token punctuation">.</span>slices<span class="token punctuation">[</span><span class="token function">len</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>slices<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token operator">-</span>i<span class="token punctuation">]</span>
+      <span class="token keyword">if</span> <span class="token operator">!</span>s<span class="token punctuation">.</span>freezed <span class="token punctuation">{</span>
+         flushoff <span class="token operator">:=</span> s<span class="token punctuation">.</span>slen <span class="token operator">/</span> blockSize <span class="token operator">*</span> blockSize
+         <span class="token keyword">if</span> pos <span class="token operator">>=</span> s<span class="token punctuation">.</span>off<span class="token operator">+</span>flushoff <span class="token operator">&amp;&amp;</span> pos <span class="token operator">&lt;=</span> s<span class="token punctuation">.</span>off<span class="token operator">+</span>s<span class="token punctuation">.</span>slen <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> s
+         <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> i <span class="token operator">></span> <span class="token number">3</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 当前s不可有内容写入，需要对其进行flush</span>
+            s<span class="token punctuation">.</span>freezed <span class="token operator">=</span> <span class="token boolean">true</span>
+            <span class="token keyword">go</span> s<span class="token punctuation">.</span><span class="token function">flushData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+         <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">if</span> pos <span class="token operator">&lt;</span> s<span class="token punctuation">.</span>off<span class="token operator">+</span>s<span class="token punctuation">.</span>slen <span class="token operator">&amp;&amp;</span> s<span class="token punctuation">.</span>off <span class="token operator">&lt;</span> pos<span class="token operator">+</span>size <span class="token punctuation">{</span>
+         <span class="token comment" spellcheck="true">// overlaped 这块JuiceFS没有实现</span>
+         <span class="token comment" spellcheck="true">// TODO: write into multiple slices</span>
+         <span class="token keyword">return</span> <span class="token boolean">nil</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="sliceWriter-write"><a href="#sliceWriter-write" class="headerlink" title="sliceWriter.write"></a>sliceWriter.write</h3><ol>
 <li>调用WriteAt具体方法将data写入pages中，写入pages后对s.slen进行更新</li>
@@ -844,93 +851,90 @@ func (c *chunkWriter) findWritableSlice(pos uint32, size uint32) *sliceWriter {
 <li>s.slen达到4MB时调用FulshTo方法</li>
 <li>off小于4MB时准备ChunkId</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func (s *sliceWriter) write(ctx meta.Context, off uint32, data []uint8) syscall.Errno {
-    f := s.chunk.file
-    // 不是真正将数据写入文件中,只是处理当前data中的数据改放入pages中
-    _, err := s.writer.WriteAt(data, int64(off))
-    if err != nil {
-        logger.Warnf("write: chunk: %d off: %d %s", s.id, off, err)
-        return syscall.EIO
-    }
-  // 更新s.slen
-    if off+uint32(len(data)) > s.slen {
-        s.slen = off + uint32(len(data))
-    }
-    s.lastMod = time.Now()
-    if s.slen == meta.ChunkSize {
-        // s.slen达到一个ChunkSize 64MB
-    s.freezed = true
-        go s.flushData()
-    } else if int(s.slen) >= f.w.blockSize {
-    // s.slen大于BlockSize 4MB
-        if s.id > 0 {
-      // 及时进行FlushTo
-            err := s.writer.FlushTo(int(s.slen))
-            if err != nil {
-                logger.Warnf("write: chunk: %d off: %d %s", s.id, off, err)
-                return syscall.EIO
-            }
-        } else if int(off) <= f.w.blockSize {
-            // 当off小于4MB时，就代表当前是一个新Chunk还未分配ChunkId，现在分配一个ChunkId，方便后续使用这个Id
-            // ChunkId也不是一定会在这里创建 在FlushData需要使用chunkId的地方会调用此方法
-            go s.prepareID(ctx, false)
-        }
-    }
-    return 0
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">write</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> off <span class="token builtin">uint32</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">uint8</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno <span class="token punctuation">{</span>
+    f <span class="token operator">:=</span> s<span class="token punctuation">.</span>chunk<span class="token punctuation">.</span>file
+    <span class="token comment" spellcheck="true">// 不是真正将数据写入文件中,只是处理当前data中的数据改放入pages中</span>
+    <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">WriteAt</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"write: chunk: %d off: %d %s"</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>id<span class="token punctuation">,</span> off<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> syscall<span class="token punctuation">.</span>EIO
+    <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">// 更新s.slen</span>
+    <span class="token keyword">if</span> off<span class="token operator">+</span><span class="token function">uint32</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">></span> s<span class="token punctuation">.</span>slen <span class="token punctuation">{</span>
+        s<span class="token punctuation">.</span>slen <span class="token operator">=</span> off <span class="token operator">+</span> <span class="token function">uint32</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    s<span class="token punctuation">.</span>lastMod <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> s<span class="token punctuation">.</span>slen <span class="token operator">==</span> meta<span class="token punctuation">.</span>ChunkSize <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// s.slen达到一个ChunkSize 64MB</span>
+    s<span class="token punctuation">.</span>freezed <span class="token operator">=</span> <span class="token boolean">true</span>
+        <span class="token keyword">go</span> s<span class="token punctuation">.</span><span class="token function">flushData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token function">int</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>slen<span class="token punctuation">)</span> <span class="token operator">>=</span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span>blockSize <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// s.slen大于BlockSize 4MB</span>
+        <span class="token keyword">if</span> s<span class="token punctuation">.</span>id <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 及时进行FlushTo</span>
+            err <span class="token operator">:=</span> s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">FlushTo</span><span class="token punctuation">(</span><span class="token function">int</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>slen<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+                logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"write: chunk: %d off: %d %s"</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>id<span class="token punctuation">,</span> off<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+                <span class="token keyword">return</span> syscall<span class="token punctuation">.</span>EIO
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span> <span class="token operator">&lt;=</span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span>blockSize <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 当off小于4MB时，就代表当前是一个新Chunk还未分配ChunkId，现在分配一个ChunkId，方便后续使用这个Id</span>
+            <span class="token comment" spellcheck="true">// ChunkId也不是一定会在这里创建 在FlushData需要使用chunkId的地方会调用此方法</span>
+            <span class="token keyword">go</span> s<span class="token punctuation">.</span><span class="token function">prepareID</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token number">0</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h3 id="wChunk-WriteAt"><a href="#wChunk-WriteAt" class="headerlink" title="wChunk.WriteAt"></a>wChunk.WriteAt</h3><h4 id="方法中参数说明"><a href="#方法中参数说明" class="headerlink" title="方法中参数说明"></a>方法中参数说明</h4><div class="table-container">
-<table>
+<h3 id="wChunk-WriteAt"><a href="#wChunk-WriteAt" class="headerlink" title="wChunk.WriteAt"></a>wChunk.WriteAt</h3><h4 id="方法中参数说明"><a href="#方法中参数说明" class="headerlink" title="方法中参数说明"></a>方法中参数说明</h4><table>
 <thead>
 <tr>
-<th style="text-align:center">参数</th>
-<th style="text-align:center">说明</th>
+<th align="center">参数</th>
+<th align="center">说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td style="text-align:center">int64 off</td>
-<td style="text-align:center">当前数据载Chunk中的写入位置</td>
+<tbody><tr>
+<td align="center">int64 off</td>
+<td align="center">当前数据载Chunk中的写入位置</td>
 </tr>
 <tr>
-<td style="text-align:center">int indx</td>
-<td style="text-align:center">当前数据应写入第几个Block</td>
+<td align="center">int indx</td>
+<td align="center">当前数据应写入第几个Block</td>
 </tr>
 <tr>
-<td style="text-align:center">int boff</td>
-<td style="text-align:center">当前数据在Block中写入的位置</td>
+<td align="center">int boff</td>
+<td align="center">当前数据在Block中写入的位置</td>
 </tr>
 <tr>
-<td style="text-align:center">int bs</td>
-<td style="text-align:center">当前每页的大小，有两种情况「64KB和4MB」</td>
+<td align="center">int bs</td>
+<td align="center">当前每页的大小，有两种情况「64KB和4MB」</td>
 </tr>
 <tr>
-<td style="text-align:center">int bi</td>
-<td style="text-align:center">当前数据在Block的哪个Page中写入</td>
+<td align="center">int bi</td>
+<td align="center">当前数据在Block的哪个Page中写入</td>
 </tr>
 <tr>
-<td style="text-align:center">int bo</td>
-<td style="text-align:center">当前数据在Block的具体Page的哪个索引开始写入</td>
+<td align="center">int bo</td>
+<td align="center">当前数据在Block的具体Page的哪个索引开始写入</td>
 </tr>
 <tr>
-<td style="text-align:center">c.pages</td>
-<td style="text-align:center">以Page为基础的 16 * 64的二维数组，总大小上限64MB，单个一维为4MB</td>
+<td align="center">c.pages</td>
+<td align="center">以Page为基础的 16 * 64的二维数组，总大小上限64MB，单个一维为4MB</td>
 </tr>
 <tr>
-<td style="text-align:center">int left</td>
-<td style="text-align:center">本需需要写入数据，有两种情况「left + n &lt;= len(p) 和 left + n &gt; len(p)」</td>
+<td align="center">int left</td>
+<td align="center">本需需要写入数据，有两种情况「left + n &lt;&#x3D; len(p) 和 left + n &gt; len(p)」</td>
 </tr>
 <tr>
-<td style="text-align:center">int n</td>
-<td style="text-align:center">每次循环写入page中的数据</td>
+<td align="center">int n</td>
+<td align="center">每次循环写入page中的数据</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <h4 id="Page二维数据说明"><a href="#Page二维数据说明" class="headerlink" title="Page二维数据说明"></a>Page二维数据说明</h4><ol>
-<li>Page是一个16 <em> 64或16 </em> 1的二维数组，16 <em> 64因为每个Chunk在indx为0的时候「刚开始写入数据还没有到达4MB」。16 </em> 1因为每个Chunk在indx = 0写完后发现还有数据，那么就不会对二维继续拆分，直接将其设置为一个Block</li>
+<li>Page是一个16 * 64或16 * 1的二维数组，16 * 64因为每个Chunk在indx为0的时候「刚开始写入数据还没有到达4MB」。16 * 1因为每个Chunk在indx &#x3D; 0写完后发现还有数据，那么就不会对二维继续拆分，直接将其设置为一个Block</li>
 </ol>
-<p><img src="/2022/05/21/JuiceFS%20Write/Chunk的第一个Page.png" alt="Chunk的第一个Page" style="zoom:50%;"></p>
+<img src="/2022/05/21/JuiceFS%20Write/Chunk的第一个Page.png" alt="Chunk的第一个Page" style="zoom:50%;">
+
 <h3 id="WriteAt流程"><a href="#WriteAt流程" class="headerlink" title="WriteAt流程"></a>WriteAt流程</h3><ol>
 <li>当前off+len(p) &gt; 64MB，说明当前p应该写入下一个Chunk中</li>
 <li>如果off &lt; c.uploaded，说明p已经写入，无需继续写入</li>
@@ -942,199 +946,199 @@ func (c *chunkWriter) findWritableSlice(pos uint32, size uint32) *sliceWriter {
 <li>当前写入的数据可能涉及到跨Block，这个和上面跨Chunk的道理一样</li>
 <li>将p中数据copy到pages中</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *wChunk) WriteAt(p []byte, off int64) (n int, err error) {
-   // off + p.len > 64MB return error
-   if int(off)+len(p) > chunkSize {
-      return 0, fmt.Errorf("write out of chunk boudary: %d > %d", int(off)+len(p), chunkSize)
-   } // cannot overwrite exist block
-   if off < int64(c.uploaded) {
-      return 0, fmt.Errorf("Cannot overwrite uploaded block: %d < %d", off, c.uploaded)
-   }
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">WriteAt</span><span class="token punctuation">(</span>p <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> off <span class="token builtin">int64</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token comment" spellcheck="true">// off + p.len > 64MB return error</span>
+   <span class="token keyword">if</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span><span class="token operator">+</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">></span> chunkSize <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"write out of chunk boudary: %d > %d"</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span><span class="token operator">+</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">,</span> chunkSize<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">// cannot overwrite exist block</span>
+   <span class="token keyword">if</span> off <span class="token operator">&lt;</span> <span class="token function">int64</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>uploaded<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"Cannot overwrite uploaded block: %d &lt; %d"</span><span class="token punctuation">,</span> off<span class="token punctuation">,</span> c<span class="token punctuation">.</span>uploaded<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
 
-   // Fill previous blocks with zeros 这是随机写的一个策略 将之前没有写入内容的地方用zeros填充
-   if c.length < int(off) {
-      zeros := make([]byte, int(off)-c.length)
-      _, _ = c.WriteAt(zeros, int64(c.length))
-   }
-   // 45[chunkId]_0[blockId]_4194304[blockSize] c.id = chunkId blockId是通过indx计算出来的
-   for n < len(p) { 
-      // indx represent  (off + n) / 4MB
-      indx := c.index(int(off) + n)
-      // boff represent current block off
-      // boff也是计算出当前Chunk已经写入到哪里了,下面会通过boff和4MB来计算出[]当前的数据写入哪个Block
-      boff := (int(off) + n) % c.store.conf.BlockSize
-      // pageSize = 64KB
-      var bs = pageSize
-      // BlockSize is 4MB
-      if indx > 0 || bs > c.store.conf.BlockSize {
-         bs = c.store.conf.BlockSize
-      }
-      // bi 是当前Block中第几个位置
-      bi := boff / bs
-      // bo 是当前Block中第几个位置的索引开始写入
-      bo := boff % bs
-      var page *Page
-      if bi < len(c.pages[indx]) {
-         page = c.pages[indx][bi]
-      } else {
-         page = allocPage(bs)
-         page.Data = page.Data[:0]
-         c.pages[indx] = append(c.pages[indx], page)
-      }
-      left := len(p) - n
-      // 下面对本个block的操作 和 chunk操作一样,都是判断是否超过4MB
-      if bo+left > bs {
-         page.Data = page.Data[:bs]
-      } else if len(page.Data) < bo+left {
-         page.Data = page.Data[:bo+left]
-      } // 将p中内容copy到page.Data中
-      n += copy(page.Data[bo:], p[n:])
-   }
-   if int(off)+n > c.length {
-      //更新c.length长度,用来write和read时知道目前已经写了多少内容
-      c.length = int(off) + n
-   }
-   return n, nil
-}
+   <span class="token comment" spellcheck="true">// Fill previous blocks with zeros 这是随机写的一个策略 将之前没有写入内容的地方用zeros填充</span>
+   <span class="token keyword">if</span> c<span class="token punctuation">.</span>length <span class="token operator">&lt;</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      zeros <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span><span class="token operator">-</span>c<span class="token punctuation">.</span>length<span class="token punctuation">)</span>
+      <span class="token boolean">_</span><span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">WriteAt</span><span class="token punctuation">(</span>zeros<span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   <span class="token comment" spellcheck="true">// 45[chunkId]_0[blockId]_4194304[blockSize] c.id = chunkId blockId是通过indx计算出来的</span>
+   <span class="token keyword">for</span> n <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+      <span class="token comment" spellcheck="true">// indx represent  (off + n) / 4MB</span>
+      indx <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">index</span><span class="token punctuation">(</span><span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span> <span class="token operator">+</span> n<span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// boff represent current block off</span>
+      <span class="token comment" spellcheck="true">// boff也是计算出当前Chunk已经写入到哪里了,下面会通过boff和4MB来计算出[]当前的数据写入哪个Block</span>
+      boff <span class="token operator">:=</span> <span class="token punctuation">(</span><span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span> <span class="token operator">+</span> n<span class="token punctuation">)</span> <span class="token operator">%</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize
+      <span class="token comment" spellcheck="true">// pageSize = 64KB</span>
+      <span class="token keyword">var</span> bs <span class="token operator">=</span> pageSize
+      <span class="token comment" spellcheck="true">// BlockSize is 4MB</span>
+      <span class="token keyword">if</span> indx <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">||</span> bs <span class="token operator">></span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize <span class="token punctuation">{</span>
+         bs <span class="token operator">=</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">// bi 是当前Block中第几个位置</span>
+      bi <span class="token operator">:=</span> boff <span class="token operator">/</span> bs
+      <span class="token comment" spellcheck="true">// bo 是当前Block中第几个位置的索引开始写入</span>
+      bo <span class="token operator">:=</span> boff <span class="token operator">%</span> bs
+      <span class="token keyword">var</span> page <span class="token operator">*</span>Page
+      <span class="token keyword">if</span> bi <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>pages<span class="token punctuation">[</span>indx<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         page <span class="token operator">=</span> c<span class="token punctuation">.</span>pages<span class="token punctuation">[</span>indx<span class="token punctuation">]</span><span class="token punctuation">[</span>bi<span class="token punctuation">]</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+         page <span class="token operator">=</span> <span class="token function">allocPage</span><span class="token punctuation">(</span>bs<span class="token punctuation">)</span>
+         page<span class="token punctuation">.</span>Data <span class="token operator">=</span> page<span class="token punctuation">.</span>Data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">]</span>
+         c<span class="token punctuation">.</span>pages<span class="token punctuation">[</span>indx<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>pages<span class="token punctuation">[</span>indx<span class="token punctuation">]</span><span class="token punctuation">,</span> page<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+      left <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">-</span> n
+      <span class="token comment" spellcheck="true">// 下面对本个block的操作 和 chunk操作一样,都是判断是否超过4MB</span>
+      <span class="token keyword">if</span> bo<span class="token operator">+</span>left <span class="token operator">></span> bs <span class="token punctuation">{</span>
+         page<span class="token punctuation">.</span>Data <span class="token operator">=</span> page<span class="token punctuation">.</span>Data<span class="token punctuation">[</span><span class="token punctuation">:</span>bs<span class="token punctuation">]</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>page<span class="token punctuation">.</span>Data<span class="token punctuation">)</span> <span class="token operator">&lt;</span> bo<span class="token operator">+</span>left <span class="token punctuation">{</span>
+         page<span class="token punctuation">.</span>Data <span class="token operator">=</span> page<span class="token punctuation">.</span>Data<span class="token punctuation">[</span><span class="token punctuation">:</span>bo<span class="token operator">+</span>left<span class="token punctuation">]</span>
+      <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">// 将p中内容copy到page.Data中</span>
+      n <span class="token operator">+=</span> <span class="token function">copy</span><span class="token punctuation">(</span>page<span class="token punctuation">.</span>Data<span class="token punctuation">[</span>bo<span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> p<span class="token punctuation">[</span>n<span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">if</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span><span class="token operator">+</span>n <span class="token operator">></span> c<span class="token punctuation">.</span>length <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//更新c.length长度,用来write和read时知道目前已经写了多少内容</span>
+      c<span class="token punctuation">.</span>length <span class="token operator">=</span> <span class="token function">int</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span> <span class="token operator">+</span> n
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> n<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h2 id="Flush相关方法"><a href="#Flush相关方法" class="headerlink" title="Flush相关方法"></a>Flush相关方法</h2><h3 id="dataWriter-flushAll"><a href="#dataWriter-flushAll" class="headerlink" title="dataWriter.flushAll"></a>dataWriter.flushAll</h3><pre class=" language-lang-go"><code class="language-lang-go">// 创建dataWriter时候,会启用一个线程一直去调用flushAll
-func (w *dataWriter) flushAll() {
-   for {
-      w.Lock()
-      now := time.Now()
-      for _, f := range w.files {
-        // 使用files时，将其使用数 + 1
-         f.refs++
-         w.Unlock()
-         tooMany := f.totalSlices() > 800
-         f.Lock()
+<h2 id="Flush相关方法"><a href="#Flush相关方法" class="headerlink" title="Flush相关方法"></a>Flush相关方法</h2><h3 id="dataWriter-flushAll"><a href="#dataWriter-flushAll" class="headerlink" title="dataWriter.flushAll"></a>dataWriter.flushAll</h3><pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 创建dataWriter时候,会启用一个线程一直去调用flushAll</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>w <span class="token operator">*</span>dataWriter<span class="token punctuation">)</span> <span class="token function">flushAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token keyword">for</span> <span class="token punctuation">{</span>
+      w<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      now <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> f <span class="token operator">:=</span> <span class="token keyword">range</span> w<span class="token punctuation">.</span>files <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 使用files时，将其使用数 + 1</span>
+         f<span class="token punctuation">.</span>refs<span class="token operator">++</span>
+         w<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+         tooMany <span class="token operator">:=</span> f<span class="token punctuation">.</span><span class="token function">totalSlices</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">800</span>
+         f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
-         lastBit := uint32(rand.Int() % 2) // choose half of chunks randomly
-         for i, c := range f.chunks {
-            hs := len(c.slices) / 2
-            for j, s := range c.slices {
-               // 当前时间 - sliceWriter开始时间 > 5s 或 当前时间 - sliceWriter修改时间 > 1s 
-              // 或 当前总共slice > 800 且 佛系的把数据写入block 且 [0,len(c.slices) / 2)
-               if !s.freezed && (now.Sub(s.started) > flushDuration || now.Sub(s.lastMod) > time.Second ||
-                  tooMany && i%2 == lastBit && j <= hs) {
-                  s.freezed = true
-                  go s.flushData()
-               }
-            }
-         }
-         f.Unlock()
-         w.free(f)
-         w.Lock()
-      }
-      w.Unlock()
-      time.Sleep(time.Millisecond * 100)
-   }
-}
+         lastBit <span class="token operator">:=</span> <span class="token function">uint32</span><span class="token punctuation">(</span>rand<span class="token punctuation">.</span><span class="token function">Int</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// choose half of chunks randomly</span>
+         <span class="token keyword">for</span> i<span class="token punctuation">,</span> c <span class="token operator">:=</span> <span class="token keyword">range</span> f<span class="token punctuation">.</span>chunks <span class="token punctuation">{</span>
+            hs <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>slices<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span>
+            <span class="token keyword">for</span> j<span class="token punctuation">,</span> s <span class="token operator">:=</span> <span class="token keyword">range</span> c<span class="token punctuation">.</span>slices <span class="token punctuation">{</span>
+               <span class="token comment" spellcheck="true">// 当前时间 - sliceWriter开始时间 > 5s 或 当前时间 - sliceWriter修改时间 > 1s </span>
+              <span class="token comment" spellcheck="true">// 或 当前总共slice > 800 且 佛系的把数据写入block 且 [0,len(c.slices) / 2)</span>
+               <span class="token keyword">if</span> <span class="token operator">!</span>s<span class="token punctuation">.</span>freezed <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>now<span class="token punctuation">.</span><span class="token function">Sub</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>started<span class="token punctuation">)</span> <span class="token operator">></span> flushDuration <span class="token operator">||</span> now<span class="token punctuation">.</span><span class="token function">Sub</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>lastMod<span class="token punctuation">)</span> <span class="token operator">></span> time<span class="token punctuation">.</span>Second <span class="token operator">||</span>
+                  tooMany <span class="token operator">&amp;&amp;</span> i<span class="token operator">%</span><span class="token number">2</span> <span class="token operator">==</span> lastBit <span class="token operator">&amp;&amp;</span> j <span class="token operator">&lt;=</span> hs<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                  s<span class="token punctuation">.</span>freezed <span class="token operator">=</span> <span class="token boolean">true</span>
+                  <span class="token keyword">go</span> s<span class="token punctuation">.</span><span class="token function">flushData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+               <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+         <span class="token punctuation">}</span>
+         f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+         w<span class="token punctuation">.</span><span class="token function">free</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span>
+         w<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+      w<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Millisecond <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h3 id="sliceWriter-flushData"><a href="#sliceWriter-flushData" class="headerlink" title="sliceWriter.flushData"></a>sliceWriter.flushData</h3><pre class=" language-lang-go"><code class="language-lang-go">// freezed, no more data
-func (s *sliceWriter) flushData() {
-   defer s.markDone()
-   if s.slen == 0 {
-      return
-   }
-   // 准备chunkId
-   s.prepareID(meta.Background, true)
-   if s.err != 0 {
-      logger.Infof("flush inode:%d chunk: %s", s.chunk.file.inode, s.err)
-      s.writer.Abort()
-      return
-   }
-   s.length = s.slen
-   if err := s.writer.Finish(int(s.length)); err != nil {
-      logger.Errorf("upload chunk %v (length: %v) fail: %s", s.id, s.length, err)
-      s.writer.Abort()
-      s.err = syscall.EIO
-   }
-   s.writer = nil
-}
+<h3 id="sliceWriter-flushData"><a href="#sliceWriter-flushData" class="headerlink" title="sliceWriter.flushData"></a>sliceWriter.flushData</h3><pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// freezed, no more data</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">flushData</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token keyword">defer</span> s<span class="token punctuation">.</span><span class="token function">markDone</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">if</span> s<span class="token punctuation">.</span>slen <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span>
+   <span class="token punctuation">}</span>
+   <span class="token comment" spellcheck="true">// 准备chunkId</span>
+   s<span class="token punctuation">.</span><span class="token function">prepareID</span><span class="token punctuation">(</span>meta<span class="token punctuation">.</span>Background<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+   <span class="token keyword">if</span> s<span class="token punctuation">.</span>err <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      logger<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"flush inode:%d chunk: %s"</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>chunk<span class="token punctuation">.</span>file<span class="token punctuation">.</span>inode<span class="token punctuation">,</span> s<span class="token punctuation">.</span>err<span class="token punctuation">)</span>
+      s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">Abort</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+   <span class="token punctuation">}</span>
+   s<span class="token punctuation">.</span>length <span class="token operator">=</span> s<span class="token punctuation">.</span>slen
+   <span class="token keyword">if</span> err <span class="token operator">:=</span> s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">Finish</span><span class="token punctuation">(</span><span class="token function">int</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+      logger<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"upload chunk %v (length: %v) fail: %s"</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>id<span class="token punctuation">,</span> s<span class="token punctuation">.</span>length<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+      s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">Abort</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      s<span class="token punctuation">.</span>err <span class="token operator">=</span> syscall<span class="token punctuation">.</span>EIO
+   <span class="token punctuation">}</span>
+   s<span class="token punctuation">.</span>writer <span class="token operator">=</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h3 id="sliceWriter-prepareID"><a href="#sliceWriter-prepareID" class="headerlink" title="sliceWriter.prepareID"></a>sliceWriter.prepareID</h3><pre class=" language-lang-go"><code class="language-lang-go">func (s *sliceWriter) prepareID(ctx meta.Context, retry bool) {
-   f := s.chunk.file
-   f.Lock()
-   for s.id == 0 {
-      var id uint64
-      f.Unlock()
-      // 根据当前的nextId和maxId来判断是否需要更新maxId
-      // 获取当前的自增nextId
-      st := f.w.m.NewChunk(ctx, &id)
-      f.Lock()
-      if st != 0 && st != syscall.EIO {
-         s.err = st
-         break
-      }
-      if !retry || st == 0 {
-         if s.id == 0 {
-            s.id = id
-         }
-         break
-      }
-      f.Unlock()
-      logger.Debugf("meta is not available: %s", st)
-      time.Sleep(time.Millisecond * 100)
-      f.Lock()
-   }
-   if s.writer != nil && s.writer.ID() == 0 {
-      s.writer.SetID(s.id)
-   }
-   logger.Warnf("Set ChunkId:%d", s.id)
-   f.Unlock()
-}
+<h3 id="sliceWriter-prepareID"><a href="#sliceWriter-prepareID" class="headerlink" title="sliceWriter.prepareID"></a>sliceWriter.prepareID</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>sliceWriter<span class="token punctuation">)</span> <span class="token function">prepareID</span><span class="token punctuation">(</span>ctx meta<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> retry <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   f <span class="token operator">:=</span> s<span class="token punctuation">.</span>chunk<span class="token punctuation">.</span>file
+   f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">for</span> s<span class="token punctuation">.</span>id <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      <span class="token keyword">var</span> id <span class="token builtin">uint64</span>
+      f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// 根据当前的nextId和maxId来判断是否需要更新maxId</span>
+      <span class="token comment" spellcheck="true">// 获取当前的自增nextId</span>
+      st <span class="token operator">:=</span> f<span class="token punctuation">.</span>w<span class="token punctuation">.</span>m<span class="token punctuation">.</span><span class="token function">NewChunk</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token operator">&amp;</span>id<span class="token punctuation">)</span>
+      f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token keyword">if</span> st <span class="token operator">!=</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> st <span class="token operator">!=</span> syscall<span class="token punctuation">.</span>EIO <span class="token punctuation">{</span>
+         s<span class="token punctuation">.</span>err <span class="token operator">=</span> st
+         <span class="token keyword">break</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">if</span> <span class="token operator">!</span>retry <span class="token operator">||</span> st <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+         <span class="token keyword">if</span> s<span class="token punctuation">.</span>id <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+            s<span class="token punctuation">.</span>id <span class="token operator">=</span> id
+         <span class="token punctuation">}</span>
+         <span class="token keyword">break</span>
+      <span class="token punctuation">}</span>
+      f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      logger<span class="token punctuation">.</span><span class="token function">Debugf</span><span class="token punctuation">(</span><span class="token string">"meta is not available: %s"</span><span class="token punctuation">,</span> st<span class="token punctuation">)</span>
+      time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>Millisecond <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">)</span>
+      f<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">if</span> s<span class="token punctuation">.</span>writer <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">ID</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      s<span class="token punctuation">.</span>writer<span class="token punctuation">.</span><span class="token function">SetID</span><span class="token punctuation">(</span>s<span class="token punctuation">.</span>id<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"Set ChunkId:%d"</span><span class="token punctuation">,</span> s<span class="token punctuation">.</span>id<span class="token punctuation">)</span>
+   f<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <p>baseMeta</p>
-<pre class=" language-lang-go"><code class="language-lang-go">type baseMeta struct {
-    sync.Mutex
-    conf *Config // 挂载目录的配置信息
-    fmt  Format  // 存储当前format磁盘的信息
+<pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> baseMeta <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    sync<span class="token punctuation">.</span>Mutex
+    conf <span class="token operator">*</span>Config <span class="token comment" spellcheck="true">// 挂载目录的配置信息</span>
+    fmt  Format  <span class="token comment" spellcheck="true">// 存储当前format磁盘的信息</span>
 
     root         Ino
     subTrash     internalNode
-    sid          uint64
-    of           *openfiles
-    removedFiles map[Ino]bool
-    compacting   map[uint64]bool
-    deleting     chan int
-    symlinks     *sync.Map
-    msgCallbacks *msgCallbacks
-    newSpace     int64
-    newInodes    int64
-    usedSpace    int64 //当前用了多少空间
-    usedInodes   int64 //当前Inode数量,也就是文件 + 文件夹数量
-    umounting    bool  //是否是未挂载
+    sid          <span class="token builtin">uint64</span>
+    of           <span class="token operator">*</span>openfiles
+    removedFiles <span class="token keyword">map</span><span class="token punctuation">[</span>Ino<span class="token punctuation">]</span><span class="token builtin">bool</span>
+    compacting   <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">uint64</span><span class="token punctuation">]</span><span class="token builtin">bool</span>
+    deleting     <span class="token keyword">chan</span> <span class="token builtin">int</span>
+    symlinks     <span class="token operator">*</span>sync<span class="token punctuation">.</span>Map
+    msgCallbacks <span class="token operator">*</span>msgCallbacks
+    newSpace     <span class="token builtin">int64</span>
+    newInodes    <span class="token builtin">int64</span>
+    usedSpace    <span class="token builtin">int64</span> <span class="token comment" spellcheck="true">//当前用了多少空间</span>
+    usedInodes   <span class="token builtin">int64</span> <span class="token comment" spellcheck="true">//当前Inode数量,也就是文件 + 文件夹数量</span>
+    umounting    <span class="token builtin">bool</span>  <span class="token comment" spellcheck="true">//是否是未挂载</span>
 
-    freeMu     sync.Mutex
-    freeInodes freeID //用来对创建文件生成Inode的
-    freeChunks freeID //用来对创建Chunk生成id的
+    freeMu     sync<span class="token punctuation">.</span>Mutex
+    freeInodes freeID <span class="token comment" spellcheck="true">//用来对创建文件生成Inode的</span>
+    freeChunks freeID <span class="token comment" spellcheck="true">//用来对创建Chunk生成id的</span>
 
     en engine
-}
+<span class="token punctuation">}</span>
 
-type freeID struct {
-    next  uint64 //下一次使用的id
-    maxid uint64    //当前最大的id,如果下次使用的nextid超过或等于maxid会对maxid进行更新
-}
+<span class="token keyword">type</span> freeID <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    next  <span class="token builtin">uint64</span> <span class="token comment" spellcheck="true">//下一次使用的id</span>
+    maxid <span class="token builtin">uint64</span>	<span class="token comment" spellcheck="true">//当前最大的id,如果下次使用的nextid超过或等于maxid会对maxid进行更新</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h3 id="baseMeta-NewChunk"><a href="#baseMeta-NewChunk" class="headerlink" title="baseMeta.NewChunk"></a>baseMeta.NewChunk</h3><pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) NewChunk(ctx Context, chunkid *uint64) syscall.Errno {
-   m.freeMu.Lock()
-   defer m.freeMu.Unlock()
-   if m.freeChunks.next >= m.freeChunks.maxid {
-      // 从redis中nextChunk且更这个值
-      v, err := m.en.incrCounter("nextChunk", chunkIDBatch)
-      if err != nil {
-         return errno(err)
-      }
-      m.freeChunks.next = uint64(v) - chunkIDBatch
-      m.freeChunks.maxid = uint64(v)
-   }
-   // 将id赋值且自增
-   *chunkid = m.freeChunks.next
-   m.freeChunks.next++
-   return 0
-}
+<h3 id="baseMeta-NewChunk"><a href="#baseMeta-NewChunk" class="headerlink" title="baseMeta.NewChunk"></a>baseMeta.NewChunk</h3><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">NewChunk</span><span class="token punctuation">(</span>ctx Context<span class="token punctuation">,</span> chunkid <span class="token operator">*</span><span class="token builtin">uint64</span><span class="token punctuation">)</span> syscall<span class="token punctuation">.</span>Errno <span class="token punctuation">{</span>
+   m<span class="token punctuation">.</span>freeMu<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">defer</span> m<span class="token punctuation">.</span>freeMu<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">if</span> m<span class="token punctuation">.</span>freeChunks<span class="token punctuation">.</span>next <span class="token operator">>=</span> m<span class="token punctuation">.</span>freeChunks<span class="token punctuation">.</span>maxid <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// 从redis中nextChunk且更这个值</span>
+      v<span class="token punctuation">,</span> err <span class="token operator">:=</span> m<span class="token punctuation">.</span>en<span class="token punctuation">.</span><span class="token function">incrCounter</span><span class="token punctuation">(</span><span class="token string">"nextChunk"</span><span class="token punctuation">,</span> chunkIDBatch<span class="token punctuation">)</span>
+      <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+         <span class="token keyword">return</span> <span class="token function">errno</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+      m<span class="token punctuation">.</span>freeChunks<span class="token punctuation">.</span>next <span class="token operator">=</span> <span class="token function">uint64</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span> <span class="token operator">-</span> chunkIDBatch
+      m<span class="token punctuation">.</span>freeChunks<span class="token punctuation">.</span>maxid <span class="token operator">=</span> <span class="token function">uint64</span><span class="token punctuation">(</span>v<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+   <span class="token comment" spellcheck="true">// 将id赋值且自增</span>
+   <span class="token operator">*</span>chunkid <span class="token operator">=</span> m<span class="token punctuation">.</span>freeChunks<span class="token punctuation">.</span>next
+   m<span class="token punctuation">.</span>freeChunks<span class="token punctuation">.</span>next<span class="token operator">++</span>
+   <span class="token keyword">return</span> <span class="token number">0</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><h3 id="编辑和拷贝的异同"><a href="#编辑和拷贝的异同" class="headerlink" title="编辑和拷贝的异同"></a>编辑和拷贝的异同</h3><h4 id="相同点："><a href="#相同点：" class="headerlink" title="相同点："></a>相同点：</h4><ul>
 <li>编辑和拷贝都会调用Write方法，调用write方法流程都是一样</li>
@@ -1147,19 +1151,22 @@ type freeID struct {
 <li>复制和编辑单次写入的大小不一，Flush将Page数据处理进Block时，不光判断当前slice写入数据长度满足4MB或64MB，还会如下几个点进行考察<ul>
 <li>现在时间 - sliceWriter创建时间 &gt; 5s</li>
 <li>现在时间 - 上次修改时间 &gt; 1s</li>
-<li>当前DataWriter持有的fileWriterMap中所有的slice是否大于800个 且 当前slice列表前一半 且 一个1/2的取模「50%的可能性」</li>
+<li>当前DataWriter持有的fileWriterMap中所有的slice是否大于800个 且 当前slice列表前一半 且 一个1&#x2F;2的取模「50%的可能性」</li>
 </ul>
 </li>
 <li>和运行JuiceFS机器的处理性能也有很大关系，相同的时间内性能越好的机器处理的数据越多，则写入Slice的数据也更多，在Flush时单个Slice转换为Block的数量必然会增多「其实讨论这个是没什么必要的，作者只是想拿出来简单引出JuiceFS Flush的巧妙之处」</li>
 </ul>
-<h3 id="编辑"><a href="#编辑" class="headerlink" title="编辑"></a>编辑</h3><p>​    编辑文件保存时，write每次是8KB，off逐渐递增8KB</p>
-<p><img src="/2022/05/21/JuiceFS%20Write/image-20220525152133223.png" alt="image-20220525152133223" style="zoom: 67%;"></p>
-<p>​    编辑文件保存存储Block时，每个chunkId的Block数量不会超过6个</p>
-<p><img src="/2022/05/21/JuiceFS%20Write/image-20220525170605680.png" alt="image-20220525170605680" style="zoom:67%;"></p>
-<h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p>​    复制文件时，write每次是128KB，off随着每次写入递增128KB</p>
-<p><img src="/2022/05/21/JuiceFS%20Write/image-20220525151900973.png" alt="image-20220525151900973" style="zoom: 67%;"></p>
-<p>​    复制文件保存存储Block时，每个chunkId的Block数量不会超过16个</p>
-<p><img src="/2022/05/21/JuiceFS%20Write/image-20220525170659982.png" alt="image-20220525170659982" style="zoom:67%;"></p>
+<h3 id="编辑"><a href="#编辑" class="headerlink" title="编辑"></a>编辑</h3><p>​	编辑文件保存时，write每次是8KB，off逐渐递增8KB</p>
+<img src="/2022/05/21/JuiceFS%20Write/image-20220525152133223.png" alt="image-20220525152133223" style="zoom: 67%;">
+
+<p>​	编辑文件保存存储Block时，每个chunkId的Block数量不会超过6个</p>
+<img src="/2022/05/21/JuiceFS%20Write/image-20220525170605680.png" alt="image-20220525170605680" style="zoom:67%;">
+
+<h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p>​	复制文件时，write每次是128KB，off随着每次写入递增128KB</p>
+<img src="/2022/05/21/JuiceFS%20Write/image-20220525151900973.png" alt="image-20220525151900973" style="zoom: 67%;">
+
+<p>​	复制文件保存存储Block时，每个chunkId的Block数量不会超过16个</p>
+<img src="/2022/05/21/JuiceFS%20Write/image-20220525170659982.png" alt="image-20220525170659982" style="zoom:67%;">
 
                 
             </div>
@@ -1977,7 +1984,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">25.5k</span>
+                        class="white-color">38.1k</span>
             
             
             

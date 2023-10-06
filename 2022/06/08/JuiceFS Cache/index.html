@@ -8,7 +8,7 @@
     <meta name="description" content="JuiceFS支持读缓存和写缓存，默认的缓存为磁盘缓存，如果你对存储效率要求更高则可开启内存缓存。官网文档可见JuiceFS缓存介绍
 磁盘缓存缓存位置如果不指定磁盘缓存路径，则不同操作系统缓存路径如下：
 
-Linux：/var/jfsCac">
+Linux：&amp;#x2F;var&amp;#">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -480,14 +480,14 @@ Linux：/var/jfsCac">
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.2k
+                    2.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    5 分
+                    13 分
                 </div>
                 
 
@@ -510,19 +510,21 @@ Linux：/var/jfsCac">
                 <p>JuiceFS支持读缓存和写缓存，默认的缓存为磁盘缓存，如果你对存储效率要求更高则可开启内存缓存。官网文档可见<a target="_blank" rel="noopener" href="https://www.juicefs.com/docs/zh/community/cache_management">JuiceFS缓存介绍</a></p>
 <h2 id="磁盘缓存"><a href="#磁盘缓存" class="headerlink" title="磁盘缓存"></a>磁盘缓存</h2><h3 id="缓存位置"><a href="#缓存位置" class="headerlink" title="缓存位置"></a>缓存位置</h3><p>如果不指定磁盘缓存路径，则不同操作系统缓存路径如下：</p>
 <ul>
-<li><strong>Linux</strong>：/var/jfsCache</li>
-<li><strong>macOS</strong>：$HOME/.juicefs/cache</li>
+<li><strong>Linux</strong>：&#x2F;var&#x2F;jfsCache</li>
+<li><strong>macOS</strong>：$HOME&#x2F;.juicefs&#x2F;cache</li>
 <li><strong>Windows</strong>：%USERPROFILE%\.juicefs\cache</li>
 </ul>
 <h3 id="设置多个缓存"><a href="#设置多个缓存" class="headerlink" title="设置多个缓存"></a>设置多个缓存</h3><p>可以为一个挂载卷设置多个缓存目录，每个缓存目录平均分配总缓存大小，每个缓存路径用 <strong>:</strong> 进行分割，例如：</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">juicefs mount localhost /opt/jfs/mount  --cache-dir /home/pengyun04/jfs/jfsCache1:/home/pengyun04/jfs/jfsCache2:/home/pengyun04/jfs/jfsCache3
+<pre class=" language-sh"><code class="language-sh">juicefs mount localhost /opt/jfs/mount  --cache-dir /home/pengyun04/jfs/jfsCache1:/home/pengyun04/jfs/jfsCache2:/home/pengyun04/jfs/jfsCache3
 </code></pre>
-<p>如上就是在/home/pengyun04/jfs下有三个缓存目录</p>
-<p><img src="/2022/06/08/JuiceFS%20Cache/多个缓存目录日志.png" alt="image-20220606161322913" style="zoom: 67%;"></p>
+<p>如上就是在&#x2F;home&#x2F;pengyun04&#x2F;jfs下有三个缓存目录</p>
+<img src="/2022/06/08/JuiceFS%20Cache/多个缓存目录日志.png" alt="image-20220606161322913" style="zoom: 67%;">
+
 <p>在Linux系统中，缓存目录只能被sudo权限用户创建，且谁创建缓存目录，只能被创建者控制和访问</p>
-<p><img src="/2022/06/08/JuiceFS%20Cache/多个缓存目录列表.png" alt="多个缓存目录列表"></p>
-<p>不指定缓存目录大小默认为100GB，每个缓存目录33GB。缓存目录可以配置磁盘存满（—free-space-ratio [0-1)）参数，这个参数指当前可用空间是：每个缓存目录大小 * (1 - 配置参数)，达到整个阈值时，会调用JuiceFS的类LRU算法来清除最久未使用缓存。配置如下：</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">juicefs mount localhost /opt/jfs/mount  
+<img src="/2022/06/08/JuiceFS%20Cache/多个缓存目录列表.png" alt="多个缓存目录列表">
+
+<p>不指定缓存目录大小默认为100GB，每个缓存目录33GB。缓存目录可以配置磁盘存满（–free-space-ratio [0-1)）参数，这个参数指当前可用空间是：每个缓存目录大小 * (1 - 配置参数)，达到整个阈值时，会调用JuiceFS的类LRU算法来清除最久未使用缓存。配置如下：</p>
+<pre class=" language-sh"><code class="language-sh">juicefs mount localhost /opt/jfs/mount  
 --cache-dir /home/pengyun04/jfs/jfsCache1:/home/pengyun04/jfs/jfsCache2
 --free-space-rati 0.2
 </code></pre>
@@ -532,45 +534,45 @@ Linux：/var/jfsCac">
 <li>获取配置中的缓存目录列表</li>
 <li>如果未配置磁盘型缓存则转至内存型缓存初始化</li>
 <li>对缓存路径进行字段序排列</li>
-<li>为每个缓存目录分配缓存大小，dirCacheSize默认为100GB，分配到每个缓存目录的大小为dirCacheSize/缓存目录个数</li>
+<li>为每个缓存目录分配缓存大小，dirCacheSize默认为100GB，分配到每个缓存目录的大小为dirCacheSize&#x2F;缓存目录个数</li>
 <li>初始化每个缓存目录</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func newCacheManager(config *Config, uploader func(key, path string)) CacheManager {
-    if config.CacheDir == "memory" || config.CacheSize == 0 {
-        return newMemStore(config)
-    }
-    var dirs []string
-    for _, d := range utils.SplitDir(config.CacheDir) {
-        dd := expandDir(d)
-        if config.AutoCreate {
-            dirs = append(dirs, dd...)
-        } else {
-            for _, d := range dd {
-                if fi, err := os.Stat(d); err == nil && fi.IsDir() {
-                    dirs = append(dirs, d)
-                }
-            }
-        }
-    }
-    if len(dirs) == 0 {
-        logger.Warnf("No cache dir existed")
-        return newMemStore(config)
-    }
-    // 字典序排序各个缓存路径
-    sort.Strings(dirs)
-    dirCacheSize := config.CacheSize << 20
-    // 每一个dir平分dirCacheSize 100GB
-    dirCacheSize /= int64(len(dirs))
-    m := &cacheManager{
-        stores: make([]*cacheStore, len(dirs)),
-    }
-    // 20% of buffer could be used for pending pages
-    pendingPages := config.BufferSize * 2 / 10 / config.BlockSize / len(dirs)
-    for i, d := range dirs {
-        m.stores[i] = newCacheStore(strings.TrimSpace(d)+string(filepath.Separator), dirCacheSize, pendingPages, config, uploader)
-    }
-    return m
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">newCacheManager</span><span class="token punctuation">(</span>config <span class="token operator">*</span>Config<span class="token punctuation">,</span> uploader <span class="token keyword">func</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> path <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token punctuation">)</span> CacheManager <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> config<span class="token punctuation">.</span>CacheDir <span class="token operator">==</span> <span class="token string">"memory"</span> <span class="token operator">||</span> config<span class="token punctuation">.</span>CacheSize <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">newMemStore</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> dirs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+    <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> d <span class="token operator">:=</span> <span class="token keyword">range</span> utils<span class="token punctuation">.</span><span class="token function">SplitDir</span><span class="token punctuation">(</span>config<span class="token punctuation">.</span>CacheDir<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        dd <span class="token operator">:=</span> <span class="token function">expandDir</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> config<span class="token punctuation">.</span>AutoCreate <span class="token punctuation">{</span>
+            dirs <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>dirs<span class="token punctuation">,</span> dd<span class="token operator">...</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> d <span class="token operator">:=</span> <span class="token keyword">range</span> dd <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> fi<span class="token punctuation">,</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">Stat</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> fi<span class="token punctuation">.</span><span class="token function">IsDir</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    dirs <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>dirs<span class="token punctuation">,</span> d<span class="token punctuation">)</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>dirs<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"No cache dir existed"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token function">newMemStore</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// 字典序排序各个缓存路径</span>
+    sort<span class="token punctuation">.</span><span class="token function">Strings</span><span class="token punctuation">(</span>dirs<span class="token punctuation">)</span>
+    dirCacheSize <span class="token operator">:=</span> config<span class="token punctuation">.</span>CacheSize <span class="token operator">&lt;&lt;</span> <span class="token number">20</span>
+    <span class="token comment" spellcheck="true">// 每一个dir平分dirCacheSize 100GB</span>
+    dirCacheSize <span class="token operator">/=</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>dirs<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    m <span class="token operator">:=</span> <span class="token operator">&amp;</span>cacheManager<span class="token punctuation">{</span>
+        stores<span class="token punctuation">:</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>cacheStore<span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>dirs<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// 20% of buffer could be used for pending pages</span>
+    pendingPages <span class="token operator">:=</span> config<span class="token punctuation">.</span>BufferSize <span class="token operator">*</span> <span class="token number">2</span> <span class="token operator">/</span> <span class="token number">10</span> <span class="token operator">/</span> config<span class="token punctuation">.</span>BlockSize <span class="token operator">/</span> <span class="token function">len</span><span class="token punctuation">(</span>dirs<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i<span class="token punctuation">,</span> d <span class="token operator">:=</span> <span class="token keyword">range</span> dirs <span class="token punctuation">{</span>
+        m<span class="token punctuation">.</span>stores<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">newCacheStore</span><span class="token punctuation">(</span>strings<span class="token punctuation">.</span><span class="token function">TrimSpace</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token operator">+</span><span class="token function">string</span><span class="token punctuation">(</span>filepath<span class="token punctuation">.</span>Separator<span class="token punctuation">)</span><span class="token punctuation">,</span> dirCacheSize<span class="token punctuation">,</span> pendingPages<span class="token punctuation">,</span> config<span class="token punctuation">,</span> uploader<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> m
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="disk-cache-newCacheStore"><a href="#disk-cache-newCacheStore" class="headerlink" title="disk_cache.newCacheStore"></a>disk_cache.newCacheStore</h4><ol>
 <li>初始化缓存目录权限和空闲缓存比率（指在磁盘空间够分配缓存大小时，必须留出<strong>缓存 * 比率</strong>的大小）</li>
@@ -578,122 +580,122 @@ Linux：/var/jfsCac">
 <li>如果剩余缓存空间和剩余inode数量不足时，打印日志</li>
 <li>处理还未处理的缓存内容</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func newCacheStore(dir string, cacheSize int64, pendingPages int, config *Config, uploader func(key, path string)) *cacheStore {
-    if config.CacheMode == 0 {
-        config.CacheMode = 0600 // only owner can read/write cache
-    }
-    if config.FreeSpace == 0.0 {
-        config.FreeSpace = 0.1 // 10%
-    }
-    c := &cacheStore{
-        dir:       dir,
-        mode:      config.CacheMode,
-        capacity:  cacheSize,
-        freeRatio: config.FreeSpace,
-        keys:      make(map[string]cacheItem),
-        pending:   make(chan pendingFile, pendingPages),
-        pages:     make(map[string]*Page),
-        uploader:  uploader,
-    }
-    c.createDir(c.dir)
-    // 获取当前剩余空间和文件数量
-    br, fr := c.curFreeRatio()
-    if br < c.freeRatio || fr < c.freeRatio {
-        logger.Warnf("not enough space (%d%%) or inodes (%d%%) for caching in %s: free ratio should be >= %d%%", int(br*100), int(fr*100), c.dir, int(c.freeRatio*100))
-    }
-    logger.Infof("Disk cache (%s): capacity (%d MB), free ratio (%d%%), max pending pages (%d)", c.dir, c.capacity>>20, int(c.freeRatio*100), pendingPages)
-    go c.flush()
-    go c.checkFreeSpace()
-    go c.refreshCacheKeys()
-    go c.scanStaging()
-    return c
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">newCacheStore</span><span class="token punctuation">(</span>dir <span class="token builtin">string</span><span class="token punctuation">,</span> cacheSize <span class="token builtin">int64</span><span class="token punctuation">,</span> pendingPages <span class="token builtin">int</span><span class="token punctuation">,</span> config <span class="token operator">*</span>Config<span class="token punctuation">,</span> uploader <span class="token keyword">func</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> path <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span>cacheStore <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> config<span class="token punctuation">.</span>CacheMode <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        config<span class="token punctuation">.</span>CacheMode <span class="token operator">=</span> <span class="token number">0600</span> <span class="token comment" spellcheck="true">// only owner can read/write cache</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> config<span class="token punctuation">.</span>FreeSpace <span class="token operator">==</span> <span class="token number">0.0</span> <span class="token punctuation">{</span>
+        config<span class="token punctuation">.</span>FreeSpace <span class="token operator">=</span> <span class="token number">0.1</span> <span class="token comment" spellcheck="true">// 10%</span>
+    <span class="token punctuation">}</span>
+    c <span class="token operator">:=</span> <span class="token operator">&amp;</span>cacheStore<span class="token punctuation">{</span>
+        dir<span class="token punctuation">:</span>       dir<span class="token punctuation">,</span>
+        mode<span class="token punctuation">:</span>      config<span class="token punctuation">.</span>CacheMode<span class="token punctuation">,</span>
+        capacity<span class="token punctuation">:</span>  cacheSize<span class="token punctuation">,</span>
+        freeRatio<span class="token punctuation">:</span> config<span class="token punctuation">.</span>FreeSpace<span class="token punctuation">,</span>
+        keys<span class="token punctuation">:</span>      <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span>cacheItem<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        pending<span class="token punctuation">:</span>   <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> pendingFile<span class="token punctuation">,</span> pendingPages<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        pages<span class="token punctuation">:</span>     <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">*</span>Page<span class="token punctuation">)</span><span class="token punctuation">,</span>
+        uploader<span class="token punctuation">:</span>  uploader<span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+    c<span class="token punctuation">.</span><span class="token function">createDir</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>dir<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 获取当前剩余空间和文件数量</span>
+    br<span class="token punctuation">,</span> fr <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">curFreeRatio</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> br <span class="token operator">&lt;</span> c<span class="token punctuation">.</span>freeRatio <span class="token operator">||</span> fr <span class="token operator">&lt;</span> c<span class="token punctuation">.</span>freeRatio <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"not enough space (%d%%) or inodes (%d%%) for caching in %s: free ratio should be >= %d%%"</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>br<span class="token operator">*</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>fr<span class="token operator">*</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">,</span> c<span class="token punctuation">.</span>dir<span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>freeRatio<span class="token operator">*</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    logger<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"Disk cache (%s): capacity (%d MB), free ratio (%d%%), max pending pages (%d)"</span><span class="token punctuation">,</span> c<span class="token punctuation">.</span>dir<span class="token punctuation">,</span> c<span class="token punctuation">.</span>capacity<span class="token operator">>></span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>freeRatio<span class="token operator">*</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">,</span> pendingPages<span class="token punctuation">)</span>
+    <span class="token keyword">go</span> c<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">go</span> c<span class="token punctuation">.</span><span class="token function">checkFreeSpace</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">go</span> c<span class="token punctuation">.</span><span class="token function">refreshCacheKeys</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">go</span> c<span class="token punctuation">.</span><span class="token function">scanStaging</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> c
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="cacheStore-createDir"><a href="#cacheStore-createDir" class="headerlink" title="cacheStore.createDir"></a>cacheStore.createDir</h4><ol>
 <li>当前目录不存在时创建，且修改其权限为限创建者查看</li>
 <li>当前目录存在但权限不符合时，修改其权限</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">// 创建磁盘缓存目录
-func (cache *cacheStore) createDir(dir string) {
-    // who can read the cache, should be able to access the directories and add new file.
-    readmode := cache.mode & 0444
-    mode := cache.mode | (readmode >> 2) | (readmode >> 1)
-    if st, err := os.Stat(dir); os.IsNotExist(err) {
-        // 不存在缓存目录则创建
-        if filepath.Dir(dir) != dir {
-            cache.createDir(filepath.Dir(dir))
-        }
-        _ = os.Mkdir(dir, mode)
-        // umask may remove some permisssions
-        // 修改成限创建者访问权限
-        _ = os.Chmod(dir, mode)
-    } else if strings.HasPrefix(dir, cache.dir) && err == nil && st.Mode() != mode {
-        // 存在缓存目录但目录权限不是限创建者访问 则 修改权限
-        changeMode(dir, st, mode)
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 创建磁盘缓存目录</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>cache <span class="token operator">*</span>cacheStore<span class="token punctuation">)</span> <span class="token function">createDir</span><span class="token punctuation">(</span>dir <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// who can read the cache, should be able to access the directories and add new file.</span>
+    readmode <span class="token operator">:=</span> cache<span class="token punctuation">.</span>mode <span class="token operator">&amp;</span> <span class="token number">0444</span>
+    mode <span class="token operator">:=</span> cache<span class="token punctuation">.</span>mode <span class="token operator">|</span> <span class="token punctuation">(</span>readmode <span class="token operator">>></span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span>readmode <span class="token operator">>></span> <span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> st<span class="token punctuation">,</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">Stat</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span> os<span class="token punctuation">.</span><span class="token function">IsNotExist</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 不存在缓存目录则创建</span>
+        <span class="token keyword">if</span> filepath<span class="token punctuation">.</span><span class="token function">Dir</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span> <span class="token operator">!=</span> dir <span class="token punctuation">{</span>
+            cache<span class="token punctuation">.</span><span class="token function">createDir</span><span class="token punctuation">(</span>filepath<span class="token punctuation">.</span><span class="token function">Dir</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        <span class="token boolean">_</span> <span class="token operator">=</span> os<span class="token punctuation">.</span><span class="token function">Mkdir</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> mode<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">// umask may remove some permisssions</span>
+        <span class="token comment" spellcheck="true">// 修改成限创建者访问权限</span>
+        <span class="token boolean">_</span> <span class="token operator">=</span> os<span class="token punctuation">.</span><span class="token function">Chmod</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> mode<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> strings<span class="token punctuation">.</span><span class="token function">HasPrefix</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> cache<span class="token punctuation">.</span>dir<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> st<span class="token punctuation">.</span><span class="token function">Mode</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> mode <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 存在缓存目录但目录权限不是限创建者访问 则 修改权限</span>
+        <span class="token function">changeMode</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> st<span class="token punctuation">,</span> mode<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h3 id="磁盘缓存详解"><a href="#磁盘缓存详解" class="headerlink" title="磁盘缓存详解"></a>磁盘缓存详解</h3><h4 id="（1）写时缓存数据"><a href="#（1）写时缓存数据" class="headerlink" title="（1）写时缓存数据"></a>（1）写时缓存数据</h4><p>写缓存时，只缓存小于4MB的内容</p>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *wChunk) syncUpload(key string, block *Page) {
-    /* 非关键代码 */
-    if blen < c.store.conf.BlockSize {
-        // 缓存到jfsCache文件目录中
-        // block will be freed after written into disk
-        c.store.bcache.cache(key, block, false)
-    }
-    /* 非关键代码 */
-}
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>wChunk<span class="token punctuation">)</span> <span class="token function">syncUpload</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">,</span> block <span class="token operator">*</span>Page<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 非关键代码 */</span>
+    <span class="token keyword">if</span> blen <span class="token operator">&lt;</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 缓存到jfsCache文件目录中</span>
+        <span class="token comment" spellcheck="true">// block will be freed after written into disk</span>
+        c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>bcache<span class="token punctuation">.</span><span class="token function">cache</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> block<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">/* 非关键代码 */</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="（2）读时缓存数据"><a href="#（2）读时缓存数据" class="headerlink" title="（2）读时缓存数据"></a>（2）读时缓存数据</h4><p>读时会缓存对象的所有内容，但是如果第一次缓存失败但强制缓存未开启则不会再缓存</p>
-<h5 id="cachedStore-load"><a href="#cachedStore-load" class="headerlink" title="cachedStore.load"></a>cachedStore.load</h5><pre class=" language-lang-go"><code class="language-lang-go">func (store *cachedStore) load(key string, page *Page, cache bool, forceCache bool) (err error) {
-    /* 非关键代码 */
-    if cache {
-        //调用缓存方法，将page中内容缓存起来
-        store.bcache.cache(key, page, forceCache)
-    }
-    return nil
-}
+<h5 id="cachedStore-load"><a href="#cachedStore-load" class="headerlink" title="cachedStore.load"></a>cachedStore.load</h5><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>store <span class="token operator">*</span>cachedStore<span class="token punctuation">)</span> <span class="token function">load</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">,</span> page <span class="token operator">*</span>Page<span class="token punctuation">,</span> cache <span class="token builtin">bool</span><span class="token punctuation">,</span> forceCache <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 非关键代码 */</span>
+    <span class="token keyword">if</span> cache <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//调用缓存方法，将page中内容缓存起来</span>
+        store<span class="token punctuation">.</span>bcache<span class="token punctuation">.</span><span class="token function">cache</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> page<span class="token punctuation">,</span> forceCache<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h5 id="cacheStore-cache"><a href="#cacheStore-cache" class="headerlink" title="cacheStore.cache"></a>cacheStore.cache</h5><pre class=" language-lang-go"><code class="language-lang-go">func (cache *cacheStore) cache(key string, p *Page, force bool) {
-    /* 非关键代码 */
-    select {
-        //通过管道传输需要缓存的数据
-    case cache.pending <- pendingFile{key, p}:
-    default:
-        if force {
-            cache.Unlock()
-            cache.pending <- pendingFile{key, p}
-            cache.Lock()
-        } else {
-            // does not have enough bandwidth to write it into disk, discard it
-            logger.Debugf("Caching queue is full (%s), drop %s (%d bytes)", cache.dir, key, len(p.Data))
-            cacheDrops.Add(1)
-            delete(cache.pages, key)
-            atomic.AddInt64(&cache.totalPages, -int64(cap(p.Data)))
-            p.Release()
-        }
-    }
-}
+<h5 id="cacheStore-cache"><a href="#cacheStore-cache" class="headerlink" title="cacheStore.cache"></a>cacheStore.cache</h5><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>cache <span class="token operator">*</span>cacheStore<span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">,</span> p <span class="token operator">*</span>Page<span class="token punctuation">,</span> force <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 非关键代码 */</span>
+    <span class="token keyword">select</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//通过管道传输需要缓存的数据</span>
+    <span class="token keyword">case</span> cache<span class="token punctuation">.</span>pending <span class="token operator">&lt;-</span> pendingFile<span class="token punctuation">{</span>key<span class="token punctuation">,</span> p<span class="token punctuation">}</span><span class="token punctuation">:</span>
+    <span class="token keyword">default</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> force <span class="token punctuation">{</span>
+            cache<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            cache<span class="token punctuation">.</span>pending <span class="token operator">&lt;-</span> pendingFile<span class="token punctuation">{</span>key<span class="token punctuation">,</span> p<span class="token punctuation">}</span>
+            cache<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// does not have enough bandwidth to write it into disk, discard it</span>
+            logger<span class="token punctuation">.</span><span class="token function">Debugf</span><span class="token punctuation">(</span><span class="token string">"Caching queue is full (%s), drop %s (%d bytes)"</span><span class="token punctuation">,</span> cache<span class="token punctuation">.</span>dir<span class="token punctuation">,</span> key<span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>Data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            cacheDrops<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token function">delete</span><span class="token punctuation">(</span>cache<span class="token punctuation">.</span>pages<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+            atomic<span class="token punctuation">.</span><span class="token function">AddInt64</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>cache<span class="token punctuation">.</span>totalPages<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token function">int64</span><span class="token punctuation">(</span><span class="token function">cap</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>Data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            p<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h5 id="cacheStore-flush"><a href="#cacheStore-flush" class="headerlink" title="cacheStore.flush"></a>cacheStore.flush</h5><p>线程循环执行本方法，读取管道传输来的pending数据</p>
-<pre class=" language-lang-go"><code class="language-lang-go">// 读取和写入时缓存数据的核心方法
-func (cache *cacheStore) flush() {
-    for {
-        w := <-cache.pending
-        path := cache.cachePath(w.key)
-        // 写入缓存中
-        if cache.capacity > 0 && cache.flushPage(path, w.page.Data) == nil {
-            //更新写入缓存中的size
-            cache.add(w.key, int32(len(w.page.Data)), uint32(time.Now().Unix()))
-        }
-        cache.Lock()
-        //删除pages中的内容
-        delete(cache.pages, w.key)
-        atomic.AddInt64(&cache.totalPages, -int64(cap(w.page.Data)))
-        cache.Unlock()
-        w.page.Release()
-    }
-}
+<pre class=" language-go"><code class="language-go"><span class="token comment" spellcheck="true">// 读取和写入时缓存数据的核心方法</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>cache <span class="token operator">*</span>cacheStore<span class="token punctuation">)</span> <span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">{</span>
+        w <span class="token operator">:=</span> <span class="token operator">&lt;-</span>cache<span class="token punctuation">.</span>pending
+        path <span class="token operator">:=</span> cache<span class="token punctuation">.</span><span class="token function">cachePath</span><span class="token punctuation">(</span>w<span class="token punctuation">.</span>key<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">// 写入缓存中</span>
+        <span class="token keyword">if</span> cache<span class="token punctuation">.</span>capacity <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> cache<span class="token punctuation">.</span><span class="token function">flushPage</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> w<span class="token punctuation">.</span>page<span class="token punctuation">.</span>Data<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//更新写入缓存中的size</span>
+            cache<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>w<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token function">int32</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>w<span class="token punctuation">.</span>page<span class="token punctuation">.</span>Data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uint32</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Unix</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        cache<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">//删除pages中的内容</span>
+        <span class="token function">delete</span><span class="token punctuation">(</span>cache<span class="token punctuation">.</span>pages<span class="token punctuation">,</span> w<span class="token punctuation">.</span>key<span class="token punctuation">)</span>
+        atomic<span class="token punctuation">.</span><span class="token function">AddInt64</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>cache<span class="token punctuation">.</span>totalPages<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token function">int64</span><span class="token punctuation">(</span><span class="token function">cap</span><span class="token punctuation">(</span>w<span class="token punctuation">.</span>page<span class="token punctuation">.</span>Data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        cache<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        w<span class="token punctuation">.</span>page<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h5 id="cacheStore-flushPage"><a href="#cacheStore-flushPage" class="headerlink" title="cacheStore.flushPage"></a>cacheStore.flushPage</h5><ol>
 <li>创建临时文件</li>
@@ -701,67 +703,67 @@ func (cache *cacheStore) flush() {
 <li>将临时文件改名为真实文件</li>
 <li>删除临时文件（幂等）</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func (cache *cacheStore) flushPage(path string, data []byte) (err error) {
-    start := time.Now()
-    cacheWrites.Add(1)
-    cacheWriteBytes.Add(float64(len(data)))
-    defer func() {
-        cacheWriteHist.Observe(time.Since(start).Seconds())
-    }()
-    cache.createDir(filepath.Dir(path))
-    tmp := path + ".tmp"
-    f, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE, cache.mode)
-    if err != nil {
-        logger.Warnf("Can't create cache file %s: %s", tmp, err)
-        return err
-    }
-    defer func() {
-        if err != nil {
-            _ = os.Remove(tmp)
-        }
-    }()
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>cache <span class="token operator">*</span>cacheStore<span class="token punctuation">)</span> <span class="token function">flushPage</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    start <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cacheWrites<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    cacheWriteBytes<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token function">float64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        cacheWriteHist<span class="token punctuation">.</span><span class="token function">Observe</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>start<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Seconds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cache<span class="token punctuation">.</span><span class="token function">createDir</span><span class="token punctuation">(</span>filepath<span class="token punctuation">.</span><span class="token function">Dir</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    tmp <span class="token operator">:=</span> path <span class="token operator">+</span> <span class="token string">".tmp"</span>
+    f<span class="token punctuation">,</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">OpenFile</span><span class="token punctuation">(</span>tmp<span class="token punctuation">,</span> os<span class="token punctuation">.</span>O_WRONLY<span class="token operator">|</span>os<span class="token punctuation">.</span>O_CREATE<span class="token punctuation">,</span> cache<span class="token punctuation">.</span>mode<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"Can't create cache file %s: %s"</span><span class="token punctuation">,</span> tmp<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> err
+    <span class="token punctuation">}</span>
+    <span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            <span class="token boolean">_</span> <span class="token operator">=</span> os<span class="token punctuation">.</span><span class="token function">Remove</span><span class="token punctuation">(</span>tmp<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
-    if _, err = f.Write(data); err != nil {
-        logger.Warnf("Write to cache file %s failed: %s", tmp, err)
-        _ = f.Close()
-        return
-    }
-    if err = f.Close(); err != nil {
-        logger.Warnf("Close cache file %s failed: %s", tmp, err)
-        return
-    }
-    if err = os.Rename(tmp, path); err != nil {
-        logger.Warnf("Rename cache file %s -> %s failed: %s", tmp, path, err)
-    }
-    return
-}
+    <span class="token keyword">if</span> <span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> f<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"Write to cache file %s failed: %s"</span><span class="token punctuation">,</span> tmp<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+        <span class="token boolean">_</span> <span class="token operator">=</span> f<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> err <span class="token operator">=</span> f<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"Close cache file %s failed: %s"</span><span class="token punctuation">,</span> tmp<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> err <span class="token operator">=</span> os<span class="token punctuation">.</span><span class="token function">Rename</span><span class="token punctuation">(</span>tmp<span class="token punctuation">,</span> path<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"Rename cache file %s -> %s failed: %s"</span><span class="token punctuation">,</span> tmp<span class="token punctuation">,</span> path<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="（3）写时删除缓存数据"><a href="#（3）写时删除缓存数据" class="headerlink" title="（3）写时删除缓存数据"></a>（3）写时删除缓存数据</h4><p>对文件内容重新保存结束时，会调用删除方法将之前文件删除（包括文件缓存）</p>
-<h5 id="main-jfs-init"><a href="#main-jfs-init" class="headerlink" title="main.jfs_init"></a>main.jfs_init</h5><pre class=" language-lang-go"><code class="language-lang-go">func jfs_init(cname, jsonConf, user, group, superuser, supergroup *C.char) uintptr {
-    //监听调用本msg的方法
-    m.OnMsg(meta.DeleteChunk, func(args ...interface{}) error {
-            chunkid := args[0].(uint64)
-            length := args[1].(uint32)
-            return store.Remove(chunkid, int(length))
-        })
-}
+<h5 id="main-jfs-init"><a href="#main-jfs-init" class="headerlink" title="main.jfs_init"></a>main.jfs_init</h5><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">jfs_init</span><span class="token punctuation">(</span>cname<span class="token punctuation">,</span> jsonConf<span class="token punctuation">,</span> user<span class="token punctuation">,</span> group<span class="token punctuation">,</span> superuser<span class="token punctuation">,</span> supergroup <span class="token operator">*</span>C<span class="token punctuation">.</span>char<span class="token punctuation">)</span> <span class="token builtin">uintptr</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//监听调用本msg的方法</span>
+    m<span class="token punctuation">.</span><span class="token function">OnMsg</span><span class="token punctuation">(</span>meta<span class="token punctuation">.</span>DeleteChunk<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span>args <span class="token operator">...</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+            chunkid <span class="token operator">:=</span> args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">uint64</span><span class="token punctuation">)</span>
+            length <span class="token operator">:=</span> args<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">uint32</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> store<span class="token punctuation">.</span><span class="token function">Remove</span><span class="token punctuation">(</span>chunkid<span class="token punctuation">,</span> <span class="token function">int</span><span class="token punctuation">(</span>length<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h5 id="baseMeta-deleteSlice"><a href="#baseMeta-deleteSlice" class="headerlink" title="baseMeta.deleteSlice"></a>baseMeta.deleteSlice</h5><pre class=" language-lang-go"><code class="language-lang-go">func (m *baseMeta) deleteSlice(chunkid uint64, size uint32) {
-    /* 非关键代码 */
-   err := m.newMsg(DeleteChunk, chunkid, size)
-    /* 非关键代码 */
-}
+<h5 id="baseMeta-deleteSlice"><a href="#baseMeta-deleteSlice" class="headerlink" title="baseMeta.deleteSlice"></a>baseMeta.deleteSlice</h5><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">deleteSlice</span><span class="token punctuation">(</span>chunkid <span class="token builtin">uint64</span><span class="token punctuation">,</span> size <span class="token builtin">uint32</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 非关键代码 */</span>
+   err <span class="token operator">:=</span> m<span class="token punctuation">.</span><span class="token function">newMsg</span><span class="token punctuation">(</span>DeleteChunk<span class="token punctuation">,</span> chunkid<span class="token punctuation">,</span> size<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">/* 非关键代码 */</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<h5 id="baseMeta-nesMsg"><a href="#baseMeta-nesMsg" class="headerlink" title="baseMeta.nesMsg"></a>baseMeta.nesMsg</h5><pre class=" language-lang-go"><code class="language-lang-go">func (r *baseMeta) newMsg(mid uint32, args ...interface{}) error {
-    r.msgCallbacks.Lock()
-    cb, ok := r.msgCallbacks.callbacks[mid]
-    r.msgCallbacks.Unlock()
-    if ok {
-        // 调用具体方法
-        return cb(args...)
-    }
-    return fmt.Errorf("message %d is not supported", mid)
-}
+<h5 id="baseMeta-nesMsg"><a href="#baseMeta-nesMsg" class="headerlink" title="baseMeta.nesMsg"></a>baseMeta.nesMsg</h5><pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>baseMeta<span class="token punctuation">)</span> <span class="token function">newMsg</span><span class="token punctuation">(</span>mid <span class="token builtin">uint32</span><span class="token punctuation">,</span> args <span class="token operator">...</span><span class="token keyword">interface</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+    r<span class="token punctuation">.</span>msgCallbacks<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cb<span class="token punctuation">,</span> ok <span class="token operator">:=</span> r<span class="token punctuation">.</span>msgCallbacks<span class="token punctuation">.</span>callbacks<span class="token punctuation">[</span>mid<span class="token punctuation">]</span>
+    r<span class="token punctuation">.</span>msgCallbacks<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> ok <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 调用具体方法</span>
+        <span class="token keyword">return</span> <span class="token function">cb</span><span class="token punctuation">(</span>args<span class="token operator">...</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"message %d is not supported"</span><span class="token punctuation">,</span> mid<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h5 id="rChunk-Remove"><a href="#rChunk-Remove" class="headerlink" title="rChunk.Remove"></a>rChunk.Remove</h5><ol>
 <li>校验是否有block</li>
@@ -770,31 +772,31 @@ func (cache *cacheStore) flush() {
 <li>先删除本地缓存</li>
 <li>如果有远端的数据则删除远端的数据</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *rChunk) Remove() error {
-   if c.length == 0 {
-      // no block
-      return nil
-   }
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">Remove</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+   <span class="token keyword">if</span> c<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// no block</span>
+      <span class="token keyword">return</span> <span class="token boolean">nil</span>
+   <span class="token punctuation">}</span>
 
-   lastIndx := (c.length - 1) / c.store.conf.BlockSize
-   var err error
-   for i := 0; i <= lastIndx; i++ {
-      // there could be multiple clients try to remove the same chunk in the same time,
-      // any of them should succeed if any blocks is removed
-      key := c.key(i)
-      c.store.pendingMutex.Lock()
-       // 删除pedning中本次待删除key
-      delete(c.store.pendingKeys, key)
-      c.store.pendingMutex.Unlock()
-       // 删除本地缓存
-       c.store.bcache.remove(key)
-       // 删除远端的数据
-       if e := c.delete(i); e != nil {
-           err = e
-       }
-   }
-   return err
-}
+   lastIndx <span class="token operator">:=</span> <span class="token punctuation">(</span>c<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize
+   <span class="token keyword">var</span> err <span class="token builtin">error</span>
+   <span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> lastIndx<span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// there could be multiple clients try to remove the same chunk in the same time,</span>
+      <span class="token comment" spellcheck="true">// any of them should succeed if any blocks is removed</span>
+      key <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">key</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+      c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>pendingMutex<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+       <span class="token comment" spellcheck="true">// 删除pedning中本次待删除key</span>
+      <span class="token function">delete</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>pendingKeys<span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+      c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>pendingMutex<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+       <span class="token comment" spellcheck="true">// 删除本地缓存</span>
+       c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>bcache<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+       <span class="token comment" spellcheck="true">// 删除远端的数据</span>
+       <span class="token keyword">if</span> e <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">delete</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span> e <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+           err <span class="token operator">=</span> e
+       <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span>
+   <span class="token keyword">return</span> err
+<span class="token punctuation">}</span>
 </code></pre>
 <h4 id="（4）读时加载缓存数据"><a href="#（4）读时加载缓存数据" class="headerlink" title="（4）读时加载缓存数据"></a>（4）读时加载缓存数据</h4><ol>
 <li>indx：寻找off所在的Block，boff：在具体Block中的哪个位置开始写入</li>
@@ -802,134 +804,134 @@ func (cache *cacheStore) flush() {
 <li>如果需要获取数据大于Block剩余的数据，则需要对下一个Block进行获取</li>
 <li>如果缓存中有目标数据则获取，没有需要进入磁盘获取</li>
 </ol>
-<pre class=" language-lang-go"><code class="language-lang-go">func (c *rChunk) ReadAt(ctx context.Context, page *Page, off int) (n int, err error) {
-    p := page.Data
-    if len(p) == 0 {
-        return 0, nil
-    }
-    if off >= c.length {
-        return 0, io.EOF
-    }
-    // off处于第几个Block
-    indx := c.index(off)
-    // 第indx个Block的开始索引
-    boff := off % c.store.conf.BlockSize
-    // 目前需要读取的block大小
-    blockSize := c.blockSize(indx)
-    //logger.Warnf("off:%d indx:%d boff:%d blcokSize:%d len(p):%d", off, indx, boff, blockSize, len(p))
-    if boff+len(p) > blockSize {
-        // read beyond currend page
-        var got int
-        logger.Warnf("boff:%d len(p):%d blockSize:%d got:%d", boff, len(p), blockSize, got)
-        for got < len(p) {
-            // aligned to current page
-            l := utils.Min(len(p)-got, c.blockSize(c.index(off))-off%c.store.conf.BlockSize)
-            //logger.Warnf("got:%d l:%d", got, l)
-            pp := page.Slice(got, l)
-            n, err = c.ReadAt(ctx, pp, off)
-            pp.Release()
-            if err != nil {
-                return got + n, err
-            }
-            if n == 0 {
-                return got, io.EOF
-            }
-            got += n
-            off += n
-            logger.Warnf("got:%d off:%d n:%d", got, off, n)
-        }
-        return got, nil
-    }
+<pre class=" language-go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>rChunk<span class="token punctuation">)</span> <span class="token function">ReadAt</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> page <span class="token operator">*</span>Page<span class="token punctuation">,</span> off <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> err <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    p <span class="token operator">:=</span> page<span class="token punctuation">.</span>Data
+    <span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> off <span class="token operator">>=</span> c<span class="token punctuation">.</span>length <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> io<span class="token punctuation">.</span>EOF
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// off处于第几个Block</span>
+    indx <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">index</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">// 第indx个Block的开始索引</span>
+    boff <span class="token operator">:=</span> off <span class="token operator">%</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize
+    <span class="token comment" spellcheck="true">// 目前需要读取的block大小</span>
+    blockSize <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">blockSize</span><span class="token punctuation">(</span>indx<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">//logger.Warnf("off:%d indx:%d boff:%d blcokSize:%d len(p):%d", off, indx, boff, blockSize, len(p))</span>
+    <span class="token keyword">if</span> boff<span class="token operator">+</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">></span> blockSize <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// read beyond currend page</span>
+        <span class="token keyword">var</span> got <span class="token builtin">int</span>
+        logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"boff:%d len(p):%d blockSize:%d got:%d"</span><span class="token punctuation">,</span> boff<span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">,</span> blockSize<span class="token punctuation">,</span> got<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> got <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// aligned to current page</span>
+            l <span class="token operator">:=</span> utils<span class="token punctuation">.</span><span class="token function">Min</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token operator">-</span>got<span class="token punctuation">,</span> c<span class="token punctuation">.</span><span class="token function">blockSize</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span><span class="token function">index</span><span class="token punctuation">(</span>off<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span>off<span class="token operator">%</span>c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>BlockSize<span class="token punctuation">)</span>
+            <span class="token comment" spellcheck="true">//logger.Warnf("got:%d l:%d", got, l)</span>
+            pp <span class="token operator">:=</span> page<span class="token punctuation">.</span><span class="token function">Slice</span><span class="token punctuation">(</span>got<span class="token punctuation">,</span> l<span class="token punctuation">)</span>
+            n<span class="token punctuation">,</span> err <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">ReadAt</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> pp<span class="token punctuation">,</span> off<span class="token punctuation">)</span>
+            pp<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> got <span class="token operator">+</span> n<span class="token punctuation">,</span> err
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> n <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> got<span class="token punctuation">,</span> io<span class="token punctuation">.</span>EOF
+            <span class="token punctuation">}</span>
+            got <span class="token operator">+=</span> n
+            off <span class="token operator">+=</span> n
+            logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"got:%d off:%d n:%d"</span><span class="token punctuation">,</span> got<span class="token punctuation">,</span> off<span class="token punctuation">,</span> n<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> got<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+    <span class="token punctuation">}</span>
 
-    key := c.key(indx)
-    if c.store.conf.CacheSize > 0 {
-        start := time.Now()
-        r, err := c.store.bcache.load(key)
-        // 查看缓存中是否有，没有则不会直接读取
-        if err == nil {
-            // 缓存中没有则需要去磁盘获取
-            n, err = r.ReadAt(p, int64(boff))
-            _ = r.Close()
-            if err == nil {
-                cacheHits.Add(1)
-                cacheHitBytes.Add(float64(n))
-                cacheReadHist.Observe(time.Since(start).Seconds())
-                return n, nil
-            }
-            if f, ok := r.(*os.File); ok {
-                logger.Warnf("remove partial cached block %s: %d %s", f.Name(), n, err)
-                _ = os.Remove(f.Name())
-            }
-        }
-    }
+    key <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">key</span><span class="token punctuation">(</span>indx<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>CacheSize <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">{</span>
+        start <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        r<span class="token punctuation">,</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>bcache<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true">// 查看缓存中是否有，没有则不会直接读取</span>
+        <span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 缓存中没有则需要去磁盘获取</span>
+            n<span class="token punctuation">,</span> err <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">ReadAt</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span>boff<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token boolean">_</span> <span class="token operator">=</span> r<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+                cacheHits<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+                cacheHitBytes<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token function">float64</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                cacheReadHist<span class="token punctuation">.</span><span class="token function">Observe</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>start<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Seconds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span> n<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> f<span class="token punctuation">,</span> ok <span class="token operator">:=</span> r<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>os<span class="token punctuation">.</span>File<span class="token punctuation">)</span><span class="token punctuation">;</span> ok <span class="token punctuation">{</span>
+                logger<span class="token punctuation">.</span><span class="token function">Warnf</span><span class="token punctuation">(</span><span class="token string">"remove partial cached block %s: %d %s"</span><span class="token punctuation">,</span> f<span class="token punctuation">.</span><span class="token function">Name</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> n<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+                <span class="token boolean">_</span> <span class="token operator">=</span> os<span class="token punctuation">.</span><span class="token function">Remove</span><span class="token punctuation">(</span>f<span class="token punctuation">.</span><span class="token function">Name</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    cacheMiss.Add(1)
-    cacheMissBytes.Add(float64(len(p)))
+    cacheMiss<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    cacheMissBytes<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token function">float64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 
-    if c.store.seekable && boff > 0 && len(p) <= blockSize/4 {
-        if c.store.downLimit != nil {
-            c.store.downLimit.Wait(int64(len(p)))
-        }
-        // partial read
-        st := time.Now()
-        in, err := c.store.storage.Get(key, int64(boff), int64(len(p)))
-        if err == nil {
-            n, err = io.ReadFull(in, p)
-            _ = in.Close()
-        }
-        used := time.Since(st)
-        logger.Debugf("GET %s RANGE(%d,%d) (%s, %.3fs)", key, boff, len(p), err, used.Seconds())
-        if used > SlowRequest {
-            logger.Infof("slow request: GET %s (%v, %.3fs)", key, err, used.Seconds())
-        }
-        objectDataBytes.WithLabelValues("GET").Add(float64(n))
-        objectReqsHistogram.WithLabelValues("GET").Observe(used.Seconds())
-        c.store.fetcher.fetch(key)
-        if err == nil {
-            return n, nil
-        } else {
-            objectReqErrors.Add(1)
-        }
-    }
+    <span class="token keyword">if</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>seekable <span class="token operator">&amp;&amp;</span> boff <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">&lt;=</span> blockSize<span class="token operator">/</span><span class="token number">4</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>downLimit <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>downLimit<span class="token punctuation">.</span><span class="token function">Wait</span><span class="token punctuation">(</span><span class="token function">int64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// partial read</span>
+        st <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        in<span class="token punctuation">,</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>storage<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span>boff<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            n<span class="token punctuation">,</span> err <span class="token operator">=</span> io<span class="token punctuation">.</span><span class="token function">ReadFull</span><span class="token punctuation">(</span>in<span class="token punctuation">,</span> p<span class="token punctuation">)</span>
+            <span class="token boolean">_</span> <span class="token operator">=</span> in<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        used <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Since</span><span class="token punctuation">(</span>st<span class="token punctuation">)</span>
+        logger<span class="token punctuation">.</span><span class="token function">Debugf</span><span class="token punctuation">(</span><span class="token string">"GET %s RANGE(%d,%d) (%s, %.3fs)"</span><span class="token punctuation">,</span> key<span class="token punctuation">,</span> boff<span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">,</span> err<span class="token punctuation">,</span> used<span class="token punctuation">.</span><span class="token function">Seconds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> used <span class="token operator">></span> SlowRequest <span class="token punctuation">{</span>
+            logger<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"slow request: GET %s (%v, %.3fs)"</span><span class="token punctuation">,</span> key<span class="token punctuation">,</span> err<span class="token punctuation">,</span> used<span class="token punctuation">.</span><span class="token function">Seconds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        objectDataBytes<span class="token punctuation">.</span><span class="token function">WithLabelValues</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token function">float64</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        objectReqsHistogram<span class="token punctuation">.</span><span class="token function">WithLabelValues</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Observe</span><span class="token punctuation">(</span>used<span class="token punctuation">.</span><span class="token function">Seconds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>fetcher<span class="token punctuation">.</span><span class="token function">fetch</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> err <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> n<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            objectReqErrors<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
 
-    block, err := c.store.group.Execute(key, func() (*Page, error) {
-        tmp := page
-        if boff > 0 || len(p) < blockSize {
-            tmp = NewOffPage(blockSize)
-        } else {
-            tmp.Acquire()
-        }
-        tmp.Acquire()
-        err := utils.WithTimeout(func() error {
-            defer tmp.Release()
-            return c.store.load(key, tmp, c.store.shouldCache(blockSize), false)
-        }, c.store.conf.GetTimeout)
-        return tmp, err
-    })
-    defer block.Release()
-    if err != nil {
-        return 0, err
-    }
-    if block != page {
-        copy(p, block.Data[boff:])
-    }
-    return len(p), nil
-}
+    block<span class="token punctuation">,</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>group<span class="token punctuation">.</span><span class="token function">Execute</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>Page<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        tmp <span class="token operator">:=</span> page
+        <span class="token keyword">if</span> boff <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">||</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span> <span class="token operator">&lt;</span> blockSize <span class="token punctuation">{</span>
+            tmp <span class="token operator">=</span> <span class="token function">NewOffPage</span><span class="token punctuation">(</span>blockSize<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            tmp<span class="token punctuation">.</span><span class="token function">Acquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+        tmp<span class="token punctuation">.</span><span class="token function">Acquire</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        err <span class="token operator">:=</span> utils<span class="token punctuation">.</span><span class="token function">WithTimeout</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">{</span>
+            <span class="token keyword">defer</span> tmp<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> tmp<span class="token punctuation">,</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span><span class="token function">shouldCache</span><span class="token punctuation">(</span>blockSize<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> c<span class="token punctuation">.</span>store<span class="token punctuation">.</span>conf<span class="token punctuation">.</span>GetTimeout<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> tmp<span class="token punctuation">,</span> err
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">defer</span> block<span class="token punctuation">.</span><span class="token function">Release</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> block <span class="token operator">!=</span> page <span class="token punctuation">{</span>
+        <span class="token function">copy</span><span class="token punctuation">(</span>p<span class="token punctuation">,</span> block<span class="token punctuation">.</span>Data<span class="token punctuation">[</span>boff<span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token function">len</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">}</span>
 </code></pre>
 <h2 id="内存缓存"><a href="#内存缓存" class="headerlink" title="内存缓存"></a>内存缓存</h2><blockquote>
 <p>以下所述只对Ubuntu系统适用</p>
 </blockquote>
-<p>在Ubuntu系统中，/dev/shm是一个可像操作磁盘一样操作内存的空间，此目录默认是内存的一半大小。<a target="_blank" rel="noopener" href="https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html">学习/dev/shm</a>。</p>
+<p>在Ubuntu系统中，&#x2F;dev&#x2F;shm是一个可像操作磁盘一样操作内存的空间，此目录默认是内存的一半大小。<a target="_blank" rel="noopener" href="https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html">学习&#x2F;dev&#x2F;shm</a>。</p>
 <h3 id="设置内存缓存"><a href="#设置内存缓存" class="headerlink" title="设置内存缓存"></a>设置内存缓存</h3><p>通过如下命令则可以将数据缓存设置在内存中。</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">mount localhost /opt/jfs/mount --cache-dir /dev/shm/jfscache
+<pre class=" language-sh"><code class="language-sh">mount localhost /opt/jfs/mount --cache-dir /dev/shm/jfscache
 </code></pre>
 <p>可以看到内存缓存和磁盘缓存肉眼可见的区别在于文件夹的大小，磁盘缓存默认4KB，而内存缓存则尽量精简</p>
-<p><img src="/2022/06/08/JuiceFS%20Cache/内存缓存目录结构.png" alt="内存缓存目录结构" style="zoom: 80%;"></p>
-<p>使用df命令查看tmpfs类型的文件系统</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">df -Th | grep tmpfs
-</code></pre>
-<p><img src="/2022/06/08/JuiceFS%20Cache/df命令.png" alt="df命令" style="zoom: 80%;"></p>
+<img src="/2022/06/08/JuiceFS%20Cache/内存缓存目录结构.png" alt="内存缓存目录结构" style="zoom: 80%;">
 
+<p>使用df命令查看tmpfs类型的文件系统</p>
+<pre class=" language-sh"><code class="language-sh">df -Th | grep tmpfs
+</code></pre>
+<img src="/2022/06/08/JuiceFS%20Cache/df命令.png" alt="df命令" style="zoom: 80%;">
                 
             </div>
             <hr/>
@@ -1745,7 +1747,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">25.5k</span>
+                        class="white-color">38.1k</span>
             
             
             
