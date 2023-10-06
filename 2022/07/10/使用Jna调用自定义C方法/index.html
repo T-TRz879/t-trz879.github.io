@@ -12,9 +12,9 @@ Clion C++开发
 Idea Java开发
 
 自定义C方法C代码结构
-
 library.c#include &#34;library.h&#34;
-#include &amp;l">
+#include 
+vo">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -482,7 +482,7 @@ library.c#include &#34;library.h&#34;
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    152
+                    149
                 </div>
                 
 
@@ -510,41 +510,38 @@ library.c#include &#34;library.h&#34;
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
-<li>OpenJDK8 <a target="_blank" rel="noopener" href="https://www.azul.com/downloads/?version=java-8-lts&os=macos&architecture=arm-64-bit&package=jdk">Zulu Java8</a></li>
+<li>OpenJDK8 <a target="_blank" rel="noopener" href="https://www.azul.com/downloads/?version=java-8-lts&amp;os=macos&amp;architecture=arm-64-bit&amp;package=jdk">Zulu Java8</a></li>
 <li>gcc (Mac OS X自带的)</li>
 <li>Clion <a target="_blank" rel="noopener" href="https://www.jetbrains.com/clion/">C++开发</a></li>
 <li>Idea <a target="_blank" rel="noopener" href="https://www.jetbrains.com/idea/">Java开发</a></li>
 </ul>
-<h2 id="自定义C方法"><a href="#自定义C方法" class="headerlink" title="自定义C方法"></a>自定义C方法</h2><h3 id="C代码结构"><a href="#C代码结构" class="headerlink" title="C代码结构"></a>C代码结构</h3><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710193653210.png" alt="C代码结构" style="zoom:50%;">
-
-<h3 id="library-c"><a href="#library-c" class="headerlink" title="library.c"></a>library.c</h3><pre class=" language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"library.h"</span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token keyword">void</span> <span class="token function">hello</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Hello, World!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h2 id="自定义C方法"><a href="#自定义C方法" class="headerlink" title="自定义C方法"></a>自定义C方法</h2><h3 id="C代码结构"><a href="#C代码结构" class="headerlink" title="C代码结构"></a>C代码结构</h3><p><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710193653210.png" alt="C代码结构" style="zoom:50%;"></p>
+<h3 id="library-c"><a href="#library-c" class="headerlink" title="library.c"></a>library.c</h3><pre class=" language-lang-c"><code class="language-lang-c">#include "library.h"
+#include <stdio.h>
+void hello(void) {
+  printf("Hello, World!\n");
+}
 </code></pre>
-<h3 id="编译生成dylib"><a href="#编译生成dylib" class="headerlink" title="编译生成dylib"></a>编译生成dylib</h3><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710193752071.png" alt="image-20220710193752071" style="zoom:50%;">
-
-<h2 id="Java调用方法"><a href="#Java调用方法" class="headerlink" title="Java调用方法"></a>Java调用方法</h2><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710194240971.png" alt="Java代码结构" style="zoom:50%;">
-
-<h3 id="IDemo接口"><a href="#IDemo接口" class="headerlink" title="IDemo接口"></a>IDemo接口</h3><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 必须继承Library</span>
-<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">IDemo</span> <span class="token keyword">extends</span> <span class="token class-name">Library</span> <span class="token punctuation">{</span>
-  <span class="token comment" spellcheck="true">// test_dll是指生成的dylib文件名「不含前缀和后缀」</span>
-  <span class="token comment" spellcheck="true">// I_DEMO 用于给其他调用的对象</span>
-  IDemo I_DEMO <span class="token operator">=</span> <span class="token punctuation">(</span>IDemo<span class="token punctuation">)</span> Native<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span><span class="token string">"test_dll"</span><span class="token punctuation">,</span> IDemo<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">void</span> <span class="token function">hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<h3 id="编译生成dylib"><a href="#编译生成dylib" class="headerlink" title="编译生成dylib"></a>编译生成dylib</h3><p><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710193752071.png" alt="image-20220710193752071" style="zoom:50%;"></p>
+<h2 id="Java调用方法"><a href="#Java调用方法" class="headerlink" title="Java调用方法"></a>Java调用方法</h2><p><img src="/2022/07/10/%E4%BD%BF%E7%94%A8Jna%E8%B0%83%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89C%E6%96%B9%E6%B3%95/image-20220710194240971.png" alt="Java代码结构" style="zoom:50%;"></p>
+<h3 id="IDemo接口"><a href="#IDemo接口" class="headerlink" title="IDemo接口"></a>IDemo接口</h3><pre class=" language-lang-java"><code class="language-lang-java">// 必须继承Library
+public interface IDemo extends Library {
+  // test_dll是指生成的dylib文件名「不含前缀和后缀」
+  // I_DEMO 用于给其他调用的对象
+  IDemo I_DEMO = (IDemo) Native.load("test_dll", IDemo.class);
+  void hello();
+}
 </code></pre>
-<h3 id="demo方法"><a href="#demo方法" class="headerlink" title="demo方法"></a>demo方法</h3><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">demo</span> <span class="token punctuation">{</span>
-  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">// dylib文件的目录</span>
-    File file <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token string">"resources/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    String absolutePath <span class="token operator">=</span> file<span class="token punctuation">.</span><span class="token function">getAbsolutePath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">// 设置当前需要去哪里找dylib</span>
-    System<span class="token punctuation">.</span><span class="token function">setProperty</span><span class="token punctuation">(</span><span class="token string">"jna.library.path"</span><span class="token punctuation">,</span> absolutePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    IDemo<span class="token punctuation">.</span>I_DEMO<span class="token punctuation">.</span><span class="token function">hello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<h3 id="demo方法"><a href="#demo方法" class="headerlink" title="demo方法"></a>demo方法</h3><pre class=" language-lang-java"><code class="language-lang-java">public class demo {
+  public static void main(String[] args) {
+    // dylib文件的目录
+    File file = new File("resources/");
+    String absolutePath = file.getAbsolutePath();
+    // 设置当前需要去哪里找dylib
+    System.setProperty("jna.library.path", absolutePath);
+    IDemo.I_DEMO.hello();
+  }
+}
 </code></pre>
 
                 
@@ -1354,7 +1351,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.1k</span>
+                        class="white-color">25.5k</span>
             
             
             
@@ -1597,22 +1594,6 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 

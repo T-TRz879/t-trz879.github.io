@@ -369,7 +369,7 @@
                     <div class="post-statis col l4 hide-on-med-and-down" data-aos="zoom-in-right">
                         
 <div class="statis">
-    <span class="count"><a href="/">22</a></span>
+    <span class="count"><a href="/">24</a></span>
     <span class="name">文章</span>
 </div>
 
@@ -383,7 +383,7 @@
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">35</a></span>
+    <span class="count"><a href="/tags">36</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -399,7 +399,7 @@
                                 <div class="post-statis hide-on-large-only" data-aos="zoom-in-right">
                                     
 <div class="statis">
-    <span class="count"><a href="/">22</a></span>
+    <span class="count"><a href="/">24</a></span>
     <span class="name">文章</span>
 </div>
 
@@ -413,7 +413,7 @@
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">35</a></span>
+    <span class="count"><a href="/tags">36</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -557,7 +557,7 @@
                 name: '文章篇数',
                 type: 'line',
                 color: ['#6772e5'],
-                data: [0,0,0,0,0,0,0,0,5,5,1,1,0],
+                data: [0,0,0,0,0,0,0,0,5,5,1,1,2],
                 markPoint: {
                     symbolSize: 45,
                     color: ['#fa755a','#3ecf8e','#82d3f4'],
@@ -599,7 +599,7 @@
                 type: 'pie',
                 radius: '50%',
                 color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
-                data: [{"name":"BUG分析","value":1},{"name":"Go","value":1},{"name":"Java","value":2},{"name":"JuiceFS","value":8},{"name":"TCP","value":2},{"name":"Linux","value":4},{"name":"Nginx","value":1},{"name":"造轮子","value":1},{"name":"计划","value":1},{"name":"Homebrew","value":1}],
+                data: [{"name":"Java","value":3},{"name":"Go","value":1},{"name":"BUG分析","value":1},{"name":"JuiceFS","value":8},{"name":"Linux","value":4},{"name":"TCP","value":2},{"name":"Nginx","value":1},{"name":"造轮子","value":1},{"name":"Homebrew","value":1},{"name":"计划","value":1}],
                 itemStyle: {
                     emphasis: {
                         shadowBlur: 10,
@@ -623,7 +623,7 @@
         xAxis: [
             {
                 type: 'category',
-                data: ["Go","分布式文件系统","POSIX","Permissions","对象存储","TCP","IO流","语法注意点","线程池","多线程"]
+                data: ["Go","分布式文件系统","POSIX","Permissions","AQS","语法注意点","对象存储","TCP","IO流","线程池"]
             }
         ],
         yAxis: [
@@ -806,6 +806,18 @@
         <div class="tag-chips center-align">
             
             
+            <a href="/tags/AQS/">
+                <span class="chip center-align waves-effect waves-light chip-default">AQS</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E8%AF%AD%E6%B3%95%E6%B3%A8%E6%84%8F%E7%82%B9/">
+                <span class="chip center-align waves-effect waves-light chip-default">语法注意点</span>
+            </a>
+            
+            
+            
             <a href="/tags/%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/">
                 <span class="chip center-align waves-effect waves-light chip-default">对象存储</span>
             </a>
@@ -820,12 +832,6 @@
             
             <a href="/tags/IO%E6%B5%81/">
                 <span class="chip center-align waves-effect waves-light chip-default">IO流</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E8%AF%AD%E6%B3%95%E6%B3%A8%E6%84%8F%E7%82%B9/">
-                <span class="chip center-align waves-effect waves-light chip-default">语法注意点</span>
             </a>
             
             
@@ -872,8 +878,68 @@
             
             
             
+            <a href="/tags/Read/">
+                <span class="chip center-align waves-effect waves-light chip-default">Read</span>
+            </a>
+            
+            
+            
             <a href="/tags/Write/">
                 <span class="chip center-align waves-effect waves-light chip-default">Write</span>
+            </a>
+            
+            
+            
+            <a href="/tags/OSS/">
+                <span class="chip center-align waves-effect waves-light chip-default">OSS</span>
+            </a>
+            
+            
+            
+            <a href="/tags/SSH/">
+                <span class="chip center-align waves-effect waves-light chip-default">SSH</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E4%BC%A0%E8%BE%93%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+                <span class="chip center-align waves-effect waves-light chip-default">传输层协议</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E7%B2%98%E5%8C%85/">
+                <span class="chip center-align waves-effect waves-light chip-default">粘包</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E4%BC%A0%E8%BE%93/">
+                <span class="chip center-align waves-effect waves-light chip-default">网络传输</span>
+            </a>
+            
+            
+            
+            <a href="/tags/Health-Check/">
+                <span class="chip center-align waves-effect waves-light chip-default">Health-Check</span>
+            </a>
+            
+            
+            
+            <a href="/tags/Debug/">
+                <span class="chip center-align waves-effect waves-light chip-default">Debug</span>
+            </a>
+            
+            
+            
+            <a href="/tags/POSIX/">
+                <span class="chip center-align waves-effect waves-light chip-default">POSIX</span>
+            </a>
+            
+            
+            
+            <a href="/tags/Permissions/">
+                <span class="chip center-align waves-effect waves-light chip-default">Permissions</span>
             </a>
             
             
@@ -896,66 +962,6 @@
             
             
             
-            <a href="/tags/Read/">
-                <span class="chip center-align waves-effect waves-light chip-default">Read</span>
-            </a>
-            
-            
-            
-            <a href="/tags/Debug/">
-                <span class="chip center-align waves-effect waves-light chip-default">Debug</span>
-            </a>
-            
-            
-            
-            <a href="/tags/OSS/">
-                <span class="chip center-align waves-effect waves-light chip-default">OSS</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E7%B2%98%E5%8C%85/">
-                <span class="chip center-align waves-effect waves-light chip-default">粘包</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E7%BD%91%E7%BB%9C%E4%BC%A0%E8%BE%93/">
-                <span class="chip center-align waves-effect waves-light chip-default">网络传输</span>
-            </a>
-            
-            
-            
-            <a href="/tags/POSIX/">
-                <span class="chip center-align waves-effect waves-light chip-default">POSIX</span>
-            </a>
-            
-            
-            
-            <a href="/tags/Permissions/">
-                <span class="chip center-align waves-effect waves-light chip-default">Permissions</span>
-            </a>
-            
-            
-            
-            <a href="/tags/Health-Check/">
-                <span class="chip center-align waves-effect waves-light chip-default">Health-Check</span>
-            </a>
-            
-            
-            
-            <a href="/tags/Attr%E7%BC%93%E5%AD%98/">
-                <span class="chip center-align waves-effect waves-light chip-default">Attr缓存</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E4%BC%A0%E8%BE%93%E5%B1%82%E5%8D%8F%E8%AE%AE/">
-                <span class="chip center-align waves-effect waves-light chip-default">传输层协议</span>
-            </a>
-            
-            
-            
             <a href="/tags/Linux/">
                 <span class="chip center-align waves-effect waves-light chip-default">Linux</span>
             </a>
@@ -968,20 +974,20 @@
             
             
             
-            <a href="/tags/open-2/">
-                <span class="chip center-align waves-effect waves-light chip-default">open(2)</span>
+            <a href="/tags/Mac/">
+                <span class="chip center-align waves-effect waves-light chip-default">Mac</span>
             </a>
             
             
             
-            <a href="/tags/file-descriptor/">
-                <span class="chip center-align waves-effect waves-light chip-default">file descriptor</span>
+            <a href="/tags/%E4%B8%8B%E8%BD%BD%E6%BA%90/">
+                <span class="chip center-align waves-effect waves-light chip-default">下载源</span>
             </a>
             
             
             
-            <a href="/tags/SSH/">
-                <span class="chip center-align waves-effect waves-light chip-default">SSH</span>
+            <a href="/tags/Attr%E7%BC%93%E5%AD%98/">
+                <span class="chip center-align waves-effect waves-light chip-default">Attr缓存</span>
             </a>
             
             
@@ -992,14 +998,14 @@
             
             
             
-            <a href="/tags/Mac/">
-                <span class="chip center-align waves-effect waves-light chip-default">Mac</span>
+            <a href="/tags/open-2/">
+                <span class="chip center-align waves-effect waves-light chip-default">open(2)</span>
             </a>
             
             
             
-            <a href="/tags/%E4%B8%8B%E8%BD%BD%E6%BA%90/">
-                <span class="chip center-align waves-effect waves-light chip-default">下载源</span>
+            <a href="/tags/file-descriptor/">
+                <span class="chip center-align waves-effect waves-light chip-default">file descriptor</span>
             </a>
             
             
@@ -1145,7 +1151,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.1k</span>
+                        class="white-color">25.5k</span>
             
             
             
@@ -1388,22 +1394,6 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 
