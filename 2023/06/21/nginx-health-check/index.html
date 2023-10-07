@@ -471,7 +471,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    489
+                    493
                 </div>
                 
 
@@ -501,7 +501,7 @@
                 <h2 id="1-下载nginx"><a href="#1-下载nginx" class="headerlink" title="1.下载nginx"></a>1.下载nginx</h2><p>从<a target="_blank" rel="noopener" href="https://nginx.org/en/download.html">nginx官方下载地址</a>中下载nginx，本次实验中采用<a target="_blank" rel="noopener" href="https://nginx.org/download/nginx-1.24.0.tar.gz">nginx-1.24.0</a>。</p>
 <h2 id="2-下载nginx-upstream-check-module"><a href="#2-下载nginx-upstream-check-module" class="headerlink" title="2.下载nginx_upstream_check_module"></a>2.下载nginx_upstream_check_module</h2><p>下载<a target="_blank" rel="noopener" href="https://github.com/yaoweibin/nginx_upstream_check_module/releases/tag/v0.4.0">第三方模块nginx_upstream_check_module</a>。</p>
 <p>根据模块方的提示，需要根据nginx的版本来选择不同的模块版本。</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">    If you use nginx-1.2.1 or nginx-1.3.0, the nginx upstream round robin
+<pre class=" language-sh"><code class="language-sh">    If you use nginx-1.2.1 or nginx-1.3.0, the nginx upstream round robin
     module changed greatly. You should use the patch named
     'check_1.2.1.patch'.
 
@@ -514,14 +514,15 @@
     If you use nginx-1.5.12+, You should use the patch named
     'check_1.5.12+.patch'.
 </code></pre>
-<h2 id="3-安装依赖包"><a href="#3-安装依赖包" class="headerlink" title="3.安装依赖包"></a>3.安装依赖包</h2><pre class=" language-lang-sh"><code class="language-lang-sh"># ubuntu
+<h2 id="3-安装依赖包"><a href="#3-安装依赖包" class="headerlink" title="3.安装依赖包"></a>3.安装依赖包</h2><pre class=" language-sh"><code class="language-sh"># ubuntu
 sudo apt install -y patch pcre pcre-devel zlib zlib-devel
 # centos
 sudo yum install -y patch pcre pcre-devel zlib zlib-devel
 </code></pre>
 <h2 id="4-配置health-check"><a href="#4-配置health-check" class="headerlink" title="4.配置health-check"></a>4.配置health-check</h2><p>将nginx和第三方模块放在如下目录中。</p>
-<p><img src="/2023/06/21/nginx-health-check/image-20230619141023600.png" alt="nginx和第三方模块" style="zoom:100%;"></p>
-<pre class=" language-lang-sh"><code class="language-lang-sh"># 进nginx目录
+<img src="/2023/06/21/nginx-health-check/image-20230619141023600.png" alt="nginx和第三方模块" style="zoom:100%;">
+
+<pre class=" language-sh"><code class="language-sh"># 进nginx目录
 cd /root/soft/nginx/nginx-1.24.0
 
 # check_1.20.1+.patch的全路径
@@ -534,7 +535,8 @@ make
 sudo make install
 </code></pre>
 <p>验证nginx安装情况</p>
-<p><img src="/2023/06/21/nginx-health-check/image-20230619143647685.png" alt="nginx的位置"></p>
+<img src="/2023/06/21/nginx-health-check/image-20230619143647685.png" alt="nginx的位置">
+
 <p>配置check-health</p>
 <pre><code># nginx配置文件在/usr/local/nginx/conf/nginx.conf中
 upstream backend &#123;
@@ -554,31 +556,35 @@ upstream backend &#123;
             proxy_pass http://backend;
         &#125;
     &#125;
-</code></pre><p>nginx常用命令：</p>
+</code></pre>
+<p>nginx常用命令：</p>
 <ul>
 <li><p>启动nginx：</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">sudo /usr/local/nginx/sbin/nginx
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx
 </code></pre>
 </li>
 <li><p>停止nginx：</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">sudo /usr/local/nginx/sbin/nginx -s stop
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -s stop
 </code></pre>
 </li>
 <li><p>重载配置：</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">sudo /usr/local/nginx/sbin/nginx -s reload
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -s reload
 </code></pre>
 </li>
 <li><p>检测配置语法：</p>
-<pre class=" language-lang-sh"><code class="language-lang-sh">sudo /usr/local/nginx/sbin/nginx -t
+<pre class=" language-sh"><code class="language-sh">sudo /usr/local/nginx/sbin/nginx -t
 </code></pre>
 </li>
 </ul>
-<h2 id="5-测试"><a href="#5-测试" class="headerlink" title="5.测试"></a>5.测试</h2><p>查看nginx日志（日志位于/usr/local/nginx/logs中）判断是否正常check-health</p>
-<p><img src="/2023/06/21/nginx-health-check/image-20230619144910788.png" alt="查看nginx日志"></p>
+<h2 id="5-测试"><a href="#5-测试" class="headerlink" title="5.测试"></a>5.测试</h2><p>查看nginx日志（日志位于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;logs中）判断是否正常check-health</p>
+<img src="/2023/06/21/nginx-health-check/image-20230619144910788.png" alt="查看nginx日志">
+
 <p>停掉10.0.16.18:8300后</p>
-<p><img src="/2023/06/21/nginx-health-check/image-20230619145238621.png" alt="关闭一个server后"></p>
+<img src="/2023/06/21/nginx-health-check/image-20230619145238621.png" alt="关闭一个server后">
+
 <p>重启10.0.16.18:8300后server恢复正常，check-health也检测到服务正常</p>
-<p><img src="/2023/06/21/nginx-health-check/image-20230619145645735.png" alt="重启server后"></p>
+<img src="/2023/06/21/nginx-health-check/image-20230619145645735.png" alt="重启server后">
+
 
                 
             </div>
@@ -1379,7 +1385,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">25.5k</span>
+                        class="white-color">38.2k</span>
             
             
             

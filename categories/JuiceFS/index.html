@@ -376,20 +376,20 @@
                 </a>
                 
                 
-                <a href="/categories/Go/" title="Go: 1">
+                <a href="/categories/Java/" title="Java: 3">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #F5EEF8;">Go
-                        <span class="tag-length">1</span>
+                            style="background-color: #F5EEF8;">Java
+                        <span class="tag-length">3</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/Java/" title="Java: 3">
+                <a href="/categories/Go/" title="Go: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #D5F5E3;">Java
-                        <span class="tag-length">3</span>
+                            style="background-color: #D5F5E3;">Go
+                        <span class="tag-length">1</span>
                     </span>
                 </a>
                 
@@ -412,20 +412,20 @@
                 </a>
                 
                 
-                <a href="/categories/Nginx/" title="Nginx: 1">
+                <a href="/categories/TCP/" title="TCP: 2">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #F8F9F9;">Nginx
-                        <span class="tag-length">1</span>
+                            style="background-color: #F8F9F9;">TCP
+                        <span class="tag-length">2</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/TCP/" title="TCP: 2">
+                <a href="/categories/Nginx/" title="Nginx: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #82E0AA;">TCP
-                        <span class="tag-length">2</span>
+                            style="background-color: #82E0AA;">Nginx
+                        <span class="tag-length">1</span>
                     </span>
                 </a>
                 
@@ -439,19 +439,19 @@
                 </a>
                 
                 
-                <a href="/categories/%E8%AE%A1%E5%88%92/" title="计划: 1">
+                <a href="/categories/Homebrew/" title="Homebrew: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #A3E4D7;">计划
+                            style="background-color: #A3E4D7;">Homebrew
                         <span class="tag-length">1</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/Homebrew/" title="Homebrew: 1">
+                <a href="/categories/%E8%AE%A1%E5%88%92/" title="计划: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #85C1E9;">Homebrew
+                            style="background-color: #85C1E9;">计划
                         <span class="tag-length">1</span>
                     </span>
                 </a>
@@ -585,7 +585,7 @@ type openfiles struct {
                         <div class="summary block-with-text">
                             
                                 JuiceFS目前使用三种方式存储元数据，分别是Redis、TIKV和SQL。接下来分别介绍Juicefs存储元数据的三种方式。
-打开文件缓存JuiceFS提供在打开文件/文件夹时将属性和Slice进行缓存，方便在下一次访问时，直接获取属性
+打开文件缓存JuiceFS提供在打开文件&#x2F;文件夹时将属性和Slice进行缓存，方便在下一次访问时，直
                             
                         </div>
                         <div class="publish-info">
@@ -696,7 +696,7 @@ type openfiles struct {
                                 JuiceFS支持读缓存和写缓存，默认的缓存为磁盘缓存，如果你对存储效率要求更高则可开启内存缓存。官网文档可见JuiceFS缓存介绍
 磁盘缓存缓存位置如果不指定磁盘缓存路径，则不同操作系统缓存路径如下：
 
-Linux：/var/jfsCac
+Linux：&#x2F;var&#
                             
                         </div>
                         <div class="publish-info">
@@ -723,12 +723,12 @@ Linux：/var/jfsCac
                             <span class="chip bg-color">Go</span>
                         </a>
                         
-                        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
-                            <span class="chip bg-color">分布式文件系统</span>
-                        </a>
-                        
                         <a href="/tags/Cache/">
                             <span class="chip bg-color">Cache</span>
+                        </a>
+                        
+                        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
+                            <span class="chip bg-color">分布式文件系统</span>
                         </a>
                         
                     </div>
@@ -750,10 +750,11 @@ Linux：/var/jfsCac
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                前置环境MacFuse​    由于 macOS 默认不支持 FUSE 接口，需要先安装 macFUSE 实现对 FUSE 的支持。将其安装完成后，按照如下步骤进行配置。
-​    系统提示需要关机，点击关机即可
+                                前置环境MacFuse​	由于 macOS 默认不支持 FUSE 接口，需要先安装 macFUSE 实现对 FUSE 的支持。将其安装完成后，按照如下步骤进行配置。
+​	系统提示需要关机，点击关机即可
 
-​    电脑完全关机后
+
+​	电脑完全关机后，一直按住开机键
                             
                         </div>
                         <div class="publish-info">
@@ -807,7 +808,7 @@ Linux：/var/jfsCac
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                Read相关类和接口​    一个dataReader中有由Inode为key的fileReader Map结构；每一个fileReader中记录着当前file的最开始的sliceReader（一开始的sliceReader会随着读取的往后
+                                Read相关类和接口​	一个dataReader中有由Inode为key的fileReader Map结构；每一个fileReader中记录着当前file的最开始的sliceReader（一开始的sliceReader会随着读取的往后推进而
                             
                         </div>
                         <div class="publish-info">
@@ -834,12 +835,12 @@ Linux：/var/jfsCac
                             <span class="chip bg-color">Go</span>
                         </a>
                         
-                        <a href="/tags/Read/">
-                            <span class="chip bg-color">Read</span>
-                        </a>
-                        
                         <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
                             <span class="chip bg-color">分布式文件系统</span>
+                        </a>
+                        
+                        <a href="/tags/Read/">
+                            <span class="chip bg-color">Read</span>
                         </a>
                         
                     </div>
@@ -861,7 +862,7 @@ Linux：/var/jfsCac
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                Write相关类和接口​    最顶层是一个DataWriter，它维护着一个由文件Inode为key，fileWriter为value的map集合，这样可以更好的管理所有的文件。​    每个fileWriter中都会有一个chuks，其
+                                Write相关类和接口​	最顶层是一个DataWriter，它维护着一个由文件Inode为key，fileWriter为value的map集合，这样可以更好的管理所有的文件。​	每个fileWriter中都会有一个chuks，其是由Chun
                             
                         </div>
                         <div class="publish-info">
@@ -978,7 +979,7 @@ Linux：/var/jfsCac
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">25.5k</span>
+                        class="white-color">38.2k</span>
             
             
             
