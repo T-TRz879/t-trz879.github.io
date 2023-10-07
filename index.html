@@ -656,9 +656,9 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                1 使用线程池的好处官网解释：减少频繁创建和销毁线程，提高CPU利用率；提供管理线程、统计任务执行次数、批量执行任务和批量执行任务时配置超时时间等额外功能
+                                1.使用线程池的好处官网解释：减少频繁创建和销毁线程，提高CPU利用率；提供管理线程、统计任务执行次数、批量执行任务和批量执行任务时配置超时时间等额外功能
 
-2 线程池的七大参数public ThreadPoolExecutor(int c
+2.线程池的七大参数public ThreadPoolExecutor(int c
                             
                         </div>
                         <div class="publish-info">
@@ -1533,6 +1533,22 @@ $(function () {
     
     <script src="/libs/instantpage/instantpage.js" type="module"></script>
     
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
 </body>
 
