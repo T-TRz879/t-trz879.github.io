@@ -476,7 +476,7 @@ type newNode struct {
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    505
+                    501
                 </div>
                 
 
@@ -503,39 +503,39 @@ type newNode struct {
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="一、for-range中赋值"><a href="#一、for-range中赋值" class="headerlink" title="一、for-range中赋值"></a>一、for-range中赋值</h2><pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> node <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token builtin">string</span>
-    version <span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+                <h2 id="一、for-range中赋值"><a href="#一、for-range中赋值" class="headerlink" title="一、for-range中赋值"></a>一、for-range中赋值</h2><pre class=" language-lang-go"><code class="language-lang-go">type node struct {
+    key     string
+    version string
+}
 
-<span class="token keyword">type</span> newNode <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token operator">*</span><span class="token builtin">string</span>
-    version <span class="token operator">*</span><span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+type newNode struct {
+    key     *string
+    version *string
+}
 
-<span class="token keyword">func</span> <span class="token function">TestRange</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    arr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>node<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
-    arr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"11"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"2"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"22"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"3"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"33"</span><span class="token punctuation">}</span>
+func TestRange(t *testing.T) {
+    arr := make([]node, 3)
+    arr[0] = node{key: "1", version: "11"}
+    arr[1] = node{key: "2", version: "22"}
+    arr[2] = node{key: "3", version: "33"}
 
-    newArr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>newNode<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+    newArr := make([]newNode, 3)
 
-    <span class="token keyword">for</span> i<span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> arr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s \n"</span><span class="token punctuation">,</span> n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-        newArr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> newNode<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token operator">&amp;</span>n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token operator">&amp;</span>n<span class="token punctuation">.</span>version<span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+    for i, n := range arr {
+        fmt.Printf("key:%s version:%s \n", n.key, n.version)
+        newArr[i] = newNode{key: &n.key, version: &n.version}
+    }
 
-    <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> newArr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-<span class="token comment" spellcheck="true">// key:1 version:11 </span>
-<span class="token comment" spellcheck="true">// key:2 version:22 </span>
-<span class="token comment" spellcheck="true">// key:3 version:33 </span>
-<span class="token comment" spellcheck="true">// key:3 version:33</span>
-<span class="token comment" spellcheck="true">// key:3 version:33</span>
-<span class="token comment" spellcheck="true">// key:3 version:33</span>
+    for _, n := range newArr {
+        fmt.Printf("key:%s version:%s\n", *n.key, *n.version)
+    }
+}
+// key:1 version:11 
+// key:2 version:22 
+// key:3 version:33 
+// key:3 version:33
+// key:3 version:33
+// key:3 version:33
 </code></pre>
 <p>为什么最后三行输出的是最后一个元素的值呢？</p>
 <p>这个陷阱在于在 <code>for</code> 循环中 <code>range</code> 过一个数组或切片，然后试图获取每个元素的地址。在 Go 中，<code>for range</code> 循环的每一次迭代中，变量 <code>n</code> 都会被重用和更新，所以 <code>&amp;n.key</code> 和 <code>&amp;n.version</code> 并不会获取到期望的值。</p>
@@ -543,36 +543,36 @@ type newNode struct {
 <p>这是因为在 <code>for range</code> 循环中，变量 <code>n</code> 在每次迭代时被重用，而不是重新创建。因此，当获取 <code>&amp;n.key</code> 和 <code>&amp;n.version</code> 时，实际上获取的是同一个变量（最后一个 <code>node</code>）的地址。</p>
 <p>为了解决这个问题，可以在循环中创建一个新的变量，将 <code>n.key</code> 和 <code>n.version</code> 的值赋给这个新的变量，然后取这个新变量的地址：</p>
 <p><strong>解决方法：</strong></p>
-<pre class=" language-go"><code class="language-go"><span class="token keyword">type</span> node <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token builtin">string</span>
-    version <span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+<pre class=" language-lang-go"><code class="language-lang-go">type node struct {
+    key     string
+    version string
+}
 
-<span class="token keyword">type</span> newNode <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    key     <span class="token operator">*</span><span class="token builtin">string</span>
-    version <span class="token operator">*</span><span class="token builtin">string</span>
-<span class="token punctuation">}</span>
+type newNode struct {
+    key     *string
+    version *string
+}
 
-<span class="token keyword">func</span> <span class="token function">TestRange</span><span class="token punctuation">(</span>t <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    arr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>node<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
-    arr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"1"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"11"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"2"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"22"</span><span class="token punctuation">}</span>
-    arr<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> node<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token string">"3"</span><span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token string">"33"</span><span class="token punctuation">}</span>
+func TestRange(t *testing.T) {
+    arr := make([]node, 3)
+    arr[0] = node{key: "1", version: "11"}
+    arr[1] = node{key: "2", version: "22"}
+    arr[2] = node{key: "3", version: "33"}
 
-    newArr <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>newNode<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+    newArr := make([]newNode, 3)
 
-    <span class="token keyword">for</span> i<span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> arr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s \n"</span><span class="token punctuation">,</span> n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true">// 进行一次值拷贝，如果这里是一个比较大的结构体，可以使用fori拷贝指针</span>
-        newKey <span class="token operator">:=</span> n<span class="token punctuation">.</span>key
-        newVersion <span class="token operator">:=</span> n<span class="token punctuation">.</span>version
-        newArr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> newNode<span class="token punctuation">{</span>key<span class="token punctuation">:</span> <span class="token operator">&amp;</span>newKey<span class="token punctuation">,</span> version<span class="token punctuation">:</span> <span class="token operator">&amp;</span>newVersion<span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
+    for i, n := range arr {
+        fmt.Printf("key:%s version:%s \n", n.key, n.version)
+    // 进行一次值拷贝，如果这里是一个比较大的结构体，可以使用fori拷贝指针
+        newKey := n.key
+        newVersion := n.version
+        newArr[i] = newNode{key: &newKey, version: &newVersion}
+    }
 
-    <span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> n <span class="token operator">:=</span> <span class="token keyword">range</span> newArr <span class="token punctuation">{</span>
-        fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"key:%s version:%s\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>key<span class="token punctuation">,</span> <span class="token operator">*</span>n<span class="token punctuation">.</span>version<span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+    for _, n := range newArr {
+        fmt.Printf("key:%s version:%s\n", *n.key, *n.version)
+    }
+}
 </code></pre>
 
                 
@@ -1370,7 +1370,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">27.7k</span>
             
             
             
